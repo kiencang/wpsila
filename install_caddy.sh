@@ -32,5 +32,5 @@ sudo ufw allow 443
 sudo ufw reload
 
 echo -e "${GREEN}>>> Cai dat hoan tat! Kiem tra trang thai Caddy:${NC}"
-
 systemctl status caddy --no-pager
+
