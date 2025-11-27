@@ -212,8 +212,12 @@ WP_GROUP="www-data"
 
 # Gán chủ sở hữu: www-data (để PHP có thể ghi file, cài plugin, upload ảnh)
 sudo chown -R $WP_OWNER:$WP_GROUP $WP_ROOT
-# Gán chủ sở hữu thư mục cha
+
+# Gán chủ sở hữu thư mục cha, không đệ quy, không -R
 sudo chown $WP_OWNER:$WP_GROUP $PARENT_DIR
+
+# Đưa caddy vào nhóm của www-data
+sudo usermod -aG www-data caddy
 
 # Chuẩn hóa quyền theo khuyến nghị bảo mật của WordPress:
 # - Thư mục: 755 (rwxr-xr-x)
@@ -223,6 +227,9 @@ sudo find $WP_ROOT -type f -exec chmod 644 {} \;
 
 # Đảm bảo Caddy có thể "đi xuyên qua" thư mục /var/www để đọc file
 sudo chmod +x /var/www
+
+# Khởi động lại để tránh phân quyền bị cache
+sudo systemctl reload php8.3-fpm
 
 # --- HOÀN TẤT ---
 echo -e "${GREEN}=============================================${NC}"
@@ -329,15 +336,15 @@ if grep -q "$MARKER" "$CADDY_FILE" 2>/dev/null; then
 		
 	echo "TIM THAY marker '$MARKER'. Dang noi noi dung vao cuoi file..."
 		
-	# Nối tiếp vào cuối file (Append)
-	echo "$CONTENT" >> "$CADDY_FILE"
+	# Thay thế cho echo >> (Nối thêm)
+	echo "$CONTENT" | sudo tee -a "$CADDY_FILE" > /dev/null
 
 else
 		
 	echo "KHONG TIM THAY marker '$MARKER'. Dang xoa cu va tao file moi..."
 		
-	# Ghi đè file (Overwrite)
-	echo "$CONTENT" > "$CADDY_FILE"
+	# Thay thế cho echo > (Ghi đè)
+	echo "$CONTENT" | sudo tee "$CADDY_FILE" > /dev/null
 
 fi
 
