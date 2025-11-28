@@ -4,7 +4,7 @@
 set -euo pipefail
 
 # Chạy lệnh
-# curl -sL https://raw.githubusercontent.com/kiencang/wpcaddydemo/refs/heads/main/install_caddy.sh | bash
+# curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/install_caddy.sh | bash
 
 # Màu sắc cho thông báo
 GREEN='\033[0;32m'
@@ -215,9 +215,6 @@ sudo chown -R $WP_OWNER:$WP_GROUP $WP_ROOT
 
 # Gán chủ sở hữu thư mục cha, không đệ quy, không -R
 sudo chown $WP_OWNER:$WP_GROUP $PARENT_DIR
-
-# Đưa caddy vào nhóm của www-data, không cần thiết
-# sudo usermod -aG www-data caddy
 
 # Chuẩn hóa quyền theo khuyến nghị bảo mật của WordPress:
 # - Thư mục: 755 (rwxr-xr-x)
