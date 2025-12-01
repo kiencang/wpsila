@@ -365,7 +365,7 @@ $DOMAIN {
         X-Frame-Options "SAMEORIGIN"
         X-XSS-Protection "0"
         Referrer-Policy "strict-origin-when-cross-origin"
-        Permissions-Policy "camera=(), microphone=(), geolocation=(), interest-cohort=()"
+        Permissions-Policy "camera=(), microphone=(), geolocation=(), browsing-topics=()"
         # Strict-Transport-Security "max-age=31536000; includeSubDomains"
         -Server
         -X-Powered-By
@@ -383,27 +383,32 @@ $DOMAIN {
     # Dung immutable vi file anh it khi sua noi dung ma giu nguyen ten
     @media_assets {
         file
-        path *.ico *.gif *.jpg *.jpeg *.png *.svg *.woff *.woff2 *.webp
+        path *.ico *.gif *.jpg *.jpeg *.png *.svg *.woff *.woff2 *.webp *.avif
     }
     header @media_assets Cache-Control "public, max-age=31536000, immutable"
 
     # --- CHAN FILE NHAY CAM (SECURITY BLOCK) ---
     @forbidden {
-        # 1. Block PHP Uploads (Ngan chay PHP trong thu muc uploads cua WP)
-        path /wp-content/uploads/**/*.php
-        
+        # 1. Block PHP Uploads (DUNG REGEX DE CHAN DE QUY)
+        # ^ bắt đầu, .* khớp mọi thứ (kể cả /), \.php$ kết thúc bằng .php
+        path_regexp bad_php ^/wp-content/uploads/.*\.php
+
         # 2. Block System Files & Directories
         path /wp-config.php
         path /.htaccess
-        path /.git*    # Them * de chan ca noi dung ben trong folder .git
-        path *.env     # Chan file .env o bat ky dau
+        path /.git*     # Prefix match: Chặn folder .git và nội dung bên trong
+        path *.env      # Suffix match: Chặn .env ở mọi nơi
         path /readme.html
         path /license.txt
+		
+		# 3. Trừ khi bạn dùng plugin Jetpack hoặc WordPress app mobile, còn không thì nên chặn
+		path /xmlrpc.php
         
-        # 3. Block Backups & Logs (Chan o moi thu muc)
+        # 4. Block Backups & Logs
         path *.sql *.bak *.log *.old
+        path *.zip *.rar *.tar *.7z
     }
-    # Tra ve 404 (Not Found) de hacker khong biet file co ton tai hay khong
+    # Tra ve 404
     respond @forbidden 404
 	
 	# PHP FastCGI (Check lai duong dan socket neu dung OS khac Ubuntu/Debian)
@@ -411,7 +416,7 @@ $DOMAIN {
 
     file_server
 
-    # Tang gioi han upload, can chinh them ơ /etc/php/8.3/fpm/php.ini cho dong bo
+    # Tang gioi han upload, can chinh them /etc/php/8.3/fpm/php.ini cho dong bo
     request_body {
         max_size 50MB
     }
