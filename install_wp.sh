@@ -7,6 +7,13 @@ set -euo pipefail
 # version 0.02.12.25
 # curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/install_wp.sh | bash
 
+# Bắt buộc phải chạy bằng root để cài đặt phần mềm
+if [[ $EUID -ne 0 ]]; then
+   echo -e "${RED}Loi: Ban phai chay script nay bang quyen Root.${NC}"
+   echo -e "Vui long vao terminal voi quyen Root, sau do chay lai lenh."
+   exit 1
+fi
+
 # --- CẤU HÌNH BIẾN NGẪU NHIÊN ---
 # 1. DB Name (Thoải mái độ dài, MySQL cho phép 64 ký tự)
 # Kết quả ví dụ: wp_a1b2c3d4e5f67890
