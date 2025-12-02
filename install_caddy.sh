@@ -391,9 +391,6 @@ $DOMAIN {
     @forbidden {
         # 1. Block PHP Uploads 
 		path /wp-content/uploads/*.php
-		
-		# Regex, mở rộng thêm một số biến thể khác
-		# path_regexp bad_php_uploads `(?i)^/wp-content/uploads/.*\.(php|phtml|phar|php5|shtml)$`
 
         # 2. Block System Files & Directories
         path /wp-config.php
@@ -403,9 +400,6 @@ $DOMAIN {
         path *.env  
         path /readme.html
         path /license.txt
-		
-		# Regex, chặn loạt file readme, license để tránh lộ thông tin phiên bản các plugin
-		# path_regexp info_files `(?i).*/(readme|license|changelog|copyright)\.(txt|html|md)$`
 		
 		# 3. Trừ khi bạn dùng plugin Jetpack hoặc đăng nhập WordPress trên điện thoại, còn không thì nên chặn
 		path /xmlrpc.php
