@@ -389,15 +389,15 @@ $DOMAIN {
 
     # --- CHAN FILE NHAY CAM (SECURITY BLOCK) ---
     @forbidden {
-        # 1. Block PHP Uploads (DUNG REGEX DE CHAN DE QUY)
-        # ^ bắt đầu, .* khớp mọi thứ (kể cả /), \.php$ kết thúc bằng .php
-        path_regexp bad_php ^/wp-content/uploads/.*\.php
+        # 1. Block PHP Uploads 
+		path /wp-content/uploads/*.php 
 
         # 2. Block System Files & Directories
         path /wp-config.php
         path /.htaccess
-        path /.git*     # Prefix match: Chặn folder .git và nội dung bên trong
-        path *.env      # Suffix match: Chặn .env ở mọi nơi
+		path /.git/
+        path /.git/*     
+        path *.env     
         path /readme.html
         path /license.txt
 		
@@ -406,7 +406,7 @@ $DOMAIN {
         
         # 4. Block Backups & Logs
         path *.sql *.bak *.log *.old
-        path *.zip *.rar *.tar *.7z
+        # path *.zip *.rar *.tar *.7z
     }
     # Tra ve 404
     respond @forbidden 404
