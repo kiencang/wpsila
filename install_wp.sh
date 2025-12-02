@@ -7,6 +7,12 @@ set -euo pipefail
 # version 0.02.12.25
 # curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/install_wp.sh | bash
 
+# Màu sắc cho thông báo
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
+NC='\033[0m' # No Color
+
 # Bắt buộc phải chạy bằng root để cài đặt phần mềm
 if [[ $EUID -ne 0 ]]; then
    echo -e "${RED}Loi: Ban phai chay script nay bang quyen Root.${NC}"
