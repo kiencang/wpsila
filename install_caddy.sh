@@ -4,7 +4,7 @@
 set -euo pipefail
 
 # Chạy lệnh
-# version 0.01.12.25
+# version 0.02.12.25
 # curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/install_caddy.sh | bash
 
 # Màu sắc cho thông báo
@@ -389,24 +389,30 @@ $DOMAIN {
 
     # --- CHAN FILE NHAY CAM (SECURITY BLOCK) ---
     @forbidden {
-        # 1. Block PHP Uploads (DUNG REGEX DE CHAN DE QUY)
-        # ^ bắt đầu, .* khớp mọi thứ (kể cả /), \.php$ kết thúc bằng .php
-        path_regexp bad_php ^/wp-content/uploads/.*\.php
+        # 1. Block PHP Uploads 
+		path /wp-content/uploads/*.php
+		
+		# Regex, mở rộng thêm một số biến thể khác
+		path_regexp bad_php_uploads `(?i)^/wp-content/uploads/.*\.(php|phtml|phar|php5|shtml)$`
 
         # 2. Block System Files & Directories
         path /wp-config.php
         path /.htaccess
-        path /.git*     # Prefix match: Chặn folder .git và nội dung bên trong
-        path *.env      # Suffix match: Chặn .env ở mọi nơi
+		path /.git
+        path /.git/* 
+        path *.env  
         path /readme.html
         path /license.txt
 		
-		# 3. Trừ khi bạn dùng plugin Jetpack hoặc WordPress app mobile, còn không thì nên chặn
+		# Regex, chặn loạt file readme, license để tránh lộ thông tin phiên bản các plugin
+		path_regexp info_files `(?i).*/(readme|license|changelog|copyright)\.(txt|html|md)$`
+		
+		# 3. Trừ khi bạn dùng plugin Jetpack hoặc đăng nhập WordPress trên điện thoại, còn không thì nên chặn
 		path /xmlrpc.php
         
         # 4. Block Backups & Logs
         path *.sql *.bak *.log *.old
-        path *.zip *.rar *.tar *.7z
+        # path *.zip *.rar *.tar *.7z
     }
     # Tra ve 404
     respond @forbidden 404
