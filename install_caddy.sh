@@ -4,7 +4,7 @@
 set -euo pipefail
 
 # Chạy lệnh
-# version 0.02.12.25
+# version 0.01.12.25
 # curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/install_caddy.sh | bash
 
 # Màu sắc cho thông báo
@@ -389,15 +389,15 @@ $DOMAIN {
 
     # --- CHAN FILE NHAY CAM (SECURITY BLOCK) ---
     @forbidden {
-        # 1. Block PHP Uploads 
-		path /wp-content/uploads/*.php
+        # 1. Block PHP Uploads (DUNG REGEX DE CHAN DE QUY)
+        # ^ bắt đầu, .* khớp mọi thứ (kể cả /), \.php$ kết thúc bằng .php
+        path_regexp bad_php ^/wp-content/uploads/.*\.php
 
         # 2. Block System Files & Directories
         path /wp-config.php
         path /.htaccess
-		path /.git
-        path /.git/* 
-        path *.env  
+        path /.git*     # Prefix match: Chặn folder .git và nội dung bên trong
+        path *.env      # Suffix match: Chặn .env ở mọi nơi
         path /readme.html
         path /license.txt
 		
@@ -406,7 +406,7 @@ $DOMAIN {
         
         # 4. Block Backups & Logs
         path *.sql *.bak *.log *.old
-        # path *.zip *.rar *.tar *.7z
+        path *.zip *.rar *.tar *.7z
     }
     # Tra ve 404
     respond @forbidden 404
@@ -450,7 +450,7 @@ caddy fmt --overwrite "$CADDY_FILE" > /dev/null 2>&1
 
 # Cấp lại quyền cho user caddy để ghi được log truy cập
 # Phòng lỗi mất quyền và không khởi động lại được caddy bằng systemctl reload caddy
-# sudo chown -R caddy:caddy /var/www/$DOMAIN/logs
+sudo chown -R caddy:caddy /var/www/$DOMAIN/logs
 
 #5. Reload lại Caddy
 sudo systemctl reload caddy
