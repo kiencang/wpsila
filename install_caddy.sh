@@ -448,10 +448,6 @@ echo "Dang kiem tra va reload Caddy..."
 # 4. Format
 caddy fmt --overwrite "$CADDY_FILE" > /dev/null 2>&1
 
-# Cấp lại quyền cho user caddy để ghi được log truy cập
-# Phòng lỗi mất quyền và không khởi động lại được caddy bằng systemctl reload caddy
-# sudo chown -R caddy:caddy /var/www/$DOMAIN/logs
-
 #5. Reload lại Caddy
 sudo systemctl reload caddy
 
