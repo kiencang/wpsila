@@ -322,14 +322,14 @@ EOF
 # 2>/dev/null: Ẩn lỗi nếu file không tồn tại
 if grep -q "$MARKER" "$CADDY_FILE" 2>/dev/null; then
 		
-	echo "TIM THAY marker '$MARKER'. Dang noi noi dung vao cuoi file..."
+	echo "TIM THAY marker '$MARKER'. Dang them cau hinh vao cuoi file Caddyfile..."
 		
 	# Thay thế cho echo >> (Nối thêm)
 	echo "$CONTENT" | sudo tee -a "$CADDY_FILE" > /dev/null
 
 else
 		
-	echo "KHONG TIM THAY marker '$MARKER'. Dang xoa cu va tao file moi..."
+	echo "CAI DAT WORDPRESS lan dau tren Caddy! Dang xoa mac dinh cu va tao file Caddyfile moi..."
 		
 	# Thay thế cho echo > (Ghi đè)
 	echo "$CONTENT" | sudo tee "$CADDY_FILE" > /dev/null
