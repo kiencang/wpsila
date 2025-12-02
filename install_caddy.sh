@@ -395,7 +395,7 @@ $DOMAIN {
         # 2. Block System Files & Directories
         path /wp-config.php
         path /.htaccess
-		path /.git/
+		path /.git
         path /.git/*     
         path *.env   
         path /readme.html
