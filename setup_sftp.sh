@@ -4,10 +4,10 @@
 set -euo pipefail
 
 # ==============================================================================
-# SCRIPT TỰ ĐỘNG TẠO TÀI KHOẢN SFTP CHO CADDY WEB SERVER (OPTIMIZED)
+# SCRIPT TỰ ĐỘNG TẠO TÀI KHOẢN SFTP CHO CADDY WEB SERVER
+# Hỗ trợ chạy trực tiếp qua pipe (curl | bash)
 # ==============================================================================
 
-# Chạy lệnh
 # curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/setup_sftp.sh | bash
 
 # Kiểm tra quyền root
@@ -20,8 +20,10 @@ echo "========================================================"
 echo "   CAU HINH SFTP CHO CADDY WEB SERVER (UBUNTU)"
 echo "========================================================"
 
-# --- 1. NHẬP THÔNG TIN ---
-read -p "Nhap ten mien (VD: example.com): " DOMAIN
+# --- 1. NHẬP THÔNG TIN (Thêm < /dev/tty để đọc từ bàn phím khi chạy qua pipe) ---
+
+# Nhập tên miền
+read -p "Nhap ten mien (VD: example.com): " DOMAIN < /dev/tty
 if [ -z "$DOMAIN" ]; then
     echo "Loi: Ten mien khong duoc de trong."
     exit 1
@@ -34,11 +36,14 @@ if [ ! -d "$WEB_ROOT" ]; then
     exit 1
 fi
 
-read -p "Nhap ten tai khoan SFTP (Mac dinh: webmaster): " SFTP_USER
+# Nhập tên user
+read -p "Nhap ten tai khoan SFTP (Mac dinh: webmaster): " SFTP_USER < /dev/tty
 SFTP_USER=${SFTP_USER:-webmaster}
 
-read -s -p "Nhap mat khau cho $SFTP_USER (De trong se tu tao random): " SFTP_PASS
+# Nhập mật khẩu
+read -s -p "Nhap mat khau cho $SFTP_USER (De trong se tu tao random): " SFTP_PASS < /dev/tty
 echo ""
+
 if [ -z "$SFTP_PASS" ]; then
     # Kiểm tra xem openssl có tồn tại không, nếu không dùng cách khác
     if command -v openssl &> /dev/null; then
@@ -85,7 +90,7 @@ echo "    Da phan quyen xong (775/664/sGID)."
 # --- 4. CẤU HÌNH SSHD ---
 echo "[+] Dang cau hinh SSHD (umask 002)..."
 SSHD_CONFIG="/etc/ssh/sshd_config"
-# Đổi tên file backup để tránh ký tự :
+# Đổi tên file backup an toàn
 BACKUP_SSHD="/etc/ssh/sshd_config.bak.$(date +%F_%H-%M-%S)"
 
 cp "$SSHD_CONFIG" "$BACKUP_SSHD"
@@ -135,7 +140,7 @@ echo "[+] Dang tao shortcut..."
 SHORTCUT_NAME=$(echo "$DOMAIN" | cut -d. -f1)
 USER_HOME="/home/$SFTP_USER"
 
-# Xóa symlink cũ nếu bị hỏng hoặc trỏ sai
+# Xóa symlink cũ nếu tồn tại
 if [ -L "$USER_HOME/$SHORTCUT_NAME" ]; then
     rm "$USER_HOME/$SHORTCUT_NAME"
 fi
