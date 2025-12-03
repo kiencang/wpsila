@@ -103,7 +103,7 @@ echo "--------------------------------------------------------------------------
 # Phần 3: Cài PHP & MariaDB
 # --- BẮT ĐẦU CÀI ĐẶT ---
 # Cài PHP & MariaDB
-echo -e "${GREEN}[1/4] Dang cai dat PHP 8.3 va cac module can thiet...${NC}"
+echo -e "${GREEN}[1/3] Dang cai dat PHP 8.3 va cac module can thiet...${NC}"
 
 # Thêm repository và cài đặt PHP
 sudo apt update
@@ -114,11 +114,11 @@ sudo apt update
 # Cài đặt PHP 8.3 và các extensions
 sudo apt install -y php8.3-fpm php8.3-mysql php8.3-curl php8.3-gd php8.3-mbstring php8.3-xml php8.3-zip php8.3-imagick php8.3-intl php8.3-bcmath
 
-echo -e "${GREEN}[2/4] Dang cai dat MariaDB Server...${NC}"
+echo -e "${GREEN}[2/3] Dang cai dat MariaDB Server...${NC}"
 sudo apt install -y mariadb-server
 
 # --- BẢO MẬT MARIADB (HARDENING) ---
-echo -e "${GREEN}[3/4] Dang thuc hien bao mat MariaDB (Secure Installation)...${NC}"
+echo -e "${GREEN}[3/3] Dang thuc hien bao mat MariaDB (Secure Installation)...${NC}"
 
 # Chạy một khối lệnh SQL để thực hiện các yêu cầu bảo mật:
 # 1. Xóa anonymous users

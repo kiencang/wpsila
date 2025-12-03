@@ -17,7 +17,7 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 # 1. Kiểm tra quyền root
-if [ "$EUID" -ne 0 ]; then
+if [[ $EUID -ne 0 ]]; then
     echo -e "${RED}Loi: Vui long chay script voi quyen root (sudo).${NC}"
     exit 1
 fi

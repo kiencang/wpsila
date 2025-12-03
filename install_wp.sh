@@ -20,21 +20,21 @@ if [[ $EUID -ne 0 ]]; then
    exit 1
 fi
 
+echo -e "${GREEN}Dang tao Database va User cho WordPress...${NC}"
+
 # --- CẤU HÌNH BIẾN NGẪU NHIÊN ---
 # 1. DB Name (Thoải mái độ dài, MySQL cho phép 64 ký tự)
 # Kết quả ví dụ: wp_a1b2c3d4e5f67890
 GEN_DB_NAME="wp_$(openssl rand -hex 8)"
 
 # 2. User Name (Nên giữ <= 16 ký tự để tương thích mọi phiên bản MySQL)
-# Giảm xuống hex 5 (10 ký tự) + "user_" (5 ký tự) = 15 ký tự
-# Kết quả ví dụ: user_a1b2c3d4e5
-GEN_DB_USER="user_$(openssl rand -hex 5)"
+# Giảm xuống hex 7 (14 ký tự) + "u_" (2 ký tự) = 16 ký tự
+# Kết quả ví dụ: u_a1b2c3d4e5f6g7
+GEN_DB_USER="u_$(openssl rand -hex 7)"
 
 # 3. Password (32 ký tự là rất mạnh rồi)
-# Kết quả ví dụ: 890123456789abcdef0123456789abcd
-GEN_DB_PASS=$(openssl rand -hex 16)
-
-echo -e "${GREEN}[4/4] Dang tao Database va User cho WordPress...${NC}"
+# Kết quả ví dụ: p_890123456789abcdef0123456789abcd
+GEN_DB_PASS="p_$(openssl rand -hex 16)"
 
 # Sử dụng biến đã tạo ở trên vào câu lệnh SQL
 # Lưu ý: Vì biến chỉ chứa chữ cái thường và số nên không cần escape phức tạp, rất an toàn.
