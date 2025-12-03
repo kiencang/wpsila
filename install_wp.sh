@@ -185,6 +185,61 @@ sudo tar xzf latest.tar.gz -C /var/www/$DOMAIN/public_html --strip-components=1
 # Dọn dẹp file nén 
 sudo rm -f latest.tar.gz
 
+ # ==================================================================
+ # BỔ SUNG: TỰ ĐỘNG CẤU HÌNH WP-CONFIG VÀ INSTALL DB
+ # ==================================================================
+    echo -e "${GREEN}>>> Dang tu dong cau hinh wp-config.php va Database...${NC}"
+
+    # 1. Cài đặt WP-CLI nếu chưa có
+    if ! [ -x "$(command -v wp)" ]; then
+        echo " -> Dang tai WP-CLI..."
+        sudo curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+        sudo chmod +x wp-cli.phar
+        sudo mv wp-cli.phar /usr/local/bin/wp
+    fi
+
+    # 2. Định nghĩa biến nội bộ cho quá trình cài đặt
+    WP_PATH="/var/www/$DOMAIN/public_html"
+    WP_ADMIN_USER="admin"
+    WP_ADMIN_PASS="p_$(openssl rand -hex 12)" # Tạo pass ngẫu nhiên
+    WP_ADMIN_EMAIL="admin@$DOMAIN"
+
+    # Di chuyển vào thư mục code
+    cd "$WP_PATH" || exit
+
+    # 3. Tạo file wp-config.php từ thông tin DB ở Bước 2
+    # Dùng --allow-root vì script đang chạy quyền sudo
+    wp config create --dbname="$GEN_DB_NAME" \
+                     --dbuser="$GEN_DB_USER" \
+                     --dbpass="$GEN_DB_PASS" \
+                     --dbhost="localhost" \
+                     --allow-root --force
+
+    # 4. Chạy lệnh Install để nạp dữ liệu vào Database
+    echo " -> Dang khoi tao du lieu WordPress..."
+    wp core install --url="https://$DOMAIN" \
+                    --title="Website $DOMAIN" \
+                    --admin_user="$WP_ADMIN_USER" \
+                    --admin_password="$WP_ADMIN_PASS" \
+                    --admin_email="$WP_ADMIN_EMAIL" \
+                    --skip-email \
+                    --allow-root
+
+# 5. Ghi thêm thông tin đăng nhập WP vào file wpp.txt
+cat >> "$CRED_FILE" <<EOF
+----------------------------------------
+WORDPRESS ADMIN INFO
+----------------------------------------
+Login URL  : https://$DOMAIN/wp-admin
+User       : $WP_ADMIN_USER
+Pass       : $WP_ADMIN_PASS
+Email      : $WP_ADMIN_EMAIL
+----------------------------------------
+EOF
+
+echo -e "${GREEN}>>> Da cai dat xong WordPress Core!${NC}"
+# ==================================================================
+
 # --- BƯỚC 4: PHÂN QUYỀN (PERMISSIONS) ---
 echo -e "${GREEN}[5/5] Dang thiet lap quyen han chuan cho WordPress...${NC}"
 
