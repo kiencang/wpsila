@@ -260,6 +260,12 @@ sudo chown $WP_OWNER:$WP_GROUP $PARENT_DIR
 sudo find $WP_ROOT -type d -exec chmod 755 {} \;
 sudo find $WP_ROOT -type f -exec chmod 644 {} \;
 
+# Phân quyền để quản lý chặt file wp-config
+WP_CONFIG="$WP_ROOT/wp-config.php"
+if [ -f "$WP_CONFIG" ]; then
+    sudo chmod 640 $WP_CONFIG
+fi
+
 # Đảm bảo Caddy có thể "đi xuyên qua" thư mục /var/www để đọc file
 sudo chmod +x /var/www
 
