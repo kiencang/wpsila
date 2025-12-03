@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Chạy lệnh
+# bash <(curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/install_wpsila.sh)
+
 # Thư mục cài đặt
 INSTALL_DIR="/opt/wpsila"
 REPO_URL="https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main"
