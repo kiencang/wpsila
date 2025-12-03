@@ -404,5 +404,5 @@ caddy fmt --overwrite "$CADDY_FILE" > /dev/null 2>&1
 #5. Reload lại Caddy
 sudo systemctl reload caddy
 
-echo "${GREEN}Nhap lenh: cat ~/wpp.txt de xem thong tin dang nhap WordPress.${NC}"
+echo "Nhap lenh: cat ~/wpp.txt de xem thong tin dang nhap WordPress."
 echo "Hoan tat! Xin chuc mung ban da cai thanh cong WordPress trên Caddy Web Server."
