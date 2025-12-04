@@ -262,8 +262,22 @@ sudo chown root:www-data $PARENT_DIR
 sudo find $WP_ROOT -type d -exec chmod 2775 {} \;
 sudo find $WP_ROOT -type f -exec chmod 664 {} \;
 
-# Phân quyền để quản lý chặt file wp-config
+# Định nghĩa đường dẫn file config 
 WP_CONFIG="$WP_ROOT/wp-config.php"
+
+# Bổ sung để vượt qua sự khó tính về quyền trong WordPress. Dù phân quyền trên đã ổn.
+# Kiểm tra: Nếu chưa có FS_METHOD thì mới thực hiện
+if ! grep -q "FS_METHOD" "$WP_CONFIG"; then
+    # Dùng lệnh sed để chèn ngay sau thẻ mở <?php
+    # Dấu ^ đảm bảo chỉ tìm <?php ở đầu dòng (tránh nhầm lẫn nếu có trong comment)
+    sudo sed -i "0,/<?php/s/<?php/<?php\n\ndefine( 'FS_METHOD', 'direct' );/" "$WP_CONFIG"
+    
+    echo "Da them cau hinh FS_METHOD: direct"
+else
+    echo "Cau hinh FS_METHOD da ton tai."
+fi
+
+# Phân quyền để quản lý chặt file wp-config
 if [ -f "$WP_CONFIG" ]; then
     sudo chmod 660 $WP_CONFIG
 fi
