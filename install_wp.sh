@@ -4,7 +4,7 @@
 set -euo pipefail
 
 # Chạy lệnh
-# version 0.04.12.25
+# version 0.05.12.25
 # curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/install_wp.sh | bash
 
 # Màu sắc cho thông báo
@@ -247,12 +247,15 @@ echo -e "${GREEN}[5/5] Dang thiet lap quyen han chuan cho WordPress...${NC}"
 WP_ROOT="/var/www/$DOMAIN/public_html"
 PARENT_DIR="/var/www/$DOMAIN"
 
-# Gán Group www-data là chủ sở hữu (để PHP có thể ghi file, cài plugin, upload ảnh)
-# User sở hữu root
-sudo chown -R root:www-data $WP_ROOT
-
 # Gán chủ sở hữu thư mục cha, không đệ quy, không -R
-sudo chown root:www-data $PARENT_DIR
+# Cái này dùng để nhốt user sFTP trong tương lai không leo ra ngoài thư mục web nó có quyền
+# Tức là nó chỉ có quyền trong phạm vi web nó được gán không leo toàn bộ các web trên VPS
+sudo chown root:root $PARENT_DIR
+sudo chmod 755 $PARENT_DIR
+
+# Gán Group www-data là chủ sở hữu (để PHP có thể ghi file, cài plugin, upload ảnh)
+# User sở hữu là root
+sudo chown -R root:www-data $WP_ROOT
 
 # Chuẩn hóa quyền để không mâu thuẫn quyền của nhau sau này khi tạo tài khoản sFTP:
 # - Thư mục: 775 (rwxrwxr-x)
