@@ -7,7 +7,7 @@
 set -euo pipefail
 
 # Chạy lệnh
-# version 0.02.12.25
+# version 0.04.12.25
 # curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/remove_web.sh | bash
 
 # Màu sắc hiển thị
@@ -41,17 +41,20 @@ if [[ "$DOMAIN" != *"."* ]]; then
     exit 1
 fi
 
-# Chặn các đường dẫn hệ thống nguy hiểm
+# Chặn các đường dẫn hệ thống nguy hiểm, mà lệnh xóa có thể gây sụp VPS
 if [[ "$DOMAIN" == "/" ]] || [[ "$DOMAIN" == "." ]] || [[ "$DOMAIN" == ".." ]]; then
     echo -e "${RED}Loi: Ten mien khong hop le.${NC}"
     exit 1
 fi
 
-# Thiết lập đường dẫn
+# Thiết lập đường dẫn, cấu trúc này do phần khởi tạo quy định
+# Do vậy khi xóa phải lấy lại cấu trúc này
 ROOT_DIR="/var/www/$DOMAIN"
+
+# Tìm đến file wp-config.php để lấy thông tin database & user
 CONFIG_FILE="$ROOT_DIR/public_html/wp-config.php"
 
-# 3. Kiểm tra thư mục web
+# 3. Kiểm tra thư mục web có tồn tại hay không?
 if [ ! -d "$ROOT_DIR" ]; then
     echo -e "${RED}Loi: Thu muc $ROOT_DIR khong ton tai. Script se dung lai.${NC}"
     exit 1
@@ -59,33 +62,38 @@ fi
 
 echo -e "${YELLOW}--- Dang quet thong tin website: $DOMAIN ---${NC}"
 
-# 4. Lấy thông tin Database (Verified Regex Method)
+# 4. Lấy thông tin Database (Sử dụng WP-CLI - Reliable Method)
 DB_NAME=""
 DB_USER=""
+WP_PATH="$ROOT_DIR/public_html" # Đường dẫn tới thư mục chứa wp-config.php
 
 if [ -f "$CONFIG_FILE" ]; then
     echo -e "${GREEN}Da tim thay wp-config.php.${NC}"
-    
-    # Logic trích xuất:
-    # 1. grep "define": Lấy dòng định nghĩa
-    # 2. grep "DB_NAME": Lấy đúng hằng số
-    # 3. grep -v: Loại bỏ các dòng comment bắt đầu bằng // hoặc #
-    # 4. head -n 1: Chỉ lấy kết quả đầu tiên
-    # 5. sed: Cắt lấy giá trị nằm giữa dấu nháy
-    
-    DB_NAME=$(grep "define" "$CONFIG_FILE" | grep "DB_NAME" | grep -v "^[[:space:]]*[#//]" | head -n 1 | sed -nE "s/.*['\"]DB_NAME['\"]\s*,\s*['\"]([^'\"]+)['\"].*/\1/p")
-    
-    DB_USER=$(grep "define" "$CONFIG_FILE" | grep "DB_USER" | grep -v "^[[:space:]]*[#//]" | head -n 1 | sed -nE "s/.*['\"]DB_USER['\"]\s*,\s*['\"]([^'\"]+)['\"].*/\1/p")
-    
-    if [ -z "$DB_NAME" ]; then
-         echo -e "${YELLOW}Canh bao: Khong trich xuat duoc DB_NAME (Cau truc file la).${NC}"
-         echo -e "${YELLOW}Script se chi xoa file ma nguon, DATABASE SE DUOC GIU LAI AN TOAN.${NC}"
+
+    # Kiểm tra xem lệnh wp có tồn tại không
+    if command -v wp &> /dev/null; then
+        # Lấy DB_NAME và DB_USER
+        # --skip-themes --skip-plugins: Bắt buộc dùng để tránh lỗi PHP từ plugin làm hỏng luồng script
+        # tr -d '\r\n': Cắt bỏ ký tự xuống dòng thừa để đảm bảo chuỗi sạch 100%
+        
+        DB_NAME=$(wp config get DB_NAME --path="$WP_PATH" --allow-root --quiet --skip-themes --skip-plugins 2>/dev/null | tr -d '\r\n')
+        DB_USER=$(wp config get DB_USER --path="$WP_PATH" --allow-root --quiet --skip-themes --skip-plugins 2>/dev/null | tr -d '\r\n')
+        
     else
-         echo -e "Database can xoa: ${RED}$DB_NAME${NC}"
-         echo -e "User DB can xoa:  ${RED}$DB_USER${NC}"
+        echo -e "${RED}Loi: WP-CLI chua duoc cai dat. Khong the lay thong tin DB.${NC}"
     fi
+
+    # Kiểm tra kết quả trả về
+    if [ -z "$DB_NAME" ]; then
+        echo -e "${YELLOW}Canh bao: Khong the trich xuat ten Database (co the file config loi hoac WP-CLI gap su co).${NC}"
+        echo -e "${YELLOW}Hanh dong: Script se chi xoa file, DATABASE SE DUOC GIU LAI.${NC}"
+    else
+        echo -e "Phat hien Database: ${RED}$DB_NAME${NC}"
+        echo -e "Phat hien DB User:  ${RED}$DB_USER${NC}"
+    fi
+
 else
-    echo -e "${YELLOW}Canh bao: Khong tim thay wp-config.php. Script se chi xoa file.${NC}"
+    echo -e "${YELLOW}Khong tim thay wp-config.php. Script se chi xoa thu muc web.${NC}"
 fi
 
 # 5. Xác nhận
