@@ -241,29 +241,31 @@ echo -e "${GREEN}>>> Da cai dat xong WordPress Core!${NC}"
 # ==================================================================
 
 # --- BƯỚC 4: PHÂN QUYỀN (PERMISSIONS) ---
+# Điều chỉnh phân quyền để dễ dàng hơn trong việc tạo tài khoản sFTP sau này.
 echo -e "${GREEN}[5/5] Dang thiet lap quyen han chuan cho WordPress...${NC}"
 
 WP_ROOT="/var/www/$DOMAIN/public_html"
 PARENT_DIR="/var/www/$DOMAIN"
-WP_OWNER="www-data"
-WP_GROUP="www-data"
 
-# Gán chủ sở hữu: www-data (để PHP có thể ghi file, cài plugin, upload ảnh)
-sudo chown -R $WP_OWNER:$WP_GROUP $WP_ROOT
+# Gán Group www-data là chủ sở hữu (để PHP có thể ghi file, cài plugin, upload ảnh)
+# User sở hữu root
+sudo chown -R root:www-data $WP_ROOT
 
 # Gán chủ sở hữu thư mục cha, không đệ quy, không -R
-sudo chown $WP_OWNER:$WP_GROUP $PARENT_DIR
+sudo chown root:www-data $PARENT_DIR
 
-# Chuẩn hóa quyền theo khuyến nghị bảo mật của WordPress:
-# - Thư mục: 755 (rwxr-xr-x)
-# - File: 644 (rw-r--r--)
-sudo find $WP_ROOT -type d -exec chmod 755 {} \;
-sudo find $WP_ROOT -type f -exec chmod 644 {} \;
+# Chuẩn hóa quyền để không mâu thuẫn quyền của nhau sau này khi tạo tài khoản sFTP:
+# - Thư mục: 775 (rwxrwxr-x)
+# - File: 664 (rw-rw-r--)
+# số 2 trước 775 là để các file sau này do sFTP up lên mặc định thuộc quyền sở hữu của group www-data
+# Do vậy user www-data thuộc group www-data sẽ có quyền làm việc với file đó mà không bị lỗi không đủ quyền.
+sudo find $WP_ROOT -type d -exec chmod 2775 {} \;
+sudo find $WP_ROOT -type f -exec chmod 664 {} \;
 
 # Phân quyền để quản lý chặt file wp-config
 WP_CONFIG="$WP_ROOT/wp-config.php"
 if [ -f "$WP_CONFIG" ]; then
-    sudo chmod 640 $WP_CONFIG
+    sudo chmod 660 $WP_CONFIG
 fi
 
 # Đảm bảo Caddy có thể "đi xuyên qua" thư mục /var/www để đọc file
