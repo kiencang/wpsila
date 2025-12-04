@@ -119,8 +119,32 @@ sudo apt install -y lsb-release ca-certificates apt-transport-https software-pro
 sudo add-apt-repository ppa:ondrej/php -y
 sudo apt update
 
-# Cài đặt PHP 8.3 và các extensions
-sudo apt install -y php8.3-fpm php8.3-mysql php8.3-curl php8.3-gd php8.3-mbstring php8.3-xml php8.3-zip php8.3-imagick php8.3-intl php8.3-bcmath
+# ==========================================
+# CÀI ĐẶT PHP 8.3 
+# ==========================================
+
+echo -e "${GREEN}[*] Đang chuẩn bị danh sách gói PHP cho Blogger...${NC}"
+
+# Danh sách các gói cần thiết (Đã loại bỏ redis và soap)
+PHP_PACKAGES=(
+    php8.3-fpm          # Trình xử lý PHP chính
+    php8.3-mysql        # Kết nối Database MariaDB/MySQL
+    php8.3-opcache      # Tăng tốc độ load trang (Cốt lõi)
+    php8.3-curl         # Kết nối API, update Core/Plugin
+    php8.3-mbstring     # Xử lý chuỗi đa ngôn ngữ (Tiếng Việt)
+    php8.3-intl         # Hỗ trợ quốc tế hóa (Quan trọng cho WP)
+    php8.3-xml          # Cần cho plugin SEO tạo sitemap (Sitemap)
+    php8.3-zip          # Giải nén, cài Plugin, Backup
+    php8.3-gd           # Thư viện xử lý ảnh cơ bản (Nhẹ)
+    php8.3-imagick      # Thư viện xử lý ảnh nâng cao (Ảnh đẹp hơn)
+    php8.3-bcmath       # Hỗ trợ tính toán số học chính xác
+    php8.3-readline     # Hỗ trợ gõ lệnh trong CLI (Tiện cho Admin)
+)
+
+echo -e "${GREEN}[*] Dang cai dat PHP 8.3 va cac Extensions...${NC}"
+
+# Cài đặt toàn bộ danh sách trên
+sudo apt install -y "${PHP_PACKAGES[@]}"
 
 echo -e "${GREEN}[2/3] Dang cai dat MariaDB Server...${NC}"
 sudo apt install -y mariadb-server
