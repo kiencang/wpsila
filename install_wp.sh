@@ -4,7 +4,7 @@
 set -euo pipefail
 
 # Chạy lệnh
-# version 0.02.12.25
+# version 0.04.12.25
 # curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/install_wp.sh | bash
 
 # Màu sắc cho thông báo
