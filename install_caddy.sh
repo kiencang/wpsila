@@ -11,11 +11,11 @@ set -euo pipefail
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 RED='\033[0;31m'
-NC='\033[0m' # No Color
+NC='\033[0m' # No Color (ngắt màu)
 
-echo "--------------------------------------------------"
+echo "--------------------------------------------------------------------"
 echo "Dang kiem tra moi truong VPS (Clean OS Check)..."
-echo "--------------------------------------------------"
+echo "--------------------------------------------------------------------"
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # Phần 1: Kiểm tra trước môi trường server, phòng lỗi cài đè, cài nhầm
@@ -27,12 +27,20 @@ if [[ $EUID -ne 0 ]]; then
    exit 1
 fi
 
-# --- BƯỚC 2: KIỂM TRA CỔNG 80 (Dùng lệnh ss) ---
+# --- BƯỚC 2: KIỂM TRA CỔNG 80 & 443(Dùng lệnh ss) ---
 # Mục đích: Phát hiện Nginx, Apache, OpenLiteSpeed hoặc bất kỳ Web Server nào đang chạy.
 # ss -tuln: Hien thi TCP/UDP, Listening, Numeric ports
 # grep -q ":80 ": Tim chuoi ":80 " (co dau cach de tranh nham voi 8080)
 if ss -tuln | grep -q ":80 "; then
     echo -e "${RED}[X] LOI NGHIEM TRONG: Cong 80 (HTTP) dang ban!${NC}"
+    echo -e "${YELLOW}Nguyen nhan:${NC} VPS nay dang chay mot Web Server nao do (Caddy, Nginx, Apache, hoac Docker...)."
+    echo -e "${YELLOW}Giai phap:${NC} Vui long su dung mot VPS moi tinh (Clean OS) de tranh xung dot va loi he thong."
+    echo -e "Script da dung lai de bao ve VPS cua ban."
+    exit 1
+fi
+
+if ss -tuln | grep -q ":443 "; then
+    echo -e "${RED}[X] LOI NGHIEM TRONG: Cong 443 (HTTPS) dang ban!${NC}"
     echo -e "${YELLOW}Nguyen nhan:${NC} VPS nay dang chay mot Web Server nao do (Caddy, Nginx, Apache, hoac Docker...)."
     echo -e "${YELLOW}Giai phap:${NC} Vui long su dung mot VPS moi tinh (Clean OS) de tranh xung dot va loi he thong."
     echo -e "Script da dung lai de bao ve VPS cua ban."
@@ -55,7 +63,7 @@ sleep 2
 
 # Ngăn cách mã
 echo "-------------------------------------------------------------------------------------------------"
-# ... (Phần code cài đặt chính ở dưới đây) ...
+
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # Phần 2: Cài Caddy Web Server
 
