@@ -123,7 +123,7 @@ sudo apt update
 # CÀI ĐẶT PHP 8.3 
 # ==========================================
 
-echo -e "${GREEN}[*] Đang chuẩn bị danh sách gói PHP cho Blogger...${NC}"
+echo -e "${GREEN}[*] Dang chuan bị danh sach goi PHP. ${NC}"
 
 # Danh sách các gói cần thiết (Đã loại bỏ redis và soap)
 PHP_PACKAGES=(
