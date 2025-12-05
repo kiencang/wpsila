@@ -1,10 +1,16 @@
 #!/bin/bash
 
+# Dừng script ngay lập tức nếu có lệnh bị lỗi
+set -euo pipefail
+
 # ==============================================================================
 # WP SILA MARIADB TUNER (BACKUP SAFE EDITION)
 # Target: Ubuntu 24.04 | MariaDB 10.11 | PHP 8.3 | Caddy
 # Use Case: Blog 1000+ Posts & Frequent Backups
 # ==============================================================================
+
+# Chạy lệnh
+# curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/mariadb_tune.sh | bash
 
 # Kiểm tra quyền root
 if [ "$(id -u)" != "0" ]; then
