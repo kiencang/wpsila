@@ -14,21 +14,21 @@ set -euo pipefail
 
 # Kiểm tra quyền root
 if [ "$(id -u)" != "0" ]; then
-   echo "Lỗi: Bạn phải chạy script này với quyền root (sudo)."
+   echo "Loi: Ban phai chay script nay voi quyen root (sudo)."
    exit 1
 fi
 
-echo ">> Đang kiểm tra cấu hình hệ thống..."
+echo ">> Dang kiem tra cau hinh he thong..."
 
 # Lấy thông tin RAM (MB)
 total_ram_mb=$(free -m | awk '/Mem:/ {print $2}')
-echo "- Tổng RAM hệ thống: ${total_ram_mb} MB"
+echo "- Tong RAM he thong: ${total_ram_mb} MB"
 
 CONFIG_DIR="/etc/mysql/mariadb.conf.d"
 CONFIG_FILE="$CONFIG_DIR/99-wpsila-tune.cnf"
 
 if [ ! -d "$CONFIG_DIR" ]; then
-    echo "Lỗi: Không tìm thấy thư mục cấu hình MariaDB ($CONFIG_DIR)."
+    echo "Loi: Khong tim thay thu muc cau hinh MariaDB ($CONFIG_DIR)."
     exit 1
 fi
 
@@ -75,7 +75,7 @@ fi
 # TẠO FILE CẤU HÌNH (AN TOÀN TUYỆT ĐỐI CHO BACKUP)
 # ==============================================================================
 
-echo ">> Đang tạo file cấu hình tối ưu backup..."
+echo ">> Dang tao file cau hinh toi uu cho backup..."
 
 cat > "$CONFIG_FILE" <<EOF
 # Cấu hình tối ưu bởi WP SILA (Blog 1000+ Posts Edition)
@@ -121,21 +121,21 @@ EOF
 # KIỂM TRA & KHỞI ĐỘNG LẠI
 # ==============================================================================
 
-echo ">> Đang khởi động lại MariaDB..."
+echo ">> Dang khoi dong lai MariaDB..."
 
 if systemctl restart mariadb; then
     if systemctl is-active --quiet mariadb; then
-        echo "✅ THÀNH CÔNG! MariaDB đã sẵn sàng cho Blog & Backup."
-        echo "   Max Packet Size: 128M (An toàn cho 1000+ bài viết)"
+        echo "✅ THANH CONG! MariaDB da san sang cho Blog & Backup."
+        echo "   Max Packet Size: 128M (An toan cho 1000+ bai viet)"
     else
-        echo "⚠️ CẢNH BÁO: Service restart OK nhưng không active."
+        echo "⚠️ CANH BAO: Service restart OK nhung KHONG active."
         rm -f "$CONFIG_FILE"
         systemctl restart mariadb
-        echo "❌ Đã hoàn tác."
+        echo "❌ Da hoan tac."
     fi
 else
-    echo "❌ LỖI: Không thể khởi động. Đang hoàn tác..."
+    echo "❌ Loi: Khong the khoi dong, dang hoan tac..."
     rm -f "$CONFIG_FILE"
     systemctl restart mariadb
-    echo "✅ Đã khôi phục trạng thái cũ."
+    echo "✅ Da khoi phuc lai trang thai cu."
 fi
