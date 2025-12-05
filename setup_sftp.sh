@@ -1,166 +1,137 @@
 #!/bin/bash
 
-# Dừng script ngay nếu có lỗi, biến chưa định nghĩa, hoặc lỗi trong pipe
+# Dừng script ngay lập tức nếu có lệnh bị lỗi
 set -euo pipefail
 
 # ==============================================================================
-# SCRIPT TỰ ĐỘNG TẠO TÀI KHOẢN SFTP CHO CADDY WEB SERVER
-# Hỗ trợ chạy trực tiếp qua pipe (curl | bash)
+# SCRIPT TẠO TÀI KHOẢN SFTP (CHROOT JAIL)
+# Dành cho cấu trúc: Vỏ /var/www/domain (root:root 755)
+# Lõi /var/www/domain/public_html (root:www-data 2775)
 # ==============================================================================
 
-# curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/setup_sftp.sh | bash
-
-# Kiểm tra quyền root
-if [[ $EUID -ne 0 ]]; then
-   echo "Loi: Script nay phai chay voi quyen root (sudo)." 
-   exit 1
+# 1. KIỂM TRA QUYỀN ROOT
+if [ "$EUID" -ne 0 ]; then
+  echo "Vui long chay script bang quyen root (sudo)."
+  exit 1
 fi
 
-echo "========================================================"
-echo "   CAU HINH SFTP CHO CADDY WEB SERVER (UBUNTU)"
-echo "========================================================"
-
-# --- 1. NHẬP THÔNG TIN (Thêm < /dev/tty để đọc từ bàn phím khi chạy qua pipe) ---
-
-# Nhập tên miền
+# 2. NHẬP THÔNG TIN
+echo "--------------------------------------------------------"
+echo "CONG CU TAO USER SFTP CHO WORDPRESS (SECURE MODE)"
+echo "--------------------------------------------------------"
 read -p "Nhap ten mien (VD: example.com): " DOMAIN < /dev/tty
-if [ -z "$DOMAIN" ]; then
-    echo "Loi: Ten mien khong duoc de trong."
+read -p "Nhap user sFTP moi: " SFTP_USER < /dev/tty
+
+# Định nghĩa thư mục Vỏ (Jail)
+JAIL_DIR="/var/www/$DOMAIN"
+
+# 3. KIỂM TRA ĐẦU VÀO
+if [ ! -d "$JAIL_DIR" ]; then
+    echo "Loi: Thu muc $JAIL_DIR KHONG ton tai!"
+    echo "Hay chac chan trang web co ton tai."
     exit 1
 fi
 
-WEB_ROOT="/var/www/$DOMAIN/public_html"
-
-if [ ! -d "$WEB_ROOT" ]; then
-    echo "Loi: Thu muc $WEB_ROOT KHONG ton tai. Vui long kiem tra lai."
-    exit 1
-fi
-
-# Nhập tên user
-read -p "Nhap ten tai khoan SFTP (Mac dinh: webmaster): " SFTP_USER < /dev/tty
-SFTP_USER=${SFTP_USER:-webmaster}
-
-# Nhập mật khẩu
-read -s -p "Nhap mat khau cho $SFTP_USER (De trong se tu tao random): " SFTP_PASS < /dev/tty
-echo ""
-
-if [ -z "$SFTP_PASS" ]; then
-    # Kiểm tra xem openssl có tồn tại không, nếu không dùng cách khác
-    if command -v openssl &> /dev/null; then
-        SFTP_PASS=$(openssl rand -base64 12)
-    else
-        SFTP_PASS=$(date +%s | sha256sum | base64 | head -c 12)
-    fi
-    echo "-> Da tao mat khau ngau nhien: $SFTP_PASS"
-fi
-
-# --- 2. TẠO USER & GROUP ---
-echo "[+] Dang xu ly tai khoan user..."
 if id "$SFTP_USER" &>/dev/null; then
-    echo "    User $SFTP_USER da ton tai."
-    # Đảm bảo home dir tồn tại kể cả khi user đã có từ trước
-    if [ ! -d "/home/$SFTP_USER" ]; then
-        mkdir -p "/home/$SFTP_USER"
-        chown "$SFTP_USER:$SFTP_USER" "/home/$SFTP_USER"
-        echo "    Da tao lai thu muc home cho user."
-    fi
-else
-    useradd -m -s /bin/bash "$SFTP_USER"
-    echo "    Da tao user $SFTP_USER."
+    echo "Loi: User '$SFTP_USER' da ton tai tren he thong!"
+    exit 1
 fi
+
+# 4. THIẾT LẬP CẤU HÌNH HỆ THỐNG (Chạy 1 lần là dùng mãi mãi)
+echo ""
+echo "Dang kiem tra cau hinh he thong..."
+
+# 4.1. Tạo group 'sftp_only' nếu chưa có
+if ! getent group sftp_only > /dev/null; then
+    groupadd sftp_only
+    echo "Da tao group: sftp_only"
+fi
+
+# 4.2. Cấu hình SSHD (Quan trọng)
+SSHD_CONFIG="/etc/ssh/sshd_config"
+NEED_RESTART=0
+
+# Backup file config
+cp $SSHD_CONFIG "${SSHD_CONFIG}.bak"
+
+# Thêm block Match Group vào cuối file nếu chưa có
+if ! grep -q "Match Group sftp_only" $SSHD_CONFIG; then
+    cat <<EOT >> $SSHD_CONFIG
+
+# --- Added by SFTP Script ---
+Match Group sftp_only
+    ChrootDirectory %h
+    ForceCommand internal-sftp -u 002
+    AllowTCPForwarding no
+    X11Forwarding no
+    PasswordAuthentication yes
+# ----------------------------
+EOT
+    echo "Da them cau hinh Match Group sftp_only."
+    NEED_RESTART=1
+else
+    echo "Cau hinh SSH da chuan."
+fi
+
+# Áp dụng cấu hình SSH mới, sử dụng reload, đừng sử dụng restart vì nó có khả năng ngắt kết nối giữa chừng.
+if [ $NEED_RESTART -eq 1 ]; then
+    # Kiểm tra cú pháp file config trước (Safety First)
+    if sshd -t; then
+        service ssh reload
+        echo "   ✅ Da reload dich vu SSH (Cau hinh an toan)."
+    else
+        echo "   ❌ NGUY HIEM: File sshd_config bi loi cu phap!"
+        echo "   ❌ Khong reload SSH de tranh mat ket noi server."
+        # Khôi phục lại file backup nếu cần thiết (tuỳ chọn)
+        cp "${SSHD_CONFIG}.bak" "$SSHD_CONFIG"
+        echo "   -> Da khoi phuc lai file config cu."
+        exit 1
+    fi
+fi
+
+# 5. TẠO USER VÀ PHÂN QUYỀN
+echo ""
+echo "Dang tao user '$SFTP_USER'..."
+
+# Giải thích lệnh useradd:
+# -d $JAIL_DIR : Home directory trỏ về /var/www/domain (Để SSH chroot vào đây)
+# -s /usr/sbin/nologin : Không cho chạy lệnh shell (Bảo mật)
+# -G www-data : Để user này có quyền ghi vào thư mục public_html (nhờ permission 2775)
+# -G sftp_only : Để user này bị SSH config "tóm" lấy và nhốt vào lồng
+# -N: Không tạo group riêng trùng tên user (dùng luôn group chính là www-data)
+# -M: Không tạo home dir (vì thư mục đã có sẵn)
+useradd -d "$JAIL_DIR" -s /usr/sbin/nologin -g www-data -G sftp_only -M -N "$SFTP_USER"
 
 # Đặt mật khẩu
-echo "$SFTP_USER:$SFTP_PASS" | chpasswd
+echo "Thiet lap mat khau cho user '$SFTP_USER':"
+passwd "$SFTP_USER"
 
-# Thêm user vào group www-data
-usermod -aG www-data "$SFTP_USER"
-echo "    Da them $SFTP_USER vao group www-data."
+# 6. KIỂM TRA LẠI QUYỀN THƯ MỤC VỎ (SAFETY CHECK)
+# Yêu cầu bắt buộc của SSH Chroot: Thư mục Home phải là root:root và quyền 755
+CURRENT_OWNER=$(stat -c '%U:%G' $JAIL_DIR)
+CURRENT_PERM=$(stat -c '%a' $JAIL_DIR)
 
-# --- 3. PHÂN QUYỀN ---
-echo "[+] Dang phan quyen thu muc web..."
-chown -R "$SFTP_USER:www-data" "$WEB_ROOT"
-
-# Sử dụng + thay vì \; để chạy nhanh hơn với find
-find "$WEB_ROOT" -type d -exec chmod 775 {} +
-find "$WEB_ROOT" -type f -exec chmod 664 {} +
-find "$WEB_ROOT" -type d -exec chmod g+s {} +
-
-echo "    Da phan quyen xong (775/664/sGID)."
-
-# --- 4. CẤU HÌNH SSHD ---
-echo "[+] Dang cau hinh SSHD (umask 002)..."
-SSHD_CONFIG="/etc/ssh/sshd_config"
-# Đổi tên file backup an toàn
-BACKUP_SSHD="/etc/ssh/sshd_config.bak.$(date +%F_%H-%M-%S)"
-
-cp "$SSHD_CONFIG" "$BACKUP_SSHD"
-echo "    Da backup sshd_config sang $BACKUP_SSHD"
-
-if grep -q "internal-sftp -u 002" "$SSHD_CONFIG"; then
-    echo "    Cau hinh umask 002 da ton tai. Bo qua."
-else
-    # FIX: Dùng Regex [[:space:]]+ để bắt cả dấu cách và dấu tab
-    if grep -qE "Subsystem[[:space:]]+sftp[[:space:]]+/usr/lib/openssh/sftp-server" "$SSHD_CONFIG"; then
-        sed -i -E 's|Subsystem[[:space:]]+sftp[[:space:]]+/usr/lib/openssh/sftp-server|Subsystem sftp internal-sftp -u 002|g' "$SSHD_CONFIG"
-        echo "    Da cap nhat sshd_config."
-        
-        # Kiểm tra cú pháp ssh trước khi restart để tránh sập SSH
-        if sshd -t; then
-            service ssh restart
-            echo "    Da khoi dong lai SSH."
-        else
-            echo "LOI: File sshd_config co loi cu phap. Da khoi phuc file backup."
-            cp "$BACKUP_SSHD" "$SSHD_CONFIG"
-            exit 1
-        fi
-    else
-        echo "    Canh bao: KHONG tim thay dong 'Subsystem sftp' mac dinh."
-        echo "    Vui long kiem tra thu cong file $SSHD_CONFIG"
-    fi
+if [ "$CURRENT_OWNER" != "root:root" ] || [ "$CURRENT_PERM" != "755" ]; then
+    echo "Phat hien sai quyen thu muc vo. Dang sua lai cho dung chuan Chroot..."
+    chown root:root "$JAIL_DIR"
+    chmod 755 "$JAIL_DIR"
+    echo "Da fix quyen $JAIL_DIR thanh root:root (755)."
 fi
 
-# --- 5. CẤU HÌNH WP-CONFIG.PHP ---
-WP_CONFIG="$WEB_ROOT/wp-config.php"
-if [ -f "$WP_CONFIG" ]; then
-    echo "[+] Dang cau hinh wp-config.php..."
-    if grep -q "FS_METHOD" "$WP_CONFIG"; then
-        echo "    FS_METHOD da duoc dinh nghia. Bo qua."
-    else
-        sed -i "/<?php/a define('FS_METHOD', 'direct');" "$WP_CONFIG"
-        echo "    Da them FS_METHOD direct."
-        chown "$SFTP_USER:www-data" "$WP_CONFIG"
-        chmod 664 "$WP_CONFIG"
-    fi
-else
-    echo "    KHONG tim thay file wp-config.php. Bo qua."
-fi
-
-# --- 6. TẠO SHORTCUT ---
-echo "[+] Dang tao shortcut..."
-SHORTCUT_NAME=$(echo "$DOMAIN" | cut -d. -f1)
-USER_HOME="/home/$SFTP_USER"
-
-# Xóa symlink cũ nếu tồn tại
-if [ -L "$USER_HOME/$SHORTCUT_NAME" ]; then
-    rm "$USER_HOME/$SHORTCUT_NAME"
-fi
-
-# Tạo mới
-if [ -d "$USER_HOME" ]; then
-    ln -s "$WEB_ROOT" "$USER_HOME/$SHORTCUT_NAME"
-    chown -h "$SFTP_USER:$SFTP_USER" "$USER_HOME/$SHORTCUT_NAME"
-    echo "    Da tao shortcut tai $USER_HOME/$SHORTCUT_NAME"
-else
-    echo "    Loi: Thu muc home $USER_HOME khong ton tai."
-fi
-
+# 7. HOÀN TẤT
+echo ""
 echo "========================================================"
-echo "   CAI DAT HOAN TAT!"
+echo "✅ TAO TAI KHOAN SFTP THANH CONG!"
 echo "========================================================"
-echo "Thong tin dang nhap SFTP:"
-echo "Host:     (IP VPS cua ban)"
-echo "Port:     22"
-echo "User:     $SFTP_USER"
-echo "Pass:     $SFTP_PASS"
-echo "Thu muc:  /var/www/$DOMAIN/public_html"
+echo "📂 Thong tin ket noi FileZilla / WinSCP:"
+echo "   - Host:       (IP VPS cua ban)"
+echo "   - Port:       22"
+echo "   - Protocol:   SFTP (SSH File Transfer Protocol)"
+echo "   - User:       $SFTP_USER"
+echo "   - Password:   (Mat khau ban vua nhap)"
+echo "--------------------------------------------------------"
+echo "📝 Luu y:"
+echo "   - Khi dang nhap, user se thay minh o thu muc goc (/)."
+echo "   - User phai vao thu muc 'public_html' de thay code web."
+echo "   - User khong the di ra ngoai thu muc web cua ho."
 echo "========================================================"
