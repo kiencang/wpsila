@@ -121,10 +121,10 @@ if [ "$SFTP_PASS" != "$SFTP_PASS_CONFIRM" ]; then
     exit 1
 fi
 
-# Dùng chpasswd để set mật khẩu (An toàn và không bị lỗi input)
-echo "$SFTP_USER:$SFTP_PASS" | chpasswd
-
-echo "✅ Da thiet lap mat khau thanh cong."
+# Mã hóa mật khẩu và gán trực tiếp (Bypass PAM check)
+ENCRYPTED_PASS=$(openssl passwd -6 "$SFTP_PASS")
+usermod -p "$ENCRYPTED_PASS" "$SFTP_USER"
+echo "   ✅ Da thiet lap mat khau thanh cong."
 
 # 6. KIỂM TRA LẠI QUYỀN THƯ MỤC VỎ (SAFETY CHECK)
 # Yêu cầu bắt buộc của SSH Chroot: Thư mục Home phải là root:root và quyền 755
