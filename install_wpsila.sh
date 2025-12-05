@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Chạy lệnh
-# bash <(curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/install_wpsila.sh)
+# curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/install_wpsila.sh | sudo bash
 
 # --- Cấu hình ---
 # LUU Y: Hay kiem tra ky duong dan REPO_URL nay tren trinh duyet
@@ -54,7 +54,7 @@ download_file "$REPO_URL/wpsila_menu.sh" "$INSTALL_DIR/wpsila_menu.sh"
 download_file "$REPO_URL/install_caddy.sh" "$INSTALL_DIR/install_caddy.sh"
 download_file "$REPO_URL/install_wp.sh" "$INSTALL_DIR/install_wp.sh"
 download_file "$REPO_URL/remove_web.sh" "$INSTALL_DIR/remove_web.sh"
-download_file "$REPO_URL/setup_sftp.sh" "$INSTALL_DIR/setup_sftp.sh.sh"
+download_file "$REPO_URL/setup_sftp.sh" "$INSTALL_DIR/setup_sftp.sh"
 
 # 6. Phân quyền
 chmod 700 "$INSTALL_DIR/"*.sh
