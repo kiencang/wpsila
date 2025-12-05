@@ -4,7 +4,7 @@
 set -euo pipefail
 
 # Chạy lệnh
-# version 0.02.12.25
+# version 0.05.12.25
 # curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/install_caddy.sh | bash
 
 # Màu sắc cho thông báo
@@ -123,7 +123,7 @@ sudo apt update
 # CÀI ĐẶT PHP 8.3 
 # ==========================================
 
-echo -e "${GREEN}[*] Dang chuan bị danh sach goi PHP. ${NC}"
+echo -e "${GREEN}[*] Dang chuan bi danh sach goi PHP. ${NC}"
 
 # Danh sách các gói cần thiết (Đã loại bỏ redis và soap)
 PHP_PACKAGES=(
