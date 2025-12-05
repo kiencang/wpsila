@@ -77,7 +77,7 @@ fi
 if [ $NEED_RESTART -eq 1 ]; then
     # Kiểm tra cú pháp file config trước (Safety First)
     if sshd -t; then
-        service ssh reload
+        systemctl reload ssh
         echo "   ✅ Da reload dich vu SSH (Cau hinh an toan)."
     else
         echo "   ❌ NGUY HIEM: File sshd_config bi loi cu phap!"
