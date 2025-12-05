@@ -148,6 +148,8 @@ PHP_PACKAGES=(
 apt install -y "${PHP_PACKAGES[@]}"
 
 echo -e "${GREEN}[2/3] Dang cai dat MariaDB Server...${NC}"
+# Thường là phiên bản 10.11 trên Ubuntu 24.04 LTS
+# Cách kiểm tra: mariadb --version, việc biết được phiên bản cụ thể sẽ giúp chúng ta có những cài đặt chính xác hơn sau này.
 sudo apt install -y mariadb-server
 
 # --- BẢO MẬT MARIADB (HARDENING) ---
