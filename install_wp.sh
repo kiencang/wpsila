@@ -3,6 +3,9 @@
 # Dừng script ngay lập tức nếu có lệnh bị lỗi
 set -euo pipefail
 
+# QUAN TRỌNG: CẤU HÌNH PHIÊN BẢN PHP
+PHP_VER="8.3"
+
 # Chạy lệnh
 # version 0.05.12.25
 # curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/install_wp.sh | bash
@@ -289,7 +292,7 @@ fi
 sudo chmod +x /var/www
 
 # Khởi động lại để tránh phân quyền bị cache
-sudo systemctl reload php8.3-fpm
+sudo systemctl reload php${PHP_VER}-fpm
 
 # --- HOÀN TẤT ---
 echo -e "${GREEN}=============================================${NC}"
@@ -322,7 +325,7 @@ $DOMAIN {
     root * /var/www/$DOMAIN/public_html
     encode zstd gzip
 	
-    # Tang gioi han upload, can chinh them /etc/php/8.3/fpm/php.ini cho dong bo
+    # Tang gioi han upload, can chinh them /etc/php/PHP_VER/fpm/php.ini cho dong bo
     request_body {
         max_size 50MB
     }	
@@ -388,8 +391,8 @@ $DOMAIN {
     # Tra ve 404
     respond @forbidden 404
 	
-	# PHP FastCGI (Check lai duong dan socket neu dung OS khac Ubuntu/Debian)
-    php_fastcgi unix//run/php/php8.3-fpm.sock
+	# PHP FastCGI, lấy động theo phiên bản PHP thiết lập ở đầu file lệnh.
+    php_fastcgi unix//run/php/php${PHP_VER}-fpm.sock
 
     file_server
 }

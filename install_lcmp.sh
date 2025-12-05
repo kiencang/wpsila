@@ -3,6 +3,9 @@
 # Dừng script ngay lập tức nếu có lệnh bị lỗi
 set -euo pipefail
 
+# QUAN TRỌNG: CẤU HÌNH PHIÊN BẢN PHP
+PHP_VER="8.3"
+
 # Chạy lệnh
 # version 0.05.12.25
 # curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/install_lcmp.sh | bash
@@ -111,7 +114,7 @@ echo "--------------------------------------------------------------------------
 # Phần 3: Cài PHP & MariaDB
 # --- BẮT ĐẦU CÀI ĐẶT ---
 # Cài PHP & MariaDB
-echo -e "${GREEN}[1/3] Dang cai dat PHP 8.3 va cac module can thiet...${NC}"
+echo -e "${GREEN}[1/3] Dang cai dat PHP ${PHP_VER} va cac module can thiet...${NC}"
 
 # Thêm repository và cài đặt PHP
 sudo apt update
@@ -120,17 +123,12 @@ sudo add-apt-repository ppa:ondrej/php -y
 sudo apt update
 
 # ==========================================
-# CÀI ĐẶT PHP 8.3 
+# CÀI ĐẶT PHP {PHP_VER} 
 # ==========================================
-
-echo -e "${GREEN}[*] Dang chuan bi danh sach goi PHP. ${NC}"
-
-# 1. CẤU HÌNH PHIÊN BẢN
-PHP_VER="8.3"
 
 echo -e "${GREEN}[*] Dang chuan bi cai dat PHP phien ban: ${PHP_VER} ${NC}"
 
-# 2. DANH SÁCH GÓI (Sử dụng biến ${PHP_VER} để ghép chuỗi)
+# 1. DANH SÁCH GÓI (Sử dụng biến ${PHP_VER} để ghép chuỗi)
 PHP_PACKAGES=(
     "php${PHP_VER}-fpm"       # Xử lý PHP (Bắt buộc)
     "php${PHP_VER}-cli"       # Chạy WP-CLI & Cron (Bắt buộc)
@@ -145,7 +143,7 @@ PHP_PACKAGES=(
     "php${PHP_VER}-bcmath"    # Tính toán chính xác (Nên có - để tương thích plugin tốt hơn)
 )
 
-# 3. LỆNH CÀI ĐẶT
+# 2. LỆNH CÀI ĐẶT
 # "${PHP_PACKAGES[@]}" sẽ bung toàn bộ danh sách trên ra thành chuỗi
 apt install -y "${PHP_PACKAGES[@]}"
 
