@@ -1,140 +1,135 @@
-#!/usr/bin/env bash
-set -euo pipefail
+#!/bin/bash
 
-# --- SAFE MARIADB TUNING SCRIPT (UBUNTU 22/24 LTS EDITION) ---
-# Mục tiêu: Tối ưu cho WordPress trên VPS cấu hình thấp
-# Tương thích: Ubuntu 22.04, 24.04 (MariaDB 10.6+)
+# ==============================================================================
+# WP SILA MARIADB TUNER (BACKUP SAFE EDITION)
+# Target: Ubuntu 24.04 | MariaDB 10.11 | PHP 8.3 | Caddy
+# Use Case: Blog 1000+ Posts & Frequent Backups
+# ==============================================================================
 
-# --- 1. Cấu hình đường dẫn ---
-DIR_PATH="/etc/mysql/mariadb.conf.d"
-FILE_NAME="99-wp-safe-tuning.cnf"
-CNF_PATH="${DIR_PATH}/${FILE_NAME}"
-BACKUP_DIR="/var/backups/mariadb-tuning"
-TIMESTAMP="$(date +%Y%m%d-%H%M%S)"
-LOG="/var/log/mariadb-safe-tune.log"
+# Kiểm tra quyền root
+if [ "$(id -u)" != "0" ]; then
+   echo "Lỗi: Bạn phải chạy script này với quyền root (sudo)."
+   exit 1
+fi
 
-# Tạo file log
-touch "$LOG" && chmod 600 "$LOG"
+echo ">> Đang kiểm tra cấu hình hệ thống..."
 
-# Kiểm tra quyền Root
-if [[ $EUID -ne 0 ]]; then
-    echo "❌ Lỗi: Bạn cần chạy bằng quyền root (sudo)."
+# Lấy thông tin RAM (MB)
+total_ram_mb=$(free -m | awk '/Mem:/ {print $2}')
+echo "- Tổng RAM hệ thống: ${total_ram_mb} MB"
+
+CONFIG_DIR="/etc/mysql/mariadb.conf.d"
+CONFIG_FILE="$CONFIG_DIR/99-wpsila-tune.cnf"
+
+if [ ! -d "$CONFIG_DIR" ]; then
+    echo "Lỗi: Không tìm thấy thư mục cấu hình MariaDB ($CONFIG_DIR)."
     exit 1
 fi
 
-# Kiểm tra thư mục config (Chắc chắn đúng trên Ubuntu 22/24)
-if [[ ! -d "$DIR_PATH" ]]; then
-    echo "❌ Không tìm thấy thư mục: $DIR_PATH. Bạn có chắc đã cài MariaDB chưa?"
-    exit 1
-fi
+# ==============================================================================
+# LOGIC TÍNH TOÁN (ĐÃ ĐIỀU CHỈNH CHO BACKUP SITE LỚN)
+# ==============================================================================
 
-mkdir -p "$BACKUP_DIR"
+pool_instances=1
+perf_schema="OFF"
 
-# --- 2. Tính toán RAM & Thông số ---
-# Lấy tổng RAM (MB)
-total_ram_kb=$(awk '/MemTotal/ {print $2}' /proc/meminfo)
-total_ram_mb=$(( total_ram_kb / 1024 ))
-echo "📊 Detected RAM: ${total_ram_mb} MB (Ubuntu LTS Environment)" | tee -a "$LOG"
-
-# LOGIC TÍNH TOÁN (Giữ nguyên vì đã rất hợp lý cho VPS nhỏ)
-if (( total_ram_mb < 600 )); then
-    # VPS 512MB
-    buffer_pool="128M"
-    max_conn=20
-    log_file_size="48M"
-    perf_schema="OFF"
-elif (( total_ram_mb < 1100 )); then
-    # VPS 1GB
+if (( total_ram_mb < 1100 )); then
+    # VPS < 1GB
     buffer_pool="256M"
-    max_conn=40
     log_file_size="64M"
-    perf_schema="OFF"
-elif (( total_ram_mb < 2100 )); then
-    # VPS 2GB
+    max_conn=50
+    tmp_table="16M"
+    
+elif (( total_ram_mb < 2500 )); then
+    # VPS 2GB (Phổ biến)
     buffer_pool="768M"
-    max_conn=80
     log_file_size="128M"
-    perf_schema="OFF"
-elif (( total_ram_mb < 4100 )); then
+    max_conn=80
+    tmp_table="32M"
+    
+elif (( total_ram_mb < 4500 )); then
     # VPS 4GB
-    buffer_pool="2048M"
-    max_conn=150
+    buffer_pool="2G"
     log_file_size="256M"
-    perf_schema="OFF"
+    max_conn=150
+    tmp_table="64M"
+    pool_instances=2
+    
 else
     # VPS > 4GB
-    calc_pool=$(( total_ram_mb * 60 / 100 ))
-    buffer_pool="${calc_pool}M"
-    max_conn=300
+    buffer_pool="50%"
     log_file_size="512M"
+    max_conn=200
+    tmp_table="64M"
+    pool_instances=4
     perf_schema="ON"
 fi
 
-echo "🔧 Plan: Buffer Pool=${buffer_pool}, Max Conn=${max_conn}" | tee -a "$LOG"
+# ==============================================================================
+# TẠO FILE CẤU HÌNH (AN TOÀN TUYỆT ĐỐI CHO BACKUP)
+# ==============================================================================
 
-# --- 3. Tạo nội dung Config ---
-TMP_FILE="$(mktemp)"
-cat > "$TMP_FILE" <<EOF
+echo ">> Đang tạo file cấu hình tối ưu backup..."
+
+cat > "$CONFIG_FILE" <<EOF
+# Cấu hình tối ưu bởi WP SILA (Blog 1000+ Posts Edition)
 [mysqld]
-# --- BẢO MẬT & TIẾT KIỆM DISK ---
-# Chỉ cho phép kết nối từ localhost (An toàn cho VPS đơn)
-bind-address = 127.0.0.1
-# Tắt Binary Log nếu không làm Replication (Tiết kiệm dung lượng đĩa cực lớn)
-skip-log-bin
 
-# --- RAM & Caching ---
+# === 1. CƠ BẢN & KẾT NỐI ===
+user                    = mysql
+bind-address            = 127.0.0.1
+skip-name-resolve       = 1
+
+# Tăng timeout lên 120s để an toàn khi Backup/Restore trên ổ cứng chậm
+wait_timeout            = 120
+interactive_timeout     = 120
+
+# === QUAN TRỌNG NHẤT CHO BACKUP ===
+# 128M giúp mysqldump/restore không bị lỗi 'Packet too large' với DB lớn
+max_allowed_packet      = 128M
+max_connections         = ${max_conn}
+max_connect_errors      = 10000
+
+# === 2. TỐI ƯU BỘ NHỚ ===
 innodb_buffer_pool_size = ${buffer_pool}
+innodb_buffer_pool_instances = ${pool_instances}
 
-# --- Ổn định & Kết nối ---
-max_connections = ${max_conn}
-wait_timeout = 300
-interactive_timeout = 300
-max_allowed_packet = 64M
-
-# --- Tối ưu I/O (Ghi đĩa) ---
-innodb_flush_method = O_DIRECT
-# Giá trị 2 tối ưu cho Blog, giảm I/O đáng kể
+# === 3. DISK I/O (TỐC ĐỘ CAO) ===
+skip-log-bin
+innodb_flush_method     = O_DIRECT
 innodb_flush_log_at_trx_commit = 2
-# An toàn trên MariaDB 10.6+ (Ubuntu 22/24)
-innodb_log_file_size = ${log_file_size}
+innodb_log_file_size    = ${log_file_size}
+innodb_file_per_table   = 1
 
-# --- Tiết kiệm tài nguyên ---
-performance_schema = ${perf_schema}
-skip-name-resolve = 1
+# === 4. QUERY PERFORMANCE ===
+tmp_table_size          = ${tmp_table}
+max_heap_table_size     = ${tmp_table}
+performance_schema      = ${perf_schema}
 
-# --- Charset chuẩn WP ---
-character-set-server = utf8mb4
-collation-server = utf8mb4_unicode_ci
+# === 5. CHARSET ===
+character-set-server    = utf8mb4
+collation-server        = utf8mb4_unicode_ci
 EOF
 
-# --- 4. Thực thi & Backup ---
-if [[ -f "$CNF_PATH" ]]; then
-    cp "$CNF_PATH" "${BACKUP_DIR}/$(basename "$CNF_PATH").bak.${TIMESTAMP}"
-fi
+# ==============================================================================
+# KIỂM TRA & KHỞI ĐỘNG LẠI
+# ==============================================================================
 
-mv "$TMP_FILE" "$CNF_PATH"
-chmod 644 "$CNF_PATH"
-
-# --- 5. Restart & Rollback ---
-echo "♻️  Đang khởi động lại MariaDB..."
-systemctl daemon-reload 2>/dev/null || true
+echo ">> Đang khởi động lại MariaDB..."
 
 if systemctl restart mariadb; then
-    echo "✅ THÀNH CÔNG! MariaDB đã chạy mượt mà."
-    echo "👉 Kiểm tra RAM DB đang dùng: mysql -e \"SELECT ROUND(VARIABLE_VALUE/1024/1024) AS 'Buffer Pool (MB)' FROM information_schema.GLOBAL_STATUS WHERE VARIABLE_NAME = 'Innodb_buffer_pool_bytes_data';\""
-else
-    echo "❌ THẤT BẠI! Đang khôi phục lại cấu hình cũ..."
-    rm -f "$CNF_PATH"
-    
-    if [[ -f "${BACKUP_DIR}/$(basename "$CNF_PATH").bak.${TIMESTAMP}" ]]; then
-        mv "${BACKUP_DIR}/$(basename "$CNF_PATH").bak.${TIMESTAMP}" "$CNF_PATH"
-        echo "✅ Đã khôi phục file cấu hình cũ."
-    fi
-
-    if systemctl restart mariadb; then
-        echo "✅ MariaDB đã hoạt động trở lại (Reverted)."
+    if systemctl is-active --quiet mariadb; then
+        echo "✅ THÀNH CÔNG! MariaDB đã sẵn sàng cho Blog & Backup."
+        echo "   Max Packet Size: 128M (An toàn cho 1000+ bài viết)"
     else
-        echo "☠️ LỖI NGHIÊM TRỌNG: MariaDB chết hẳn. Check ngay: journalctl -xeu mariadb"
+        echo "⚠️ CẢNH BÁO: Service restart OK nhưng không active."
+        rm -f "$CONFIG_FILE"
+        systemctl restart mariadb
+        echo "❌ Đã hoàn tác."
     fi
-    exit 1
+else
+    echo "❌ LỖI: Không thể khởi động. Đang hoàn tác..."
+    rm -f "$CONFIG_FILE"
+    systemctl restart mariadb
+    echo "✅ Đã khôi phục trạng thái cũ."
 fi
