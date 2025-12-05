@@ -55,7 +55,7 @@ NEED_RESTART=0
 cp $SSHD_CONFIG "${SSHD_CONFIG}.bak"
 
 # Thêm block Match Group vào cuối file nếu chưa có
-if ! grep -q "Match Group sftp_only" $SSHD_CONFIG; then
+if ! grep -q "^Match Group sftp_only" $SSHD_CONFIG; then
     cat <<EOT >> $SSHD_CONFIG
 
 # --- Added by SFTP Script ---
