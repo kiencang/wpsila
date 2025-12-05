@@ -102,9 +102,29 @@ echo "Dang tao user '$SFTP_USER'..."
 # -M: Không tạo home dir (vì thư mục đã có sẵn)
 useradd -d "$JAIL_DIR" -s /usr/sbin/nologin -g www-data -G sftp_only -M -N "$SFTP_USER"
 
-# Đặt mật khẩu
+# --- [SUA LOI NHAP PASSWD] ---
+# Thay vì dùng lệnh 'passwd' dễ lỗi, ta dùng 'read' để nhập vào biến trước
 echo "Thiet lap mat khau cho user '$SFTP_USER':"
-passwd "$SFTP_USER"
+
+# Thêm cờ -s: Silent (ẩn ký tự khi gõ mật khẩu để bảo mật) nếu cần, nhưng để hiện cho chắc chắn
+# < /dev/tty: Đảm bảo script luôn đọc từ bàn phím kể cả khi chạy qua pipe
+read -p " -> Nhap mat khau moi: " SFTP_PASS < /dev/tty
+echo "" # Xuống dòng vì -s không tự xuống dòng
+read -p " -> Nhap lai mat khau: " SFTP_PASS_CONFIRM < /dev/tty
+echo ""
+
+# Kiểm tra khớp mật khẩu
+if [ "$SFTP_PASS" != "$SFTP_PASS_CONFIRM" ]; then
+    echo "Loi: Mat khau nhap lai khong khop!"
+    # Xóa user vừa tạo để tránh rác
+    userdel "$SFTP_USER"
+    exit 1
+fi
+
+# Dùng chpasswd để set mật khẩu (An toàn và không bị lỗi input)
+echo "$SFTP_USER:$SFTP_PASS" | chpasswd
+
+echo "✅ Da thiet lap mat khau thanh cong."
 
 # 6. KIỂM TRA LẠI QUYỀN THƯ MỤC VỎ (SAFETY CHECK)
 # Yêu cầu bắt buộc của SSH Chroot: Thư mục Home phải là root:root và quyền 755
