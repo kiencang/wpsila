@@ -36,10 +36,10 @@ while true; do
     read -r choice  # Them -r cho an toan
     case $choice in
         1)
-            if [[ -f "$BASE_DIR/install_caddy.sh" ]]; then
-                bash "$BASE_DIR/install_caddy.sh"
+            if [[ -f "$BASE_DIR/install_lcmp.sh" ]]; then
+                bash "$BASE_DIR/install_lcmp.sh"
             else
-                echo -e "${RED}Loi: Khong tim thay file install_caddy.sh${NC}"
+                echo -e "${RED}Loi: Khong tim thay file install_lcmp.sh${NC}"
             fi
             echo -e "\n${BLUE}An Enter de quay lai...${NC}"; read -r ;; # Them -r
         2)

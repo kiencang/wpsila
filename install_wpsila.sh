@@ -51,7 +51,7 @@ download_file() {
 }
 
 download_file "$REPO_URL/wpsila_menu.sh" "$INSTALL_DIR/wpsila_menu.sh"
-download_file "$REPO_URL/install_caddy.sh" "$INSTALL_DIR/install_caddy.sh"
+download_file "$REPO_URL/install_caddy.sh" "$INSTALL_DIR/install_lcmp.sh"
 download_file "$REPO_URL/install_wp.sh" "$INSTALL_DIR/install_wp.sh"
 download_file "$REPO_URL/remove_web.sh" "$INSTALL_DIR/remove_web.sh"
 download_file "$REPO_URL/setup_sftp.sh" "$INSTALL_DIR/setup_sftp.sh"
