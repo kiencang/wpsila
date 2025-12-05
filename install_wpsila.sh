@@ -54,6 +54,7 @@ download_file "$REPO_URL/wpsila_menu.sh" "$INSTALL_DIR/wpsila_menu.sh"
 download_file "$REPO_URL/install_caddy.sh" "$INSTALL_DIR/install_caddy.sh"
 download_file "$REPO_URL/install_wp.sh" "$INSTALL_DIR/install_wp.sh"
 download_file "$REPO_URL/remove_web.sh" "$INSTALL_DIR/remove_web.sh"
+download_file "$REPO_URL/setup_sftp.sh" "$INSTALL_DIR/setup_sftp.sh.sh"
 
 # 6. Phân quyền
 chmod 700 "$INSTALL_DIR/"*.sh
@@ -68,5 +69,5 @@ if [[ -x "$BIN_LINK" ]]; then
     echo -e "\033[0;32m=== CAI DAT THANH CONG! ===\033[0m"
     echo "Hay go lenh: wpsila de bat dau su dung."
 else
-    error_exit "Loi khi tao lenh tat wpsila."
+    error_exit "Loi khi tao lenh shortcut wpsila."
 fi

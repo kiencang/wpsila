@@ -19,11 +19,12 @@ fi
 show_menu() {
     clear
     echo -e "${BLUE}================================================${NC}"
-    echo -e "${GREEN}    WPSILA MANAGER (Local Version)              ${NC}"
+    echo -e "${GREEN}            WPSILA MANAGER (Local Version)              ${NC}"
     echo -e "${BLUE}================================================${NC}"
     echo -e "${YELLOW}1.${NC} Cai dat (install) Caddy Web Server"
     echo -e "${YELLOW}2.${NC} Cai dat (install) Website WordPress moi"
-    echo -e "${YELLOW}3.${NC} Go cai dat (delete) Website WordPress"
+	echo -e "${YELLOW}3.${NC} Them tai khoan sFTP cho website"
+    echo -e "${YELLOW}4.${NC} Go cai dat (delete) Website WordPress"
     echo -e "${BLUE}------------------------------------------------${NC}"
     echo -e "${YELLOW}0.${NC} Exit (thoat)"
     echo -e "${BLUE}================================================${NC}"
@@ -49,6 +50,13 @@ while true; do
             fi
             echo -e "\n${BLUE}An Enter de quay lai...${NC}"; read -r ;; # Them -r
         3)
+            if [[ -f "$BASE_DIR/setup_sftp.sh" ]]; then
+                bash "$BASE_DIR/setup_sftp.sh"
+            else
+                echo -e "${RED}Loi: Khong tim thay file setup_sftp.sh${NC}"
+            fi
+            echo -e "\n${BLUE}An Enter de quay lai...${NC}"; read -r ;; # Them -r			
+        4)
             if [[ -f "$BASE_DIR/remove_web.sh" ]]; then
                 bash "$BASE_DIR/remove_web.sh"
             else
