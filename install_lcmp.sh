@@ -125,16 +125,10 @@ sudo apt update
 
 echo -e "${GREEN}[*] Dang chuan bi danh sach goi PHP. ${NC}"
 
-# 1. CẤU HÌNH PHIÊN BẢN (Cho phép người dùng truyền tham số vào)
-# ${1:-8.3} nghĩa là: Nếu có tham số $1 truyền vào thì dùng, không thì mặc định là 8.3
-PHP_VER="${1:-8.3}"
+# 1. CẤU HÌNH PHIÊN BẢN
+PHP_VER="8.3"
 
 echo -e "${GREEN}[*] Dang chuan bi cai dat PHP phien ban: ${PHP_VER} ${NC}"
-
-# Nếu cài PHP 8.1 thì chạy lệnh này:
-# curl -sL https://raw.githubusercontent.com/kiencang/wpsila/main/install_lcmp.sh | bash -s -- 8.1
-# Nếu không truyền tham số thì mặc định cài bản 8.3
-# Trên local thì chạy ./install_lcmp.sh 8.1
 
 # 2. DANH SÁCH GÓI (Sử dụng biến ${PHP_VER} để ghép chuỗi)
 PHP_PACKAGES=(
