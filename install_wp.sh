@@ -331,6 +331,7 @@ echo "Domain chuyen huong (redirect domain): $RED_DOMAIN"
 
 # Lưu ý: Tôi thêm $MARKER vào nội dung để lần sau chạy nó sẽ nhận diện được
 read -r -d '' CONTENT <<EOF || true
+###start_wpsila_kiencang_$DOMAIN###
 # 1. Chuyen huong RED_DOMAIN ve DOMAIN 
 $RED_DOMAIN {
     redir https://$DOMAIN{uri} permanent
@@ -414,6 +415,7 @@ $DOMAIN {
 }
     # Danh dau maker de nhan dien sau nay
     $MARKER
+###end_wpsila_kiencang_$DOMAIN###	
 EOF
 
 # 3. Thực hiện Logic kiểm tra
