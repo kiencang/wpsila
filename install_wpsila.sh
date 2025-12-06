@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Dừng script ngay lập tức nếu có lệnh bị lỗi
+set -euo pipefail
+
 # Chạy lệnh
 # curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/install_wpsila.sh | sudo bash
 
