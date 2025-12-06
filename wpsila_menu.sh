@@ -51,8 +51,15 @@ while true; do
             fi
             echo -e "\n${BLUE}An Enter de quay lai...${NC}"; read -r ;; # Them -r
         3)
-            if [[ -f "$BASE_DIR/mariadb_tune.sh" && -f "$BASE_DIR/php_ini_tune.sh" && -f "$BASE_DIR/pool_tune.sh" ]];
-				bash "$BASE_DIR/mariadb_tune.sh" && bash "$BASE_DIR/php_ini_tune.sh" && bash "$BASE_DIR/pool_tune.sh"
+            if [[ -f "$BASE_DIR/mariadb_tune.sh" && -f "$BASE_DIR/php_ini_tune.sh" && -f "$BASE_DIR/pool_tune.sh" ]]; then
+                echo -e "${GREEN}>> Dang chay toi uu MariaDB...${NC}"
+                bash "$BASE_DIR/mariadb_tune.sh" && \
+                
+                echo -e "${GREEN}>> Dang chay toi uu PHP INI...${NC}"
+                bash "$BASE_DIR/php_ini_tune.sh" && \
+                
+                echo -e "${GREEN}>> Dang chay toi uu PHP Pool...${NC}"
+                bash "$BASE_DIR/pool_tune.sh"
             else
                 echo -e "${RED}Loi: Khong tim thay file cai dat toi uu.${NC}"
             fi
