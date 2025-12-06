@@ -51,10 +51,13 @@ download_file() {
 }
 
 download_file "$REPO_URL/wpsila_menu.sh" "$INSTALL_DIR/wpsila_menu.sh"
-download_file "$REPO_URL/install_caddy.sh" "$INSTALL_DIR/install_lcmp.sh"
+download_file "$REPO_URL/install_lcmp.sh" "$INSTALL_DIR/install_lcmp.sh"
 download_file "$REPO_URL/install_wp.sh" "$INSTALL_DIR/install_wp.sh"
 download_file "$REPO_URL/remove_web.sh" "$INSTALL_DIR/remove_web.sh"
 download_file "$REPO_URL/setup_sftp.sh" "$INSTALL_DIR/setup_sftp.sh"
+download_file "$REPO_URL/mariadb_tune.sh" "$INSTALL_DIR/mariadb_tune.sh"
+download_file "$REPO_URL/php_ini_tune.sh" "$INSTALL_DIR/php_ini_tune.sh"
+download_file "$REPO_URL/pool_tune.sh" "$INSTALL_DIR/pool_tune.sh"
 
 # 6. Phân quyền
 chmod 700 "$INSTALL_DIR/"*.sh
