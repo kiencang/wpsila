@@ -86,7 +86,7 @@ if [ -f "$CONFIG_FILE" ]; then
     # Kiểm tra kết quả trả về
     if [ -z "$DB_NAME" ]; then
         echo -e "${YELLOW}Canh bao: Khong the trich xuat ten Database (co the file config loi hoac WP-CLI gap su co).${NC}"
-        echo -e "${YELLOW}Hanh dong: Script se chi xoa file, DATABASE SE DUOC GIU LAI.${NC}"
+        echo -e "${YELLOW}Hanh dong: Script se chi xoa file, DATABASE CHUA XOA.${NC}"
     else
         echo -e "Phat hien Database: ${RED}$DB_NAME${NC}"
         echo -e "Phat hien DB User:  ${RED}$DB_USER${NC}"
@@ -145,7 +145,47 @@ else
     exit 1
 fi
 
-# 8. Kết thúc
+# 8. Xóa chứng chỉ https đã xin cấp trước đây
+# Định nghĩa đường dẫn gốc chứa cert
+CERT_PATH="/var/lib/caddy/.local/share/caddy/certificates/acme-v02.api.letsencrypt.org-directory"
+
+# 8.1. Kiểm tra xem biến DOMAIN có rỗng không?
+if [ -z "$DOMAIN" ]; then
+    echo "LOI: Bien ten mien bi rong! Dung lai de bao ve he thong."
+    exit 1
+fi
+
+# 8.2. Kiểm tra xem thư mục cert của tên miền đó có tồn tại không rồi mới xóa
+if [ -d "$CERT_PATH/$DOMAIN" ]; then
+    echo "Dang xoa chung chi cu cua $DOMAIN..."
+    sudo rm -rf "$CERT_PATH/$DOMAIN"
+else
+    echo "Khong tim thay chung chi cu cua $DOMAIN (Co the chua duoc tao bao gio)."
+fi
+
+# 8.3. Xử lý luôn cả tên miền chuyển hướng
+# Xác định tên miền chuyển hướng
+if [[ "$DOMAIN" == www.* ]]; then
+    # Nếu bắt đầu bằng www. -> Cắt bỏ 4 ký tự đầu (www.)
+    RED_DOMAIN="${DOMAIN#www.}"
+else
+    # Nếu không có www. -> Thêm www. vào đầu
+    RED_DOMAIN="www.$DOMAIN"
+fi
+
+# Phòng thủ
+if [ -z "$RED_DOMAIN" ]; then
+    echo "LOI: Bien ten mien bi rong! Dung lai de bao ve he thong."
+    exit 1
+fi
+
+# Xóa https của tên miền chuyển hướng
+if [ -d "$CERT_PATH/$RED_DOMAIN" ]; then
+    echo "Dang xoa chung chi cu cua $RED_DOMAIN..."
+    sudo rm -rf "$CERT_PATH/$RED_DOMAIN"
+fi
+
+# 9. Kết thúc
 echo -e ""
 echo -e "${GREEN}=== XOA WEBSITE THANH CONG! ===${NC}"
 echo -e "Viec can lam tiep theo:"
