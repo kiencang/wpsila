@@ -185,9 +185,75 @@ if [ -d "$CERT_PATH/$RED_DOMAIN" ]; then
     sudo rm -rf "$CERT_PATH/$RED_DOMAIN"
 fi
 
-# 9. Kết thúc
+# 9. Thêm phần xóa cấu hình trong file Caddyfile
+
+# 9.1. Khai báo biến
+CADDY_FILE="/etc/caddy/Caddyfile"
+
+# Kiểm tra nếu người dùng chưa nhập domain
+if [ -z "$DOMAIN" ]; then
+    echo "Loi: Ten mien trong. Thoat chuong trinh, cau hinh trong Caddyfile chua duoc xoa."
+    exit 1
+fi
+
+# 9.2. Tạo nội dung Marker cần tìm
+# Lưu ý: Marker phải khớp chính xác với những gì bạn đã thêm vào trước đó
+START_MARKER="###start_wpsila_kiencang_${DOMAIN}###"
+END_MARKER="###end_wpsila_kiencang_${DOMAIN}###"
+
+# 9.3. Kiểm tra xem Marker có tồn tại trong file không
+# Dùng grep -F (fixed string) để tìm chính xác chuỗi, tránh lỗi regex
+if ! grep -Fq "$START_MARKER" "$CADDY_FILE"; then
+    echo "Thong bao: KHONG tim thay cau hinh cho domain $DOMAIN trong Caddyfile."
+    exit 0
+fi
+
+echo "Dang tien hanh xoa cau hinh cho: $DOMAIN..."
+
+# 9.4. Xử lý tên miền cho Regex (Quan trọng)
+# Dấu chấm (.) trong domain (ví dụ abc.com) là ký tự đặc biệt trong Regex
+# Cần chuyển đổi dấu . thành \. để sed hiểu đó là dấu chấm thực sự.
+DOMAIN_ESCAPED=$(echo "$DOMAIN" | sed 's/\./\\./g')
+
+# Update lại biến Marker dùng cho Regex (có escaped domain)
+REGEX_START="^###start_wpsila_kiencang_${DOMAIN_ESCAPED}###$"
+REGEX_END="^###end_wpsila_kiencang_${DOMAIN_ESCAPED}###$"
+
+# 9.5. Backup file Caddyfile hiện tại (An toàn là trên hết)
+# 9.5.1. Lấy timestamp 1 lần duy nhất và lưu vào biến
+TIMESTAMP=$(date +%s)
+
+# 9.5.2. Định nghĩa tên file backup cụ thể
+BACKUP_FILE="${CADDY_FILE}.bak_${TIMESTAMP}"
+
+# 9.5.3. Tạo file backup cho caddyfile
+echo "Dang tao file backup: $BACKUP_FILE"
+cp "$CADDY_FILE" "$BACKUP_FILE"
+
+# 9.6. Thực hiện xóa bằng SED
+# Giải thích lệnh sed:
+# -i : Sửa trực tiếp trên file
+# /^...$/ : Dấu ^ là bắt đầu dòng, $ là kết thúc dòng -> Đảm bảo dòng đó chỉ chứa đúng marker, không thừa thiếu khoảng trắng hay ký tự lạ.
+# , : Là phạm vi từ Regex Start đến Regex End
+# d : Delete (xóa)
+sed -i "/$REGEX_START/,/$REGEX_END/d" "$CADDY_FILE"
+
+# 9.7. Kiểm tra tính hợp lệ của Caddyfile mới (Validation)
+# Nếu Caddy báo lỗi cấu hình, lập tức khôi phục file cũ
+if ! caddy validate --config "$CADDY_FILE" --adapter caddyfile > /dev/null 2>&1; then
+    echo "CANH BAO: File Caddyfile bi loi sau khi sua. Dang khoi phuc lai file ban dau..."
+	
+    cp "$BACKUP_FILE" "$CADDY_FILE"
+	
+    echo "Da khoi phuc lai file goc. Vui long kiem tra lai Caddyfile de xoa thu cong no."
+    exit 1
+else
+    # 9.8. Nếu mọi thứ OK, Reload lại Caddy
+    echo "Cau hinh hop le. Dang reload Caddy..."
+    systemctl reload caddy
+    echo "Hoan tat! Da xoa cau hinh cho $DOMAIN trong Caddyfile."
+fi
+
+# 10. Kết thúc
 echo -e ""
 echo -e "${GREEN}=== XOA WEBSITE THANH CONG! ===${NC}"
-echo -e "Viec can lam tiep theo:"
-echo -e "1. Mo file Caddyfile xoa cau hinh domain."
-echo -e "2. Chay lenh: systemctl reload caddy"
