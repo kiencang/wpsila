@@ -331,7 +331,7 @@ echo "Domain chuyen huong (redirect domain): $RED_DOMAIN"
 
 # Lưu ý: Tôi thêm $MARKER vào nội dung để lần sau chạy nó sẽ nhận diện được
 read -r -d '' CONTENT <<EOF || true
-# 1. Chuyen huong www ve non-www 
+# 1. Chuyen huong RED_DOMAIN ve DOMAIN 
 $RED_DOMAIN {
     redir https://$DOMAIN{uri} permanent
 }
