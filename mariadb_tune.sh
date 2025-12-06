@@ -13,19 +13,29 @@ set -euo pipefail
 # curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/mariadb_tune.sh | bash
 
 # Kiểm tra quyền root
-if [ "$(id -u)" != "0" ]; then
+if [[ $EUID -ne 0 ]]; then
    echo "Loi: Ban phai chay script nay voi quyen root (sudo)."
    exit 1
 fi
 
 echo ">> Dang kiem tra cau hinh he thong..."
 
-# Lấy thông tin RAM (MB)
-total_ram_mb=$(free -m | awk '/Mem:/ {print $2}')
+# Lấy tổng RAM theo KB từ Kernel (Chính xác tuyệt đối, không phụ thuộc ngôn ngữ)
+total_ram_kb=$(grep -i 'MemTotal' /proc/meminfo | awk '{print $2}')
+
+# Chuyển đổi sang MB để hiển thị hoặc tính toán đơn giản (chia 1024)
+# Dùng phép tính số học của bash $((...)) nhanh hơn dùng lệnh bên ngoài
+total_ram_mb=$((total_ram_kb / 1024))
+
 echo "- Tong RAM he thong: ${total_ram_mb} MB"
 
+# Thư mục chứa các file cấu hình phụ của MariaDB trên Ubuntu
+# Phân tách cấu hình tùy chỉnh ra khỏi cấu hình hệ thống
 CONFIG_DIR="/etc/mysql/mariadb.conf.d"
-CONFIG_FILE="$CONFIG_DIR/99-wpsila-tune.cnf"
+
+# Tên file tùy chỉnh, số 99 để nó được đọc cuối, ghi đè các file đã được đọc trước đó
+# vì các file sẽ đọc theo thứ tự chữ cái rồi đến số...
+CONFIG_FILE="$CONFIG_DIR/99-wpsila-db-tune.cnf"
 
 if [ ! -d "$CONFIG_DIR" ]; then
     echo "Loi: Khong tim thay thu muc cau hinh MariaDB ($CONFIG_DIR)."
@@ -69,6 +79,27 @@ else
     tmp_table="64M"
     pool_instances=4
     perf_schema="ON"
+fi
+
+
+# Xử lý trường hợp buffer_pool là dạng phần trăm (ví dụ "50%")
+if [[ "$buffer_pool" == *"%" ]]; then
+    percent=${buffer_pool%\%} # Lấy số 50 ra khỏi chuỗi "50%"
+    
+    # Bước 1: Tính ra số MB thô
+    raw_mb=$(( total_ram_mb * percent / 100 ))
+    
+    # Bước 2: Làm tròn về bội số của 128MB (Chunk alignment)
+    # Logic: Chia cho 128 (lấy phần nguyên), sau đó nhân lại cho 128
+    # Ví dụ: 4117 / 128 = 32 (nguyên); 32 * 128 = 4096.
+    buffer_pool_mb=$(( (raw_mb / 128) * 128 ))
+    
+    # Bước 3: Kiểm tra an toàn (tránh trường hợp RAM quá bé tính ra 0)
+    if (( buffer_pool_mb < 128 )); then
+        buffer_pool_mb=128
+    fi
+
+    buffer_pool="${buffer_pool_mb}M"
 fi
 
 # ==============================================================================
