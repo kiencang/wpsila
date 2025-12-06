@@ -1,33 +1,33 @@
 #!/bin/bash
 set -euo pipefail
 
-# --- TỰ ĐỘNG PHÁT HIỆN PHP VERSION ---
-# Lấy version PHP đang chạy (dạng 8.0, 8.1, 8.3...)
+# Phiên bản PHP hiện tại
+PHP_VER="8.3"
+
+# Kiểm tra xem hệ thống có đang chạy PHP hay không
 if ! command -v php &> /dev/null; then
     echo "❌ Không tìm thấy PHP. Vui lòng cài đặt PHP trước."
     exit 1
 fi
 
-CURRENT_PHP_VER=$(php -r "echo PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION;")
-echo ">> Phát hiện phiên bản PHP: $CURRENT_PHP_VER"
-
-CONF_DIR="/etc/php/${CURRENT_PHP_VER}/fpm/conf.d"
+# Thư mục chứa các file cấu hình bổ sung cho PHP-FPM
+CONF_DIR="/etc/php/${PHP_VER}/fpm/conf.d"
 
 # Kiểm tra xem thư mục có tồn tại không
 if [ ! -d "$CONF_DIR" ]; then
-    echo "❌ Không tìm thấy thư mục cấu hình: $CONF_DIR"
-    echo ">> Script này chỉ hỗ trợ Ubuntu/Debian với cấu trúc thư mục chuẩn."
+    echo "❌ KHONG tim thay thu muc cau hinh: $CONF_DIR"
+    echo ">> Script nay chi ho tro Ubuntu/Debian voi cau hinh thu muc chuan."
     exit 1
 fi
 
+# Đặt tên cho file và lưu nó vào thư mục cấu hình bổ sung
 PHP_INI_FILE="${CONF_DIR}/99-wpsila-tuned.ini"
 
 # --- TẠO FILE CẤU HÌNH ---
-echo ">> Đang tạo cấu hình tối ưu cho WordPress..."
+echo ">> Dang tao file cau hinh toi uu cho WordPress..."
 
 cat > "${PHP_INI_FILE}" <<EOF
 ; ==============================================================================
-; TUNED BY AI EXPERT (Based on WPSILA)
 ; Target: Low-end VPS | WordPress Blog
 ; ==============================================================================
 
@@ -66,10 +66,10 @@ disable_functions = system,pcntl_alarm,pcntl_fork,pcntl_waitpid,pcntl_wait,pcntl
 EOF
 
 # --- KHỞI ĐỘNG LẠI PHP ---
-echo ">> Đang reload lại PHP-FPM..."
-if service php${CURRENT_PHP_VER}-fpm reload; then
-    echo "✅ Hoàn tất! Cấu hình đã được áp dụng cho PHP $CURRENT_PHP_VER."
-    echo "   File cấu hình: $PHP_INI_FILE"
+echo ">> Dang reload lai PHP-FPM..."
+if service php${PHP_VER}-fpm reload; then
+    echo "✅ Hoan tat! Cau hinh da duoc ap dung cho PHP $PHP_VER."
+    echo "   File cau hinh: $PHP_INI_FILE"
 else
-    echo "⚠️  Không thể reload PHP tự động. Vui lòng chạy lệnh: service php${CURRENT_PHP_VER}-fpm reload"
+    echo "⚠️  KHONG the reload PHP tu dong. Vui long chay lenh: service php${PHP_VER}-fpm reload"
 fi
