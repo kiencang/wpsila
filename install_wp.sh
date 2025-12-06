@@ -312,11 +312,27 @@ echo "--------------------------------------------------------------------------
 CADDY_FILE="/etc/caddy/Caddyfile"
 MARKER="#wpSila_kiencang"
 
-# 2. Định nghĩa nội dung bạn muốn thêm vào
+# Xác định và chuẩn hóa dạng tên miền có-www hoặc không-www, để xác định tên miền chuyển hướng phù hợp
+# Giả sử biến DOMAIN đã được nhập
+# DOMAIN="example.com" hoặc DOMAIN="www.example.com"
+
+# Xử lý logic
+if [[ "$DOMAIN" == www.* ]]; then
+    # Nếu bắt đầu bằng www. -> Cắt bỏ 4 ký tự đầu (www.)
+    RED_DOMAIN="${DOMAIN#www.}"
+else
+    # Nếu không có www. -> Thêm www. vào đầu
+    RED_DOMAIN="www.$DOMAIN"
+fi
+
+# Kiểm tra kết quả
+echo "Domain chinh: $DOMAIN"
+echo "Domain chuyen huong (redirect domain): $RED_DOMAIN"
+
 # Lưu ý: Tôi thêm $MARKER vào nội dung để lần sau chạy nó sẽ nhận diện được
 read -r -d '' CONTENT <<EOF || true
 # 1. Chuyen huong www ve non-www 
-www.$DOMAIN {
+$RED_DOMAIN {
     redir https://$DOMAIN{uri} permanent
 }
 
