@@ -1,4 +1,6 @@
 #!/bin/bash
+
+# Dừng script ngay lập tức nếu có lệnh bị lỗi
 set -euo pipefail
 
 # Phiên bản PHP
@@ -85,7 +87,8 @@ echo "   - pm.max_children = $PM_MAX_CHILDREN"
 echo "   - pm.start_servers = $PM_START_SERVERS"
 
 # 5. TẠO FILE CẤU HÌNH (GHI ĐÈ)
-CONFIG_FILE="${CONF_DIR}/99-wpsila-pool.conf"
+# Link dẫn của file
+CONFIG_FILE="${CONF_DIR}/99-wpsila-pool-tune.conf"
 
 cat > "${CONFIG_FILE}" <<EOF
 ; ==============================================================================

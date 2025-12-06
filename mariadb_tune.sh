@@ -31,20 +31,16 @@ echo "- Tong RAM he thong: ${total_ram_mb} MB"
 
 # Thư mục chứa các file cấu hình phụ của MariaDB trên Ubuntu
 # Phân tách cấu hình tùy chỉnh ra khỏi cấu hình hệ thống
-CONFIG_DIR="/etc/mysql/mariadb.conf.d"
+CONF_DIR="/etc/mysql/mariadb.conf.d"
 
-# Tên file tùy chỉnh, số 99 để nó được đọc cuối, ghi đè các file đã được đọc trước đó
-# vì các file sẽ đọc theo thứ tự chữ cái rồi đến số...
-CONFIG_FILE="$CONFIG_DIR/99-wpsila-db-tune.cnf"
-
-if [ ! -d "$CONFIG_DIR" ]; then
-    echo "Loi: Khong tim thay thu muc cau hinh MariaDB ($CONFIG_DIR)."
+if [ ! -d "$CONF_DIR" ]; then
+    echo "Loi: Khong tim thay thu muc cau hinh MariaDB ($CONF_DIR)."
     exit 1
 fi
 
-# ==============================================================================
+# ======================================================
 # LOGIC TÍNH TOÁN (ĐÃ ĐIỀU CHỈNH CHO BACKUP SITE LỚN)
-# ==============================================================================
+# ======================================================
 
 pool_instances=1
 perf_schema="OFF"
@@ -102,9 +98,13 @@ if [[ "$buffer_pool" == *"%" ]]; then
     buffer_pool="${buffer_pool_mb}M"
 fi
 
-# ==============================================================================
+# ====================================================
 # TẠO FILE CẤU HÌNH (AN TOÀN TUYỆT ĐỐI CHO BACKUP)
-# ==============================================================================
+# ====================================================
+
+# Tên file tùy chỉnh, số 99 để nó được đọc cuối, ghi đè các file đã được đọc trước đó
+# vì các file sẽ đọc theo thứ tự chữ cái rồi đến số...
+CONFIG_FILE="$CONF_DIR/99-wpsila-db-tune.cnf"
 
 echo ">> Dang tao file cau hinh toi uu cho blog nhieu bai viet va backup thuong xuyen..."
 

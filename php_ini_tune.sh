@@ -1,4 +1,6 @@
 #!/bin/bash
+
+# Dừng script ngay lập tức nếu có lệnh bị lỗi
 set -euo pipefail
 
 # Phiên bản PHP hiện tại
@@ -27,13 +29,13 @@ if [ ! -d "$CONF_DIR" ]; then
     exit 1
 fi
 
+# --- TẠO FILE CẤU HÌNH (GHI ĐÈ) ---
 # Đặt tên cho file và lưu nó vào thư mục cấu hình bổ sung
-PHP_INI_FILE="${CONF_DIR}/99-wpsila-tuned.ini"
+CONFIG_FILE="${CONF_DIR}/99-wpsila-phpini-tune.ini"
 
-# --- TẠO FILE CẤU HÌNH ---
 echo ">> Dang tao file cau hinh toi uu cho WordPress..."
 
-cat > "${PHP_INI_FILE}" <<EOF
+cat > "${CONFIG_FILE}" <<EOF
 ; ==============================================================================
 ; Target: Low-end VPS | WordPress Blog
 ; ==============================================================================
@@ -76,7 +78,7 @@ EOF
 echo ">> Dang reload lai PHP-FPM..."
 if service php${PHP_VER}-fpm reload; then
     echo "✅ Hoan tat! Cau hinh da duoc ap dung cho PHP $PHP_VER."
-    echo "   File cau hinh: $PHP_INI_FILE"
+    echo "   File cau hinh: $CONFIG_FILE"
 else
     echo "⚠️  KHONG the reload PHP tu dong. Vui long chay lenh: service php${PHP_VER}-fpm reload"
 fi
