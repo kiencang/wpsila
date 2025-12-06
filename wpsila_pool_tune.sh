@@ -8,6 +8,9 @@ PHP_VER="8.3"
 # SCRIPT TỰ ĐỘNG TỐI ƯU PHP-FPM POOL THEO RAM (Dành cho Ubuntu/Debian)
 # ==============================================================================
 
+# Test lệnh
+# curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/wpsila_pool_tune.sh | sudo bash
+
 # 1. KIỂM TRA QUYỀN ROOT
 if [ "$EUID" -ne 0 ]; then
   echo "❌ Vui long chay script nay voi quyen root (sudo)."

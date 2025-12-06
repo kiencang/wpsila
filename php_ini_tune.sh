@@ -4,6 +4,13 @@ set -euo pipefail
 # Phiên bản PHP hiện tại
 PHP_VER="8.3"
 
+# ==============================================================================
+# SCRIPT TỰ ĐỘNG TỐI ƯU PHP INI (Dành cho Ubuntu)
+# ==============================================================================
+
+# Test lệnh
+# curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/php_ini_tune.sh | sudo bash
+
 # Kiểm tra xem hệ thống có đang chạy PHP hay không
 if ! command -v php &> /dev/null; then
     echo "❌ Không tìm thấy PHP. Vui lòng cài đặt PHP trước."

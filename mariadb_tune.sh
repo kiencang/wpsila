@@ -9,8 +9,8 @@ set -euo pipefail
 # Use Case: Blog 1000+ Posts & Frequent Backups
 # ==============================================================================
 
-# Chạy lệnh
-# curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/mariadb_tune.sh | bash
+# Test lệnh
+# curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/mariadb_tune.sh | sudo bash
 
 # Kiểm tra quyền root
 if [[ $EUID -ne 0 ]]; then
