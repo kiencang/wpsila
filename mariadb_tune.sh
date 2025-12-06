@@ -106,7 +106,7 @@ fi
 # TẠO FILE CẤU HÌNH (AN TOÀN TUYỆT ĐỐI CHO BACKUP)
 # ==============================================================================
 
-echo ">> Dang tao file cau hinh toi uu cho backup..."
+echo ">> Dang tao file cau hinh toi uu cho blog nhieu bai viet va backup thuong xuyen..."
 
 cat > "$CONFIG_FILE" <<EOF
 # Cấu hình tối ưu bởi WP SILA (Blog 1000+ Posts Edition)

@@ -41,7 +41,7 @@ total_ram_kb=$(grep -i 'MemTotal' /proc/meminfo | awk '{print $2}')
 TOTAL_RAM=$((total_ram_kb / 1024))
 
 echo ">> 🖥️  Thong tin he thong:"
-echo "   - Tổng RAM: ${TOTAL_RAM} MB"
+echo "   - Tong RAM: ${TOTAL_RAM} MB"
 
 # 4. TÍNH TOÁN THÔNG SỐ (Logic Safe Tuning)
 # Công thức dựa trên mức tiêu thụ trung bình 50-60MB/tiến trình PHP
