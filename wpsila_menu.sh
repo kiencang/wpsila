@@ -18,17 +18,18 @@ fi
 
 show_menu() {
     clear
-    echo -e "${BLUE}================================================${NC}"
+    echo -e "${BLUE}=======================================================${NC}"
     echo -e "${GREEN}            WPSILA MANAGER (Local Version)              ${NC}"
-    echo -e "${BLUE}================================================${NC}"
+    echo -e "${BLUE}=======================================================${NC}"
     echo -e "${YELLOW}1.${NC} Cai dat (install) Caddy Web Server (mot lan la du)"
 	echo -e "${YELLOW}2.${NC} Toi uu he thong (mot lan la du)"
+	echo -e "${BLUE}------------------------------------------------${NC}"
     echo -e "${YELLOW}3.${NC} Cai dat (install) Website WordPress moi"
 	echo -e "${YELLOW}4.${NC} Them tai khoan sFTP cho website"
     echo -e "${YELLOW}5.${NC} Go cai dat (delete) Website WordPress"
     echo -e "${BLUE}------------------------------------------------${NC}"
     echo -e "${YELLOW}0.${NC} Exit (thoat)"
-    echo -e "${BLUE}================================================${NC}"
+    echo -e "${BLUE}=======================================================${NC}"
     echo -n "Nhap lua chon: "
 }
 
