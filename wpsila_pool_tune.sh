@@ -1,33 +1,41 @@
 #!/bin/bash
 set -euo pipefail
 
+# Phiên bản PHP
+PHP_VER="8.3"
+
 # ==============================================================================
 # SCRIPT TỰ ĐỘNG TỐI ƯU PHP-FPM POOL THEO RAM (Dành cho Ubuntu/Debian)
 # ==============================================================================
 
 # 1. KIỂM TRA QUYỀN ROOT
 if [ "$EUID" -ne 0 ]; then
-  echo "❌ Vui lòng chạy script này với quyền root (sudo)."
+  echo "❌ Vui long chay script nay voi quyen root (sudo)."
   exit 1
 fi
 
-# 2. PHÁT HIỆN PHIÊN BẢN PHP
+# Kiểm tra xem có đang cài đặt PHP không?
 if ! command -v php &> /dev/null; then
-    echo "❌ Không tìm thấy PHP. Vui lòng cài đặt PHP trước."
+    echo "❌ Khong tim thay PHP. Vui long cai dat PHP truoc."
     exit 1
 fi
-CURRENT_PHP_VER=$(php -r "echo PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION;")
-CONF_DIR="/etc/php/${CURRENT_PHP_VER}/fpm/pool.d"
+
+CONF_DIR="/etc/php/${PHP_VER}/fpm/pool.d"
 
 if [ ! -d "$CONF_DIR" ]; then
-    echo "❌ Không tìm thấy thư mục cấu hình: $CONF_DIR"
+    echo "❌ Khong tim thay thu muc cau hinh: $CONF_DIR"
     exit 1
 fi
 
 # 3. PHÁT HIỆN DUNG LƯỢNG RAM (MB)
-TOTAL_RAM=$(free -m | awk '/^Mem:/{print $2}')
-echo ">> 🖥️  Thông tin hệ thống:"
-echo "   - Phiên bản PHP: $CURRENT_PHP_VER"
+# Lấy tổng RAM theo KB từ Kernel (Chính xác tuyệt đối, không phụ thuộc ngôn ngữ)
+total_ram_kb=$(grep -i 'MemTotal' /proc/meminfo | awk '{print $2}')
+
+# Chuyển đổi sang MB để hiển thị hoặc tính toán đơn giản (chia 1024)
+# Dùng phép tính số học của bash $((...)) nhanh hơn dùng lệnh bên ngoài
+TOTAL_RAM=$((total_ram_kb / 1024))
+
+echo ">> 🖥️  Thong tin he thong:"
 echo "   - Tổng RAM: ${TOTAL_RAM} MB"
 
 # 4. TÍNH TOÁN THÔNG SỐ (Logic Safe Tuning)
@@ -67,12 +75,12 @@ else
     PM_MAX_SPARE=30
 fi
 
-echo ">> ⚡ Áp dụng cấu hình cho mức RAM: $RAM_PROFILE"
+echo ">> ⚡ Ap dung cau hinh cho muc RAM: $RAM_PROFILE"
 echo "   - pm.max_children = $PM_MAX_CHILDREN"
 echo "   - pm.start_servers = $PM_START_SERVERS"
 
 # 5. TẠO FILE CẤU HÌNH (GHI ĐÈ)
-CONFIG_FILE="${CONF_DIR}/z-wpsila-pool.conf"
+CONFIG_FILE="${CONF_DIR}/99-wpsila-pool.conf"
 
 cat > "${CONFIG_FILE}" <<EOF
 ; ==============================================================================
@@ -90,14 +98,14 @@ pm.max_requests = 1000
 EOF
 
 # 6. RELOAD PHP-FPM
-echo ">> 🔄 Đang reload lại PHP-FPM..."
+echo ">> 🔄 Dang reload lai PHP-FPM..."
 
 # Test cấu hình trước khi reload để tránh sập web
-if php-fpm${CURRENT_PHP_VER} -t; then
-    service php${CURRENT_PHP_VER}-fpm reload
-    echo "✅ THÀNH CÔNG! Đã cập nhật file: $CONFIG_FILE"
+if php-fpm${PHP_VER} -t; then
+    service php${PHP_VER}-fpm reload
+    echo "✅ THANH CONG! Da cap nhat file: $CONFIG_FILE"
 else
-    echo "❌ Lỗi cấu hình! Đã hủy bỏ reload. Vui lòng kiểm tra file log."
+    echo "❌ Loi cau hinh! Da huy bo reload. Vui long kiem tra lai file log."
     rm "${CONFIG_FILE}"
-    echo "   Đã xóa file cấu hình lỗi để khôi phục trạng thái cũ."
+    echo "   Da xoa bo cau hinh loi de khoi phuc lai trang thai cu."
 fi
