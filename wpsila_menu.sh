@@ -21,9 +21,9 @@ show_menu() {
     echo -e "${BLUE}================================================${NC}"
     echo -e "${GREEN}            WPSILA MANAGER (Local Version)              ${NC}"
     echo -e "${BLUE}================================================${NC}"
-    echo -e "${YELLOW}1.${NC} Cai dat (install) Caddy Web Server"
-    echo -e "${YELLOW}2.${NC} Cai dat (install) Website WordPress moi"
-	echo -e "${YELLOW}3.${NC} Toi uu he thong"
+    echo -e "${YELLOW}1.${NC} Cai dat (install) Caddy Web Server (mot lan la du)"
+	echo -e "${YELLOW}2.${NC} Toi uu he thong (mot lan la du)"
+    echo -e "${YELLOW}3.${NC} Cai dat (install) Website WordPress moi"
 	echo -e "${YELLOW}4.${NC} Them tai khoan sFTP cho website"
     echo -e "${YELLOW}5.${NC} Go cai dat (delete) Website WordPress"
     echo -e "${BLUE}------------------------------------------------${NC}"
@@ -44,13 +44,6 @@ while true; do
             fi
             echo -e "\n${BLUE}An Enter de quay lai...${NC}"; read -r ;; # Them -r
         2)
-            if [[ -f "$BASE_DIR/install_wp.sh" ]]; then
-                bash "$BASE_DIR/install_wp.sh"
-            else
-                echo -e "${RED}Loi: Khong tim thay file install_wp.sh${NC}"
-            fi
-            echo -e "\n${BLUE}An Enter de quay lai...${NC}"; read -r ;; # Them -r
-        3)
             if [[ -f "$BASE_DIR/mariadb_tune.sh" && -f "$BASE_DIR/php_ini_tune.sh" && -f "$BASE_DIR/pool_tune.sh" ]]; then
                 echo -e "${GREEN}>> Dang chay toi uu MariaDB...${NC}"
                 bash "$BASE_DIR/mariadb_tune.sh" && \
@@ -63,7 +56,14 @@ while true; do
             else
                 echo -e "${RED}Loi: Khong tim thay file cai dat toi uu.${NC}"
             fi
-            echo -e "\n${BLUE}An Enter de quay lai...${NC}"; read -r ;; # Them -r			
+            echo -e "\n${BLUE}An Enter de quay lai...${NC}"; read -r ;; # Them -r					
+        3)
+            if [[ -f "$BASE_DIR/install_wp.sh" ]]; then
+                bash "$BASE_DIR/install_wp.sh"
+            else
+                echo -e "${RED}Loi: Khong tim thay file install_wp.sh${NC}"
+            fi
+            echo -e "\n${BLUE}An Enter de quay lai...${NC}"; read -r ;; # Them -r	
         4)
             if [[ -f "$BASE_DIR/setup_sftp.sh" ]]; then
                 bash "$BASE_DIR/setup_sftp.sh"
