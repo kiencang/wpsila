@@ -310,7 +310,7 @@ echo "--------------------------------------------------------------------------
 # Phần 5: Chinh sua file Caddyfile
 # 1. Khai báo biến đường dẫn và Marker
 CADDY_FILE="/etc/caddy/Caddyfile"
-MARKER="#wpSila_kiencang"
+MARKER="#wpsila_kiencang"
 
 # Xác định và chuẩn hóa dạng tên miền có-www hoặc không-www, để xác định tên miền chuyển hướng phù hợp
 # Giả sử biến DOMAIN đã được nhập
@@ -412,7 +412,7 @@ $DOMAIN {
 
     file_server
 }
-    # Đánh dấu marker để nhận diện sau này
+    # Danh dau maker de nhan dien sau nay
     $MARKER
 EOF
 
