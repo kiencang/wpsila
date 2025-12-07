@@ -308,141 +308,97 @@ echo "--------------------------------------------------------------------------
 # --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # Phần 5: Chinh sua file Caddyfile
+# ---------------------------------------------------------
 # 1. Khai báo biến đường dẫn và Marker
 CADDY_FILE="/etc/caddy/Caddyfile"
 MARKER="#wpsila_kiencang"
+# URL trỏ tới file template (đã thay đổi theo link của bạn)
+TEMPLATE_URL="https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/caddyfile-wp.tpl"
+TEMP_CADDY="/tmp/caddy_gen_temp.conf"
 
-# Xác định và chuẩn hóa dạng tên miền có-www hoặc không-www, để xác định tên miền chuyển hướng phù hợp
-# Giả sử biến DOMAIN đã được nhập
-# DOMAIN="example.com" hoặc DOMAIN="www.example.com"
-
-# Xử lý logic
+# Xác định và chuẩn hóa dạng tên miền
 if [[ "$DOMAIN" == www.* ]]; then
-    # Nếu bắt đầu bằng www. -> Cắt bỏ 4 ký tự đầu (www.)
     RED_DOMAIN="${DOMAIN#www.}"
 else
-    # Nếu không có www. -> Thêm www. vào đầu
     RED_DOMAIN="www.$DOMAIN"
 fi
 
-# Kiểm tra kết quả
 echo "Domain chinh: $DOMAIN"
-echo "Domain chuyen huong (redirect domain): $RED_DOMAIN"
+echo "Domain chuyen huong: $RED_DOMAIN"
 
-# Lưu ý: Tôi thêm $MARKER vào nội dung để lần sau chạy nó sẽ nhận diện được
-read -r -d '' CONTENT <<EOF || true
-###start_wpsila_kiencang_$DOMAIN###
-# 1. Chuyen huong RED_DOMAIN ve DOMAIN 
-$RED_DOMAIN {
-    redir https://$DOMAIN{uri} permanent
-}
-
-# 2. Cau hinh chinh
-$DOMAIN {
-    root * /var/www/$DOMAIN/public_html
-    encode zstd gzip
-	
-    # Tang gioi han upload, can chinh them /etc/php/PHP_VER/fpm/php.ini cho dong bo
-    request_body {
-        max_size 50MB
-    }	
-
-    # Log: Tu dong xoay vong
-    log {
-        output file /var/www/$DOMAIN/logs/access.log {
-            roll_size 10mb
-            roll_keep 10
-        }
-    }
-
-    # --- SECURITY HEADERS ---
-    # Sau khi HTTPS da chay on dinh, hay bo comment dong Strict-Transport-Security
-    header {
-        X-Content-Type-Options "nosniff"
-        X-Frame-Options "SAMEORIGIN"
-        X-XSS-Protection "0"
-        Referrer-Policy "strict-origin-when-cross-origin"
-        Permissions-Policy "camera=(), microphone=(), geolocation=(), browsing-topics=()"
-        # Strict-Transport-Security "max-age=31536000; includeSubDomains"
-        -Server
-        -X-Powered-By
-    }
-
-    # --- CACHE CODE (CSS/JS) ---
-    # Khong dung immutable de tranh loi khi update code
-    @code_assets {
-        file
-        path *.css *.js
-    }
-    header @code_assets Cache-Control "public, max-age=604800"
-
-    # --- CACHE MEDIA (ANH/FONT) ---
-    # Dung immutable vi file anh it khi sua noi dung ma giu nguyen ten
-    @media_assets {
-        file
-        path *.ico *.gif *.jpg *.jpeg *.png *.svg *.woff *.woff2 *.webp *.avif
-    }
-    header @media_assets Cache-Control "public, max-age=31536000, immutable"
-
-    # --- CHAN FILE NHAY CAM (SECURITY BLOCK) ---
-    @forbidden {
-        # 1. Block PHP Uploads 
-        path /wp-content/uploads/*.php
-
-        # 2. Block System Files & Directories
-        path /wp-config.php
-        path /.htaccess
-		path /.git
-        path /.git/*     
-        path *.env   
-        path /readme.html
-        path /license.txt
-		
-		# 3. Block xmlrpc 
-		path /xmlrpc.php
-        
-        # 4. Block Backups & Logs
-        path *.sql *.bak *.log *.old
-        # path *.zip *.rar *.tar *.7z
-    }
-    # Tra ve 404
-    respond @forbidden 404
-	
-	# PHP FastCGI, lấy động theo phiên bản PHP thiết lập ở đầu file lệnh.
-    php_fastcgi unix//run/php/php${PHP_VER}-fpm.sock
-
-    file_server
-}
-    # Danh dau maker de nhan dien sau nay
-    $MARKER
-###end_wpsila_kiencang_$DOMAIN###	
-EOF
-
-# 3. Thực hiện Logic kiểm tra
-# grep -q: Chế độ im lặng (quiet), chỉ trả về đúng (0) hoặc sai (1), không in ra màn hình
-# 2>/dev/null: Ẩn lỗi nếu file không tồn tại
-if grep -q "$MARKER" "$CADDY_FILE" 2>/dev/null; then
-		
-	echo "TIM THAY marker '$MARKER'. Dang them cau hinh vao cuoi file Caddyfile..."
-		
-	# Thay thế cho echo >> (Nối thêm)
-	echo "$CONTENT" | sudo tee -a "$CADDY_FILE" > /dev/null
-
-else
-		
-	echo "CAI DAT WORDPRESS lan dau tren Caddy! Dang xoa mac dinh cu va tao file Caddyfile moi..."
-		
-	# Thay thế cho echo > (Ghi đè)
-	echo "$CONTENT" | sudo tee "$CADDY_FILE" > /dev/null
-
+# 2. Tải template cấu hình từ GitHub
+echo -e "${GREEN}>>> Dang tai Caddy Template tu GitHub...${NC}"
+if ! curl -sL "$TEMPLATE_URL" -o "$TEMP_CADDY"; then
+    echo -e "${RED}Loi: Khong the tai file template Caddy. Kiem tra lai ket noi mang hoac URL.${NC}"
+    exit 1
 fi
 
-echo "Dang kiem tra va reload Caddy..."
-# 4. Format
-caddy fmt --overwrite "$CADDY_FILE" > /dev/null 2>&1
+# 3. Xử lý thay thế biến vào Template
+sed -i "s|{{DOMAIN}}|$DOMAIN|g" "$TEMP_CADDY"
+sed -i "s|{{RED_DOMAIN}}|$RED_DOMAIN|g" "$TEMP_CADDY"
+sed -i "s|{{PHP_VER}}|$PHP_VER|g" "$TEMP_CADDY"
 
-#5. Reload lại Caddy
-sudo systemctl reload caddy
+CONTENT=$(cat "$TEMP_CADDY")
+rm -f "$TEMP_CADDY"
+
+# --- TẠO BACKUP AN TOÀN ---
+TIMESTAMP=$(date +%s)
+BACKUP_FILE="${CADDY_FILE}.bak_${TIMESTAMP}"
+
+# Kiểm tra nếu file tồn tại thì mới backup để tránh lỗi
+if [ -f "$CADDY_FILE" ]; then
+    echo "Dang tao file backup: $BACKUP_FILE"
+    sudo cp "$CADDY_FILE" "$BACKUP_FILE"
+else
+    echo "Day la lan cai dat dau tien, chua co file Caddyfile cu de backup."
+    # Tạo file rỗng để tránh lỗi cho các lệnh phía sau
+    sudo touch "$CADDY_FILE"
+fi
+
+# 4. Thực hiện ghi vào Caddyfile chính
+if grep -q "$MARKER" "$CADDY_FILE" 2>/dev/null; then
+    echo "TIM THAY marker '$MARKER'. Dang them cau hinh vao cuoi file Caddyfile..."
+    echo "$CONTENT" | sudo tee -a "$CADDY_FILE" > /dev/null
+else
+    echo "CAI DAT WORDPRESS lan dau! Tao file Caddyfile moi..."
+    echo "$CONTENT" | sudo tee "$CADDY_FILE" > /dev/null
+fi
+
+# Format lại cho đẹp
+sudo caddy fmt --overwrite "$CADDY_FILE" > /dev/null 2>&1
+
+# 5. VALIDATE & ROLLBACK
+echo "Dang kiem tra cu phap Caddyfile..."
+
+# Kiểm tra tính hợp lệ
+if ! sudo caddy validate --config "$CADDY_FILE" --adapter caddyfile > /dev/null 2>&1; then
+    echo -e "${RED}CANH BAO: File Caddyfile bi loi cu phap!${NC}"
+    
+    # In ra lỗi cụ thể cho người dùng xem sai ở đâu
+    sudo caddy validate --config "$CADDY_FILE" --adapter caddyfile
+    
+    echo -e "${YELLOW}Dang khoi phuc lai file ban dau...${NC}"
+    
+    if [ -f "$BACKUP_FILE" ]; then
+        sudo cp "$BACKUP_FILE" "$CADDY_FILE"
+        echo "Da khoi phuc lai file goc an toan."
+    else
+        # Trường hợp cài lần đầu mà lỗi luôn thì xóa file lỗi đi
+        echo "Khong co file backup (cai lan dau). Xoa file loi..."
+        sudo rm "$CADDY_FILE"
+    fi
+    
+    exit 1
+else
+    # Nếu mọi thứ OK, Reload lại Caddy
+    echo "Cau hinh hop le. Dang reload Caddy..."
+    if sudo systemctl reload caddy; then
+        echo -e "${GREEN}>>> Reload Caddy thanh cong!${NC}"
+    else
+        echo -e "${RED}>>> Loi: Validate OK nhung khong the reload service.${NC}"
+        exit 1
+    fi
+fi
 
 echo "Nhap lenh: cat ~/wpp.txt de xem thong tin dang nhap WordPress."
 echo "Hoan tat! Xin chuc mung ban da cai thanh cong WordPress trên Caddy Web Server."
