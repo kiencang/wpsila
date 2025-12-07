@@ -63,7 +63,6 @@ download_file "$REPO_URL/php_ini_tune.sh" "$INSTALL_DIR/php_ini_tune.sh"
 download_file "$REPO_URL/pool_tune.sh" "$INSTALL_DIR/pool_tune.sh"
 download_file "$REPO_URL/wpp.sh" "$INSTALL_DIR/wpp.sh"
 download_file "$REPO_URL/wpsila.conf" "$INSTALL_DIR/wpsila.conf"
-download_file "$REPO_URL/caddyfile_wp.tpl" "$INSTALL_DIR/caddyfile_wp.tpl"
 
 # 6. Phân quyền
 chmod 700 "$INSTALL_DIR/"*.sh
