@@ -392,12 +392,8 @@ if ! sudo caddy validate --config "$CADDY_FILE" --adapter caddyfile > /dev/null 
 else
     # Nếu mọi thứ OK, Reload lại Caddy
     echo "Cau hinh hop le. Dang reload Caddy..."
-    if sudo systemctl reload caddy; then
-        echo -e "${GREEN}>>> Reload Caddy thanh cong!${NC}"
-    else
-        echo -e "${RED}>>> Loi: Validate OK nhung khong the reload service.${NC}"
-        exit 1
-    fi
+    sudo systemctl reload caddy
+    echo "Hoan tat! Da cap nhat cau hinh cho $DOMAIN trong Caddyfile."
 fi
 
 echo "Nhap lenh: cat ~/wpp.txt de xem thong tin dang nhap WordPress."
