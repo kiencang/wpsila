@@ -228,7 +228,7 @@ BACKUP_FILE="${CADDY_FILE}.bak_${TIMESTAMP}"
 
 # 9.5.3. Tạo file backup cho caddyfile
 echo "Dang tao file backup: $BACKUP_FILE"
-cp "$CADDY_FILE" "$BACKUP_FILE"
+sudo cp "$CADDY_FILE" "$BACKUP_FILE"
 
 # 9.6. Thực hiện xóa bằng SED
 # Giải thích lệnh sed:
@@ -236,21 +236,23 @@ cp "$CADDY_FILE" "$BACKUP_FILE"
 # /^...$/ : Dấu ^ là bắt đầu dòng, $ là kết thúc dòng -> Đảm bảo dòng đó chỉ chứa đúng marker, không thừa thiếu khoảng trắng hay ký tự lạ.
 # , : Là phạm vi từ Regex Start đến Regex End
 # d : Delete (xóa)
-sed -i "/$REGEX_START/,/$REGEX_END/d" "$CADDY_FILE"
+sudo sed -i "/$REGEX_START/,/$REGEX_END/d" "$CADDY_FILE"
 
 # 9.7. Kiểm tra tính hợp lệ của Caddyfile mới (Validation)
 # Nếu Caddy báo lỗi cấu hình, lập tức khôi phục file cũ
-if ! caddy validate --config "$CADDY_FILE" --adapter caddyfile > /dev/null 2>&1; then
+if ! sudo caddy validate --config "$CADDY_FILE" --adapter caddyfile > /dev/null 2>&1; then
     echo "CANH BAO: File Caddyfile bi loi sau khi sua. Dang khoi phuc lai file ban dau..."
 	
-    cp "$BACKUP_FILE" "$CADDY_FILE"
+    sudo cp "$BACKUP_FILE" "$CADDY_FILE"
 	
     echo "Da khoi phuc lai file goc. Vui long kiem tra lai Caddyfile de xoa thu cong no."
     exit 1
 else
     # 9.8. Nếu mọi thứ OK, Reload lại Caddy
     echo "Cau hinh hop le. Dang reload Caddy..."
-    systemctl reload caddy
+	# Ngăn ngừa việc mất quyền hay xảy ra
+	sudo chown -R caddy:caddy /var/www/$DOMAIN/logs
+    sudo systemctl reload caddy
     echo "Hoan tat! Da xoa cau hinh cho $DOMAIN trong Caddyfile."
 fi
 

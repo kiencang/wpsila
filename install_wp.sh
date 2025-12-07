@@ -392,6 +392,9 @@ if ! sudo caddy validate --config "$CADDY_FILE" --adapter caddyfile > /dev/null 
 else
     # Nếu mọi thứ OK, Reload lại Caddy
     echo "Cau hinh hop le. Dang reload Caddy..."
+	# Ngăn ngừa việc mất quyền hay xảy ra, khiến cho việc tải lại không thành công
+	sudo chown -R caddy:caddy /var/www/$DOMAIN/logs
+	
     sudo systemctl reload caddy
     echo "Hoan tat! Da cap nhat cau hinh cho $DOMAIN trong Caddyfile."
 fi
