@@ -392,7 +392,10 @@ if ! sudo caddy validate --config "$CADDY_FILE" --adapter caddyfile > /dev/null 
 else
     # Nếu mọi thứ OK, Reload lại Caddy
     echo "Cau hinh hop le. Dang reload Caddy..."
-	# Ngăn ngừa việc mất quyền hay xảy ra, khiến cho việc tải lại không thành công
+	# Ngăn ngừa việc mất quyền hay xảy ra, khiến cho việc tải lại không thành công.
+	# Nguyên nhân là vì mặc dù phân quyền đã làm, nhưng trong quá trình cài đặt có thể root ghi vào file log.
+	# Nó thành chủ sở hữu và không cho user caddy can thiệp vào nữa, cách phòng thủ tốt nhất là tái lập lại quyền.
+	# Rất dễ xảy ra với việc cài lần đầu tiên.
 	sudo chown -R caddy:caddy /var/www/$DOMAIN/logs
 	
     sudo systemctl reload caddy
