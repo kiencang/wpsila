@@ -3,114 +3,30 @@
 # Dừng script ngay lập tức nếu có lệnh bị lỗi
 set -euo pipefail
 
+#+++
+
+# -------------------------------------------------------------------------------------------------------------------------------
 # Chạy lệnh
 # version 0.05.12.25
 # curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/install_wp.sh | bash
+# -------------------------------------------------------------------------------------------------------------------------------
 
-# Màu sắc cho thông báo
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-RED='\033[0;31m'
-NC='\033[0m' # No Color
+#+++
 
-# QUAN TRỌNG: CẤU HÌNH PHIÊN BẢN PHP
-# 1. Đặt giá trị mặc định (phòng hờ không tìm thấy file config)
-DEFAULT_PHP_VER="8.3"
-
-# 2. Định nghĩa đường dẫn file config 
-# (Ví dụ: file config nằm cùng thư mục với script đang chạy)
-# Lấy đường dẫn tuyệt đối của thư mục chứa file script đang chạy
-SCRIPT_DIR="$(dirname "$(realpath "$0")")"
-
-# Trỏ vào file config nằm cùng thư mục đó
-WPSILA_CONFIG_FILE="$SCRIPT_DIR/wpsila.conf"
-
-# 3. Kiểm tra và nạp file config
-if [ -f "$WPSILA_CONFIG_FILE" ]; then
-    # Lệnh 'source' hoặc dấu chấm '.' sẽ đọc biến từ file kia vào script này
-    source "$WPSILA_CONFIG_FILE"
-    echo -e "${GREEN}Da tim thay file cau hinh: ${WPSILA_CONFIG_FILE}${NC}"
-else
-    echo -e "${YELLOW}Khong tim thay file config. Su dung phien ban mac dinh.${NC}"
-fi
-
-# 4. Chốt phiên bản cuối cùng
-# Cú pháp ${BIEN_1:-$BIEN_2} nghĩa là: Nếu BIEN_1 rỗng (chưa set trong config), thì lấy BIEN_2
-PHP_VER="${PHP_VER:-$DEFAULT_PHP_VER}"
-
-echo "Phien ban PHP: $PHP_VER"
-
-# Bắt buộc phải chạy bằng root để cài đặt phần mềm
+# -------------------------------------------------------------------------------------------------------------------------------
+# A. Quyền chạy
+# Bắt buộc phải chạy bằng root để cài đặt WordPress
 if [[ $EUID -ne 0 ]]; then
    echo -e "${RED}Loi: Ban phai chay script nay bang quyen Root.${NC}"
    echo -e "Vui long vao terminal voi quyen Root, sau do chay lai lenh."
    exit 1
 fi
+# -------------------------------------------------------------------------------------------------------------------------------
 
-echo -e "${GREEN}Dang tao Database va User cho WordPress...${NC}"
+#+++
 
-# --- CẤU HÌNH BIẾN NGẪU NHIÊN ---
-# 1. DB Name (Thoải mái độ dài, MySQL cho phép 64 ký tự)
-# Kết quả ví dụ: wp_a1b2c3d4e5f67890
-GEN_DB_NAME="wp_$(openssl rand -hex 8)"
-
-# 2. User Name (Nên giữ <= 16 ký tự để tương thích mọi phiên bản MySQL)
-# Giảm xuống hex 7 (14 ký tự) + "u_" (2 ký tự) = 16 ký tự
-# Kết quả ví dụ: u_a1b2c3d4e5f6g7
-GEN_DB_USER="u_$(openssl rand -hex 7)"
-
-# 3. Password (32 ký tự là rất mạnh rồi)
-# Kết quả ví dụ: p_890123456789abcdef0123456789abcd
-GEN_DB_PASS="p_$(openssl rand -hex 16)"
-
-# Sử dụng biến đã tạo ở trên vào câu lệnh SQL
-# Lưu ý: Vì biến chỉ chứa chữ cái thường và số nên không cần escape phức tạp, rất an toàn.
-
-sudo mariadb -e "CREATE DATABASE IF NOT EXISTS ${GEN_DB_NAME} DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
-sudo mariadb -e "CREATE USER IF NOT EXISTS '${GEN_DB_USER}'@'localhost' IDENTIFIED BY '${GEN_DB_PASS}';"
-sudo mariadb -e "GRANT ALL PRIVILEGES ON ${GEN_DB_NAME}.* TO '${GEN_DB_USER}'@'localhost';"
-sudo mariadb -e "FLUSH PRIVILEGES;"
-
-# --- KẾT THÚC VÀ XUẤT THÔNG TIN ---
-
-# Lưu thông tin vào file để tra cứu sau này (Quan trọng vì mật khẩu là ngẫu nhiên)
-CRED_FILE="$HOME/wpp.txt"
-
-# Kiểm tra nếu file tồn tại thì mới xóa
-sudo rm -f "$CRED_FILE"
-
-# Tạo file mới cho trang WordPress đang cài
-cat > "$CRED_FILE" <<EOF
-----------------------------------------
-WORDPRESS DATABASE CREDENTIALS
-Date: $(date)
-----------------------------------------
-Database Name : ${GEN_DB_NAME}
-Database User : ${GEN_DB_USER}
-Database Pass : ${GEN_DB_PASS}
-----------------------------------------
-EOF
-chmod 600 "$CRED_FILE" # Chỉ user hiện tại mới đọc được file này
-
-# Để xem lại nội dung dùng lệnh sau trên terminal: cat ~/wpp.txt
-# Copy bằng cách bôi đen ở terminal, sau đó paste (ctrl + V) như bình thường ở giao diện cài đặt
-# Sau khi cài xong WordPress cần xóa file này đi bằng lệnh: rm ~/wpp.txt
-
-echo -e "${GREEN}>>> Cai dat hoan tat!${NC}"
-echo -e "${YELLOW}Thong tin Database (Da duoc luu tai $CRED_FILE):${NC}"
-echo -e "  - Database: ${GEN_DB_NAME}"
-echo -e "  - User:     ${GEN_DB_USER}"
-echo -e "  - Pass:     ${GEN_DB_PASS}"
-echo -e "${YELLOW}Kiem tra PHP version:${NC}"
-php -v
-echo -e "${GREEN}>>> Buoc tiep theo: Cai dat WordPress.${NC}"
-sleep 2
-
-echo "-------------------------------------------------------------------------------------------------"
-# ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-# Phần 4: Cai dat WordPress
-# --- KIỂM TRA MÔI TRƯỜNG ---
+# -------------------------------------------------------------------------------------------------------------------------------
+# B. Kiểm tra môi trường
 # Script này yêu cầu Caddy và PHP đã được cài trước đó
 echo -e "${GREEN}>>> Dang kiem tra moi truong he thong...${NC}"
 
@@ -125,16 +41,62 @@ if ! id "www-data" &>/dev/null; then
     echo -e "${YELLOW}Goi y: Hay cai dat PHP-FPM.${NC}"
     exit 1
 fi
+# -------------------------------------------------------------------------------------------------------------------------------
 
-# --- BƯỚC 1: NHẬP VÀ XỬ LÝ TÊN MIỀN ---
+#+++
+
+# -------------------------------------------------------------------------------------------------------------------------------
+# C. Màu sắc cho thông báo
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
+NC='\033[0m' # No Color
+# -------------------------------------------------------------------------------------------------------------------------------
+
+#+++
+
+# -------------------------------------------------------------------------------------------------------------------------------
+# D. CẤU HÌNH PHIÊN BẢN PHP
+
+# D1. Đặt giá trị mặc định (phòng hờ không tìm thấy file config)
+DEFAULT_PHP_VER="8.3"
+
+# D2. Định nghĩa đường dẫn file config 
+# (Ví dụ: file config nằm cùng thư mục với script đang chạy)
+# Lấy đường dẫn tuyệt đối của thư mục chứa file script đang chạy
+SCRIPT_DIR="$(dirname "$(realpath "$0")")"
+
+# Trỏ vào file config nằm cùng thư mục đó
+WPSILA_CONFIG_FILE="$SCRIPT_DIR/wpsila.conf"
+
+# D3. Kiểm tra và nạp file config
+if [ -f "$WPSILA_CONFIG_FILE" ]; then
+    # Lệnh 'source' hoặc dấu chấm '.' sẽ đọc biến từ file kia vào script này
+    source "$WPSILA_CONFIG_FILE"
+    echo -e "${GREEN}Da tim thay file cau hinh: ${WPSILA_CONFIG_FILE}${NC}"
+else
+    echo -e "${YELLOW}Khong tim thay file config. Su dung phien ban mac dinh.${NC}"
+fi
+
+# D4. Chốt phiên bản cuối cùng
+# Cú pháp ${BIEN_1:-$BIEN_2} nghĩa là: Nếu BIEN_1 rỗng (chưa set trong config), thì lấy BIEN_2
+PHP_VER="${PHP_VER:-$DEFAULT_PHP_VER}"
+
+echo "Phien ban PHP: $PHP_VER"
+# -------------------------------------------------------------------------------------------------------------------------------
+
+#+++
+
+# -------------------------------------------------------------------------------------------------------------------------------
+# E. NHẬP VÀ XỬ LÝ TÊN MIỀN
 echo -e "${GREEN}>>> Vui long nhap ten mien cua ban (vi du: example.com):${NC}"
 
-# Cấu hình số lần thử tối đa
+# E1. Cấu hình số lần thử tối đa
 MAX_RETRIES=3
 COUNT=0
 DOMAIN=""
 
-# Bắt đầu vòng lặp
+# E2. Bắt đầu vòng lặp
 while [[ $COUNT -lt $MAX_RETRIES ]]; do
 	COUNT=$((COUNT + 1)) # Đừng để $COUNT++, nó sẽ gặp lỗi Bash gặp 0
     
@@ -148,7 +110,7 @@ while [[ $COUNT -lt $MAX_RETRIES ]]; do
     # Xử lý chuỗi, bỏ khoảng trắng, chuyển chữ hoa thành chữ thường
 	TEMP_DOMAIN=$(echo "$INPUT_DOMAIN" | tr -d ' ' | tr '[:upper:]' '[:lower:]')
 	
-	# 2. Gọt bỏ http, https và trailing slash
+	# Gọt bỏ http, https và trailing slash (dấu suộc / source)
     # Input:  https://Example.com/
     # Output: example.com
     DOMAIN=$(echo "$TEMP_DOMAIN" | sed -e 's|^https\?://||' -e 's|/.*$||')
@@ -181,8 +143,81 @@ done
 echo -e "Thanh cong! Domain duoc chap nhan: $DOMAIN"
 
 echo -e "${GREEN}>>> Dang tien hanh cai dat cho domain: ${YELLOW}$DOMAIN${NC}"
+# -------------------------------------------------------------------------------------------------------------------------------
 
-# --- BƯỚC 2: TẠO CẤU TRÚC THƯ MỤC ---
+#+++
+
+# -------------------------------------------------------------------------------------------------------------------------------
+# F. Tạo Database & User
+
+echo -e "${GREEN}Dang tao Database va User cho WordPress...${NC}"
+
+# --- CẤU HÌNH BIẾN NGẪU NHIÊN ---
+# F1. DB Name (Thoải mái độ dài, MySQL cho phép 64 ký tự)
+# Kết quả ví dụ: wp_a1b2c3d4e5f67890
+GEN_DB_NAME="wp_$(openssl rand -hex 8)"
+
+# F2. User Name (Nên giữ <= 16 ký tự để tương thích mọi phiên bản MySQL)
+# Giảm xuống hex 7 (14 ký tự) + "u_" (2 ký tự) = 16 ký tự
+# Kết quả ví dụ: u_a1b2c3d4e5f6g7
+GEN_DB_USER="u_$(openssl rand -hex 7)"
+
+# F3. Password (32 ký tự là rất mạnh rồi)
+# Kết quả ví dụ: p_890123456789abcdef0123456789abcd
+GEN_DB_PASS="p_$(openssl rand -hex 16)"
+
+# F4. Tạo bảng trong MariaDB
+# Sử dụng biến đã tạo ở trên vào câu lệnh SQL
+# Lưu ý: Vì biến chỉ chứa chữ cái thường và số nên không cần escape phức tạp, rất an toàn.
+
+sudo mariadb -e "CREATE DATABASE IF NOT EXISTS ${GEN_DB_NAME} DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+sudo mariadb -e "CREATE USER IF NOT EXISTS '${GEN_DB_USER}'@'localhost' IDENTIFIED BY '${GEN_DB_PASS}';"
+sudo mariadb -e "GRANT ALL PRIVILEGES ON ${GEN_DB_NAME}.* TO '${GEN_DB_USER}'@'localhost';"
+sudo mariadb -e "FLUSH PRIVILEGES;"
+
+# F5. Xuất thông tin
+# Lưu thông tin vào file để tra cứu sau này (Quan trọng vì mật khẩu là ngẫu nhiên)
+CRED_FILE="$HOME/wpp.txt"
+
+# Kiểm tra nếu file tồn tại thì mới xóa
+sudo rm -f "$CRED_FILE"
+
+# Tạo file mới cho trang WordPress đang cài
+cat > "$CRED_FILE" <<EOF
+----------------------------------------
+WORDPRESS DATABASE CREDENTIALS
+Date: $(date)
+----------------------------------------
+Database Name : ${GEN_DB_NAME}
+Database User : ${GEN_DB_USER}
+Database Pass : ${GEN_DB_PASS}
+----------------------------------------
+EOF
+chmod 600 "$CRED_FILE" # Chỉ user hiện tại mới đọc được file này
+
+# Để xem lại nội dung dùng lệnh sau trên terminal: cat ~/wpp.txt (đã bổ sung vào menu để người dùng cuối xem)
+# Copy bằng cách bôi đen ở terminal, sau đó paste (ctrl + V) như bình thường ở giao diện cài đặt
+# Sau khi cài xong WordPress cần xóa file này đi bằng lệnh: rm ~/wpp.txt
+
+echo -e "${GREEN}>>> Cai dat hoan tat!${NC}"
+echo -e "${YELLOW}Thong tin Database (Da duoc luu tai $CRED_FILE):${NC}"
+echo -e "  - Database: ${GEN_DB_NAME}"
+echo -e "  - User:     ${GEN_DB_USER}"
+echo -e "  - Pass:     ${GEN_DB_PASS}"
+echo -e "${YELLOW}Kiem tra PHP version:${NC}"
+php -v
+echo -e "${GREEN}>>> Buoc tiep theo: Cai dat WordPress.${NC}"
+sleep 2
+# -------------------------------------------------------------------------------------------------------------------------------
+
+#+++
+
+echo "-------------------------------------------------------------------------------------------------"
+
+
+# -------------------------------------------------------------------------------------------------------------------------------
+# G. Cai dat WordPress
+# G1. TẠO CẤU TRÚC THƯ MỤC
 echo -e "${GREEN}[1/5] Dang tao thu muc chua ma nguon...${NC}"
 # Tạo thư mục web root (-p giúp không báo lỗi nếu thư mục đã tồn tại)
 sudo mkdir -p /var/www/$DOMAIN/public_html
@@ -192,8 +227,12 @@ echo -e "${GREEN}[2/5] Dang tao thu muc logs va cap quyen...${NC}"
 sudo mkdir -p /var/www/$DOMAIN/logs
 # Cấp quyền cho user caddy để ghi được log truy cập
 sudo chown -R caddy:caddy /var/www/$DOMAIN/logs
+# -------------------------------------------------------------------------------------------------------------------------------
 
-# --- BƯỚC 3: TẢI VÀ GIẢI NÉN WORDPRESS ---
+#++
+
+# -------------------------------------------------------------------------------------------------------------------------------
+# G2. TẢI VÀ GIẢI NÉN WORDPRESS 
 echo -e "${GREEN}[3/5] Dang tai WordPress phien ban moi nhat...${NC}"
 
 # Di chuyển vào thư mục tên miền
@@ -211,13 +250,15 @@ sudo tar xzf latest.tar.gz -C /var/www/$DOMAIN/public_html --strip-components=1
 
 # Dọn dẹp file nén 
 sudo rm -f latest.tar.gz
+# -------------------------------------------------------------------------------------------------------------------------------
 
- # ==================================================================
- # BỔ SUNG: TỰ ĐỘNG CẤU HÌNH WP-CONFIG VÀ INSTALL DB
- # ==================================================================
-    echo -e "${GREEN}>>> Dang tu dong cau hinh wp-config.php va Database...${NC}"
+#++
 
-    # 1. Cài đặt WP-CLI nếu chưa có
+# -------------------------------------------------------------------------------------------------------------------------------
+# G3. TỰ ĐỘNG CẤU HÌNH WP-CONFIG VÀ INSTALL DB
+echo -e "${GREEN}>>> Dang tu dong cau hinh wp-config.php va Database...${NC}"
+
+# G3.1. Cài đặt WP-CLI nếu chưa có
     if ! [ -x "$(command -v wp)" ]; then
         echo " -> Dang tai WP-CLI..."
         sudo curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
@@ -225,7 +266,7 @@ sudo rm -f latest.tar.gz
         sudo mv wp-cli.phar /usr/local/bin/wp
     fi
 
-    # 2. Định nghĩa biến nội bộ cho quá trình cài đặt
+# G3.2. Định nghĩa biến nội bộ cho quá trình cài đặt
     WP_PATH="/var/www/$DOMAIN/public_html"
     WP_ADMIN_USER="admin"
     WP_ADMIN_PASS="p_$(openssl rand -hex 12)" # Tạo pass ngẫu nhiên
@@ -234,7 +275,7 @@ sudo rm -f latest.tar.gz
     # Di chuyển vào thư mục code
     cd "$WP_PATH" || exit
 
-    # 3. Tạo file wp-config.php từ thông tin DB ở Bước 2
+# G3.3. Tạo file wp-config.php từ thông tin DB ở Bước 2
     # Dùng --allow-root vì script đang chạy quyền sudo
     wp config create --dbname="$GEN_DB_NAME" \
                      --dbuser="$GEN_DB_USER" \
@@ -242,7 +283,7 @@ sudo rm -f latest.tar.gz
                      --dbhost="localhost" \
                      --allow-root --force
 
-    # 4. Chạy lệnh Install để nạp dữ liệu vào Database
+# G3.4. Chạy lệnh Install để nạp dữ liệu vào Database
     echo " -> Dang khoi tao du lieu WordPress..."
     wp core install --url="https://$DOMAIN" \
                     --title="Website $DOMAIN" \
@@ -252,7 +293,7 @@ sudo rm -f latest.tar.gz
                     --skip-email \
                     --allow-root
 
-# 5. Ghi thêm thông tin đăng nhập WP vào file wpp.txt
+# G3.5. Ghi thêm thông tin đăng nhập WP vào file wpp.txt
 cat >> "$CRED_FILE" <<EOF
 ----------------------------------------
 WORDPRESS ADMIN INFO
@@ -265,9 +306,12 @@ Email      : $WP_ADMIN_EMAIL
 EOF
 
 echo -e "${GREEN}>>> Da cai dat xong WordPress Core!${NC}"
-# ==================================================================
+# -------------------------------------------------------------------------------------------------------------------------------
 
-# --- BƯỚC 4: PHÂN QUYỀN (PERMISSIONS) ---
+#++
+
+# -------------------------------------------------------------------------------------------------------------------------------
+# H. PHÂN QUYỀN (PERMISSIONS) ---
 # Điều chỉnh phân quyền để dễ dàng hơn trong việc tạo tài khoản sFTP sau này.
 echo -e "${GREEN}[5/5] Dang thiet lap quyen han chuan cho WordPress...${NC}"
 
@@ -329,14 +373,17 @@ echo -e "${GREEN}>>> Buoc tiep theo: Cau hinh Caddyfile.${NC}"
 sleep 2
 
 echo "-------------------------------------------------------------------------------------------------"
-# --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------------------------------------
 
-# Phần 5: Chinh sua file Caddyfile
+
+# -------------------------------------------------------------------------------------------------------------------------------
+# I. Chinh sua file Caddyfile
 # ---------------------------------------------------------
-# 1. Khai báo biến đường dẫn và Marker
+# I1. Khai báo biến đường dẫn và Marker
 CADDY_FILE="/etc/caddy/Caddyfile"
 MARKER="#wpsila_kiencang"
-# URL trỏ tới file template (đã thay đổi theo link của bạn)
+
+# URL trỏ tới file template (mẫu động, để cập nhật khi cần thiết, tốt hơn là mẫu cố định)
 TEMPLATE_URL="https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/caddyfile_wp.tpl"
 TEMP_CADDY="/tmp/caddy_gen_temp.conf"
 
@@ -350,14 +397,14 @@ fi
 echo "Domain chinh: $DOMAIN"
 echo "Domain chuyen huong: $RED_DOMAIN"
 
-# 2. Tải template cấu hình từ GitHub
+# I2. Tải template cấu hình từ GitHub
 echo -e "${GREEN}>>> Dang tai Caddy Template tu GitHub...${NC}"
 if ! curl -sL "$TEMPLATE_URL" -o "$TEMP_CADDY"; then
     echo -e "${RED}Loi: Khong the tai file template Caddy. Kiem tra lai ket noi mang hoac URL.${NC}"
     exit 1
 fi
 
-# 3. Xử lý thay thế biến vào Template
+# I3. Xử lý thay thế biến vào Template
 sed -i "s|{{DOMAIN}}|$DOMAIN|g" "$TEMP_CADDY"
 sed -i "s|{{RED_DOMAIN}}|$RED_DOMAIN|g" "$TEMP_CADDY"
 sed -i "s|{{PHP_VER}}|$PHP_VER|g" "$TEMP_CADDY"
@@ -365,7 +412,7 @@ sed -i "s|{{PHP_VER}}|$PHP_VER|g" "$TEMP_CADDY"
 CONTENT=$(cat "$TEMP_CADDY")
 rm -f "$TEMP_CADDY"
 
-# --- TẠO BACKUP AN TOÀN ---
+# I4. TẠO BACKUP AN TOÀN 
 TIMESTAMP=$(date +%s)
 BACKUP_FILE="${CADDY_FILE}.bak_${TIMESTAMP}"
 
@@ -379,7 +426,7 @@ else
     sudo touch "$CADDY_FILE"
 fi
 
-# 4. Thực hiện ghi vào Caddyfile chính
+# I5. Thực hiện ghi vào Caddyfile chính
 if grep -q "$MARKER" "$CADDY_FILE" 2>/dev/null; then
     echo "TIM THAY marker '$MARKER'. Dang them cau hinh vao cuoi file Caddyfile..."
     echo "$CONTENT" | sudo tee -a "$CADDY_FILE" > /dev/null
@@ -391,7 +438,7 @@ fi
 # Format lại cho đẹp
 sudo caddy fmt --overwrite "$CADDY_FILE" > /dev/null 2>&1
 
-# 5. VALIDATE & ROLLBACK
+# I6. VALIDATE & ROLLBACK
 echo "Dang kiem tra cu phap Caddyfile..."
 
 # Kiểm tra tính hợp lệ
@@ -425,6 +472,10 @@ else
     sudo systemctl reload caddy
     echo "Hoan tat! Da cap nhat cau hinh cho $DOMAIN trong Caddyfile."
 fi
+# -------------------------------------------------------------------------------------------------------------------------------
 
-echo "Nhap lenh: cat ~/wpp.txt de xem thong tin dang nhap WordPress."
+
+# -------------------------------------------------------------------------------------------------------------------------------
 echo "Hoan tat! Xin chuc mung ban da cai thanh cong WordPress trên Caddy Web Server."
+echo "Nhap muc 4 de xem thong tin pass cua trang WordPress ban vua tao."
+# -------------------------------------------------------------------------------------------------------------------------------
