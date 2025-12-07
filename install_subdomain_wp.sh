@@ -89,7 +89,7 @@ echo "Phien ban PHP: $PHP_VER"
 
 # -------------------------------------------------------------------------------------------------------------------------------
 # E. NHẬP VÀ XỬ LÝ TÊN MIỀN
-echo -e "${GREEN}>>> Vui long nhap ten mien cua ban (vi du: example.com):${NC}"
+echo -e "${GREEN}>>> Vui long nhap sudomain cua ban (vi du: hello.example.com):${NC}"
 
 # E1. Cấu hình số lần thử tối đa
 MAX_RETRIES=3
@@ -101,10 +101,10 @@ while [[ $COUNT -lt $MAX_RETRIES ]]; do
     COUNT=$((COUNT + 1)) 
     
     if [[ $COUNT -eq 1 ]]; then
-        read -p "Nhap Domain: " INPUT_DOMAIN < /dev/tty
+        read -p "Nhap SubDomain: " INPUT_DOMAIN < /dev/tty
     else
         echo -e "${RED}Ban vua nhap sai! Hay chu y nhap lai dung nhe.${NC}"
-        read -p "Nhap Domain: " INPUT_DOMAIN < /dev/tty
+        read -p "Nhap SubDomain: " INPUT_DOMAIN < /dev/tty
     fi
     
     # Xử lý chuỗi
@@ -113,9 +113,9 @@ while [[ $COUNT -lt $MAX_RETRIES ]]; do
     
     # Validation cơ bản
     if [[ -z "$DOMAIN" ]]; then
-        echo -e "${RED}Loi: Ten mien khong duoc de trong!${NC}"
+        echo -e "${RED}Loi: SubDomain khong duoc de trong!${NC}"
     elif [[ "$DOMAIN" != *"."* ]]; then
-        echo -e "${RED}Loi: Ten mien '$DOMAIN' khong hop le (thieu dau cham).${NC}"
+        echo -e "${RED}Loi: SubDomain '$DOMAIN' khong hop le (thieu dau cham).${NC}"
     else
         if [[ "$INPUT_DOMAIN" != "$DOMAIN" ]]; then
              echo -e "${GREEN}Script da tu dong chuan hoa input '${INPUT_DOMAIN}' thanh '${DOMAIN}'${NC}"
@@ -156,7 +156,7 @@ if [ -f "$CADDY_CONF_CHECK" ]; then
     # ([[:space:],:]|\{|$)  : Kết thúc bằng khoảng trắng, dấu phẩy (,), dấu hai chấm (:) hoặc dấu {
     
     if grep -Eq "(^|[[:space:]/])$DOMAIN([[:space:],:]|\{|$)" "$CADDY_CONF_CHECK"; then
-        echo -e "${RED}NGUY HIEM: Ten mien [$DOMAIN] da duoc cau hinh trong Caddyfile!${NC}"
+        echo -e "${RED}NGUY HIEM: SubDomain [$DOMAIN] da duoc cau hinh trong Caddyfile!${NC}"
         echo -e "Script phat hien ten mien nay da ton tai (co the kem theo port hoac trong danh sach)."
         echo -e "Vui long kiem tra file $CADDY_CONF_CHECK va xoa cau hinh cu truoc khi chay lai."
         exit 1
@@ -167,7 +167,7 @@ fi
 if [ -d "$WEB_ROOT_DIR_CHECK" ]; then
     echo -e "${RED}NGUY HIEM: Thu muc web [$WEB_ROOT_DIR_CHECK] da ton tai!${NC}"
     echo -e "Viec tiep tuc co the ghi de du lieu cu."
-    echo -e "Vui long xoa thu muc thu cong hoac chon ten mien khac."
+    echo -e "Vui long xoa thu muc thu cong hoac chon SubDomain khac."
     exit 1
 fi
 
@@ -175,8 +175,8 @@ echo -e "${GREEN}Kiem tra an toan hoan tat. Ten mien hop le de cai moi.${NC}"
 # -----------------------------------------------
 
 # --- Script tiếp tục chạy từ đây khi dữ liệu đã đúng ---
-echo -e "Thanh cong! Domain duoc chap nhan: $DOMAIN"
-echo -e "${GREEN}>>> Dang tien hanh cai dat cho domain: ${YELLOW}$DOMAIN${NC}"
+echo -e "Thanh cong! SubDomain duoc chap nhan: $DOMAIN"
+echo -e "${GREEN}>>> Dang tien hanh cai dat cho SubDomain: ${YELLOW}$DOMAIN${NC}"
 # -------------------------------------------------------------------------------------------------------------------------------
 
 #+++
