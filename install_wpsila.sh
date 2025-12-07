@@ -1,14 +1,12 @@
 #!/bin/bash
 
-# Dừng script ngay lập tức nếu có lệnh bị lỗi
+# Dừng script ngay lập tức nếu có biến chưa khai báo hoặc pipeline bị lỗi
+# Lưu ý: set -e sẽ được xử lý khéo léo trong hàm download để không ngắt script đột ngột
 set -euo pipefail
 
-# Chạy lệnh
-# curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/install_wpsila.sh | sudo bash
-
 # --- Cấu hình ---
-# LUU Y: Hay kiem tra ky duong dan REPO_URL nay tren trinh duyet
 INSTALL_DIR="/opt/wpsila"
+# Giữ nguyên URL theo yêu cầu của bạn
 REPO_URL="https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main" 
 BIN_LINK="/usr/local/bin/wpsila"
 
@@ -25,14 +23,16 @@ if [[ $EUID -ne 0 ]]; then
    error_exit "Ban phai chay lenh nay duoi quyen Root!"
 fi
 
-# 2. Cài đặt wget nếu thiếu
+# 2. Cài đặt wget và ca-certificates (QUAN TRỌNG: thêm ca-certificates để tránh lỗi SSL)
 if ! command -v wget &> /dev/null; then
     echo "Dang cai dat wget..."
-    apt-get update -qq && apt-get install -y wget -qq || error_exit "Khong the cai dat wget"
+    apt-get update -qq && apt-get install -y wget ca-certificates -qq || error_exit "Khong the cai dat wget"
 fi
 
 # 3. Tạo thư mục
-mkdir -p "$INSTALL_DIR"
+if [[ ! -d "$INSTALL_DIR" ]]; then
+    mkdir -p "$INSTALL_DIR"
+fi
 
 # 4. Làm sạch file cũ (Clean Install)
 echo "Dang lam sach thu muc cai dat..."
@@ -44,12 +44,20 @@ echo "Dang tai cac module..."
 download_file() {
     local url="$1"
     local dest="$2"
-    # Them tham so random de tranh cache
-    wget -q "${url}?v=$RANDOM" -O "$dest"
     
-    # Kiem tra file co du lieu khong
+    # FIX LOI: Dùng 'if ! wget' để bắt lỗi thay vì để 'set -e' tự động kill script
+    # Thêm --no-cache (nếu wget hỗ trợ) hoặc bỏ qua cache server
+    # Bỏ '?v=$RANDOM' để tránh lỗi 404 do sai format URL
+    if ! wget -q --no-cache "$url" -O "$dest"; then
+        echo -e "\033[0;31m[DOWNLOAD FAIL]\033[0m Khong the tai: $url"
+        rm -f "$dest" # Xóa file rác nếu có
+        error_exit "Loi ket noi hoac duong dan khong chinh xac."
+    fi
+    
+    # Kiểm tra file tải về có dữ liệu không
     if [[ ! -s "$dest" ]]; then
-        error_exit "Khong the tai file: $dest. Vui long kiem tra lai REPO_URL."
+        rm -f "$dest"
+        error_exit "File tai ve bi rong (0 bytes): $dest"
     fi
 }
 
