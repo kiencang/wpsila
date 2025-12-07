@@ -3,8 +3,17 @@
 # Dừng script ngay lập tức nếu có lệnh bị lỗi
 set -euo pipefail
 
-# QUAN TRỌNG: CẤU HÌNH PHIÊN BẢN PHP
+# Chạy lệnh
+# version 0.05.12.25
+# curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/install_lcmp.sh | bash
 
+# Màu sắc cho thông báo
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
+NC='\033[0m' # No Color (ngắt màu)
+
+# QUAN TRỌNG: CẤU HÌNH PHIÊN BẢN PHP
 # 1. Đặt giá trị mặc định (phòng hờ không tìm thấy file config)
 DEFAULT_PHP_VER="8.3"
 
@@ -26,16 +35,6 @@ fi
 PHP_VER="${PHP_VER:-$DEFAULT_PHP_VER}"
 
 echo "Phien ban PHP: $PHP_VER"
-
-# Chạy lệnh
-# version 0.05.12.25
-# curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/install_lcmp.sh | bash
-
-# Màu sắc cho thông báo
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-RED='\033[0;31m'
-NC='\033[0m' # No Color (ngắt màu)
 
 echo "--------------------------------------------------------------------"
 echo "Dang kiem tra moi truong VPS (Clean OS Check)..."
