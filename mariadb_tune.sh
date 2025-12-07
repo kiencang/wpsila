@@ -3,11 +3,11 @@
 # Dừng script ngay lập tức nếu có lệnh bị lỗi
 set -euo pipefail
 
-# ==============================================================================
+# ======================================================
 # WP SILA MARIADB TUNER (BACKUP SAFE EDITION)
 # Target: Ubuntu 24.04 | MariaDB 10.11 | PHP 8.3 | Caddy
 # Use Case: Blog 1000+ Posts & Frequent Backups
-# ==============================================================================
+# ======================================================
 
 # Test lệnh
 # curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/mariadb_tune.sh | sudo bash
@@ -98,9 +98,9 @@ if [[ "$buffer_pool" == *"%" ]]; then
     buffer_pool="${buffer_pool_mb}M"
 fi
 
-# ====================================================
+# ======================================================
 # TẠO FILE CẤU HÌNH (AN TOÀN TUYỆT ĐỐI CHO BACKUP)
-# ====================================================
+# ======================================================
 
 # Tên file tùy chỉnh, số 99 để nó được đọc cuối, ghi đè các file đã được đọc trước đó
 # vì các file sẽ đọc theo thứ tự chữ cái rồi đến số...
@@ -148,9 +148,9 @@ character-set-server    = utf8mb4
 collation-server        = utf8mb4_unicode_ci
 EOF
 
-# ==============================================================================
+# ======================================================
 # KIỂM TRA & KHỞI ĐỘNG LẠI
-# ==============================================================================
+# ======================================================
 
 echo ">> Dang khoi dong lai MariaDB..."
 
