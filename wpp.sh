@@ -17,10 +17,8 @@ TARGET_FILE="$USER_HOME/wpp.txt"
 
 # 4. Kiểm tra và chạy lệnh
 if [ -f "$TARGET_FILE" ]; then
-    echo "Đang đọc file tại: $TARGET_FILE"
+    echo "Dang doc file tai: $TARGET_FILE"
     cat "$TARGET_FILE"
 else
-    echo "LỖI: Không tìm thấy file tại $TARGET_FILE"
-    # Bạn có thể bỏ dòng exit 1 nếu muốn script chạy tiếp các lệnh sau
-    exit 1
+    echo "KHONG tim thay file tai $TARGET_FILE"
 fi
