@@ -432,6 +432,7 @@ MARKER="#wpsila_kiencang"
 echo "Domain chinh: $DOMAIN"
 echo "Domain chuyen huong: $RED_DOMAIN"
 
+# I2. Nội dung Caddyfile
 # Lưu ý: thêm $MARKER vào nội dung để lần sau chạy nó sẽ nhận diện được
 read -r -d '' CONTENT <<EOF || true
 ###start_wpsila_kiencang_$DOMAIN###
@@ -547,7 +548,7 @@ fi
 # Format lại cho đẹp
 sudo caddy fmt --overwrite "$CADDY_FILE" > /dev/null 2>&1
 
-# I6. VALIDATE & ROLLBACK
+# I5. VALIDATE & ROLLBACK
 echo "Dang kiem tra cu phap Caddyfile..."
 
 # Kiểm tra tính hợp lệ
