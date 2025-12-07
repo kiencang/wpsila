@@ -15,7 +15,11 @@ DEFAULT_PHP_VER="8.3"
 
 # 2. Định nghĩa đường dẫn file config 
 # (Ví dụ: file config nằm cùng thư mục với script đang chạy)
-WPSILA_CONFIG_FILE="./wpsila.conf" 
+# Lấy đường dẫn tuyệt đối của thư mục chứa file script đang chạy
+SCRIPT_DIR="$(dirname "$(realpath "$0")")"
+
+# Trỏ vào file config nằm cùng thư mục đó
+WPSILA_CONFIG_FILE="$SCRIPT_DIR/wpsila.conf"
 
 # 3. Kiểm tra và nạp file config
 if [ -f "$WPSILA_CONFIG_FILE" ]; then
