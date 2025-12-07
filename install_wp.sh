@@ -428,30 +428,22 @@ echo "--------------------------------------------------------------------------
 CADDY_FILE="/etc/caddy/Caddyfile"
 MARKER="#wpsila_kiencang"
 
-# URL trỏ tới file template (mẫu động, để cập nhật khi cần thiết, tốt hơn là mẫu cố định)
-TEMPLATE_URL="https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/caddyfile_wp.tpl"
-TEMP_CADDY="/tmp/caddy_gen_temp.conf"
-
 # Xác định và chuẩn hóa dạng tên miền
 echo "Domain chinh: $DOMAIN"
 echo "Domain chuyen huong: $RED_DOMAIN"
 
-# I2. Tải template cấu hình từ GitHub
-echo -e "${GREEN}>>> Dang tai Caddy Template tu GitHub...${NC}"
-if ! curl -sL "$TEMPLATE_URL" -o "$TEMP_CADDY"; then
-    echo -e "${RED}Loi: Khong the tai file template Caddy. Kiem tra lai ket noi mang hoac URL.${NC}"
-    exit 1
-fi
+# Lấy mẫu template của Caddyfile
+TEMP_CADDY_DIR="$(dirname "$(realpath "$0")")"
+TEMP_CADDY_FILE="$TEMP_CADDY_DIR/caddyfile_wp.tpl"
 
-# I3. Xử lý thay thế biến vào Template
-sed -i "s|{{DOMAIN}}|$DOMAIN|g" "$TEMP_CADDY"
-sed -i "s|{{RED_DOMAIN}}|$RED_DOMAIN|g" "$TEMP_CADDY"
-sed -i "s|{{PHP_VER}}|$PHP_VER|g" "$TEMP_CADDY"
+# I2. Xử lý thay thế biến vào Template
+sed -i "s|{{DOMAIN}}|$DOMAIN|g" "$TEMP_CADDY_FILE"
+sed -i "s|{{RED_DOMAIN}}|$RED_DOMAIN|g" "$TEMP_CADDY_FILE"
+sed -i "s|{{PHP_VER}}|$PHP_VER|g" "$TEMP_CADDY_FILE"
 
-CONTENT=$(cat "$TEMP_CADDY")
-rm -f "$TEMP_CADDY"
+CONTENT=$(cat "$TEMP_CADDY_FILE")
 
-# I4. TẠO BACKUP AN TOÀN 
+# I3. TẠO BACKUP AN TOÀN 
 TIMESTAMP=$(date +%s)
 BACKUP_FILE="${CADDY_FILE}.bak_${TIMESTAMP}"
 
@@ -465,7 +457,7 @@ else
     sudo touch "$CADDY_FILE"
 fi
 
-# I5. Thực hiện ghi vào Caddyfile chính
+# I4. Thực hiện ghi vào Caddyfile chính
 if grep -q "$MARKER" "$CADDY_FILE" 2>/dev/null; then
     echo "TIM THAY marker '$MARKER'. Dang them cau hinh vao cuoi file Caddyfile..."
     echo "$CONTENT" | sudo tee -a "$CADDY_FILE" > /dev/null
