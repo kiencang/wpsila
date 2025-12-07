@@ -96,42 +96,35 @@ MAX_RETRIES=3
 COUNT=0
 DOMAIN=""
 
-# E2. Bắt đầu vòng lặp
+# E2. Bắt đầu vòng lặp nhập liệu
 while [[ $COUNT -lt $MAX_RETRIES ]]; do
-	COUNT=$((COUNT + 1)) # Đừng để $COUNT++, nó sẽ gặp lỗi Bash gặp 0
+    COUNT=$((COUNT + 1)) 
     
-    # Hiển thị prompt có kèm số lần thử để user biết
-	if [[ $COUNT -eq 1 ]]; then
-		read -p "Nhap Domain: " INPUT_DOMAIN < /dev/tty
-	else
-		echo -e "${RED}Ban vua nhap sai! Hay chu y nhap lai dung nhe.${NC}"
-		read -p "Nhap Domain: " INPUT_DOMAIN < /dev/tty
-	fi
-    # Xử lý chuỗi, bỏ khoảng trắng, chuyển chữ hoa thành chữ thường
-	TEMP_DOMAIN=$(echo "$INPUT_DOMAIN" | tr -d ' ' | tr '[:upper:]' '[:lower:]')
-	
-	# Gọt bỏ http, https và trailing slash (dấu suộc / source)
-    # Input:  https://Example.com/
-    # Output: example.com
+    if [[ $COUNT -eq 1 ]]; then
+        read -p "Nhap Domain: " INPUT_DOMAIN < /dev/tty
+    else
+        echo -e "${RED}Ban vua nhap sai! Hay chu y nhap lai dung nhe.${NC}"
+        read -p "Nhap Domain: " INPUT_DOMAIN < /dev/tty
+    fi
+    
+    # Xử lý chuỗi
+    TEMP_DOMAIN=$(echo "$INPUT_DOMAIN" | tr -d ' ' | tr '[:upper:]' '[:lower:]')
     DOMAIN=$(echo "$TEMP_DOMAIN" | sed -e 's|^https\?://||' -e 's|/.*$||')
     
-    # --- KIỂM TRA LOGIC ---
+    # Validation cơ bản
     if [[ -z "$DOMAIN" ]]; then
         echo -e "${RED}Loi: Ten mien khong duoc de trong!${NC}"
     elif [[ "$DOMAIN" != *"."* ]]; then
         echo -e "${RED}Loi: Ten mien '$DOMAIN' khong hop le (thieu dau cham).${NC}"
     else
-        # Nếu đã sửa xong mà hợp lệ -> Chấp nhận luôn
-        # Có thể in ra thông báo để người dùng biết script đã tự sửa giúp họ
         if [[ "$INPUT_DOMAIN" != "$DOMAIN" ]]; then
              echo -e "${GREEN}Script da tu dong chuan hoa input '${INPUT_DOMAIN}' thanh '${DOMAIN}'${NC}"
         fi
         break
     fi
 
-    # Nếu mã chạy xuống đây nghĩa là nhập sai
     if [[ $COUNT -eq $MAX_RETRIES ]]; then
-        echo -e "${RED}Ban da nhap sai qua 3 lan. Script se dung lai de bao ve he thong.${NC}"
+        echo -e "${RED}Ban da nhap sai qua 3 lan. Dung script.${NC}"
         exit 1
     else
         echo "Vui long thu lai..."
@@ -139,9 +132,53 @@ while [[ $COUNT -lt $MAX_RETRIES ]]; do
     fi
 done
 
+# --- BƯỚC MỚI: KIỂM TRA TỒN TẠI (QUAN TRỌNG) ---
+echo "Dang kiem tra an toan he thong..."
+
+# Xác định luôn dạng chuyển hướng của tên miền để tiện kiểm tra thư mục web gốc
+if [[ "$DOMAIN" == www.* ]]; then
+    RED_DOMAIN="${DOMAIN#www.}"
+else
+    RED_DOMAIN="www.$DOMAIN"
+fi
+
+# Định nghĩa đường dẫn
+# Thư mục tên miền người dùng nhập vào
+WEB_ROOT_DIR_CHECK="/var/www/$DOMAIN"
+
+# Dự phòng thư mục tên miền chuyển hướng
+WEB_ROOT_DIR_CHECK_RED="/var/www/$RED_DOMAIN"
+
+# Đường dẫn tới file Caddyfile
+CADDY_CONF_CHECK="/etc/caddy/Caddyfile" 
+
+# 1. Kiểm tra thư mục Web
+if [ -d "$WEB_ROOT_DIR_CHECK" ]; then
+    echo -e "${RED}NGUY HIEM: Thu muc web [$WEB_ROOT_DIR_CHECK] da ton tai!${NC}"
+    echo -e "Viec tiep tuc co the ghi de du lieu cu."
+    echo -e "Vui long xoa thu muc thu cong hoac chon ten mien khac."
+    exit 1
+fi
+
+if [ -d "$WEB_ROOT_DIR_CHECK_RED" ]; then
+    echo -e "${RED}NGUY HIEM: Thu muc web [$WEB_ROOT_DIR_CHECK_RED] da ton tai!${NC}"
+    echo -e "Viec tiep tuc co the gay nham lan."
+    echo -e "Vui long xoa thu muc thu cong hoac chon ten mien khac."
+    exit 1
+fi
+
+# 2. Kiểm tra trong Caddyfile
+if grep -Fq "$DOMAIN" "$CADDY_CONF_CHECK"; then
+    echo -e "${RED}NGUY HIEM: Ten mien [$DOMAIN] da duoc cau hinh trong Caddyfile!${NC}"
+    echo -e "Vui long kiem tra file Caddyfile va xoa cau hinh cu truoc khi chay lai."
+    exit 1
+fi
+
+echo -e "${GREEN}Kiem tra an toan hoan tat. Ten mien hop le de cai moi.${NC}"
+# -----------------------------------------------
+
 # --- Script tiếp tục chạy từ đây khi dữ liệu đã đúng ---
 echo -e "Thanh cong! Domain duoc chap nhan: $DOMAIN"
-
 echo -e "${GREEN}>>> Dang tien hanh cai dat cho domain: ${YELLOW}$DOMAIN${NC}"
 # -------------------------------------------------------------------------------------------------------------------------------
 
@@ -388,12 +425,6 @@ TEMPLATE_URL="https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/
 TEMP_CADDY="/tmp/caddy_gen_temp.conf"
 
 # Xác định và chuẩn hóa dạng tên miền
-if [[ "$DOMAIN" == www.* ]]; then
-    RED_DOMAIN="${DOMAIN#www.}"
-else
-    RED_DOMAIN="www.$DOMAIN"
-fi
-
 echo "Domain chinh: $DOMAIN"
 echo "Domain chuyen huong: $RED_DOMAIN"
 
