@@ -313,7 +313,7 @@ echo "--------------------------------------------------------------------------
 CADDY_FILE="/etc/caddy/Caddyfile"
 MARKER="#wpsila_kiencang"
 # URL trỏ tới file template (đã thay đổi theo link của bạn)
-TEMPLATE_URL="https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/caddyfile-wp.tpl"
+TEMPLATE_URL="https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/caddyfile_wp.tpl"
 TEMP_CADDY="/tmp/caddy_gen_temp.conf"
 
 # Xác định và chuẩn hóa dạng tên miền
