@@ -3,8 +3,13 @@
 # Dừng script ngay lập tức nếu có lệnh bị lỗi
 set -euo pipefail
 
-# QUAN TRỌNG: CẤU HÌNH PHIÊN BẢN PHP
+# Màu sắc cho thông báo
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
+NC='\033[0m' # No Color (ngắt màu)
 
+# QUAN TRỌNG: CẤU HÌNH PHIÊN BẢN PHP
 # 1. Đặt giá trị mặc định (phòng hờ không tìm thấy file config)
 DEFAULT_PHP_VER="8.3"
 
