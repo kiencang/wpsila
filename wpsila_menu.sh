@@ -27,7 +27,10 @@ show_menu() {
     echo -e "${YELLOW}3.${NC} >> Cai dat (install) website WordPress moi"
 	echo -e "${YELLOW}4.${NC} >> Xem thong tin pass cua trang WordPress vua tao"
 	echo -e "${YELLOW}5.${NC} >> Them tai khoan sFTP cho website"
-    echo -e "${YELLOW}6.${NC} >> Xoa cai dat (delete) website WordPress"
+	echo -e "${BLUE}--------------------------------------------------------${NC}"
+	echo -e "${YELLOW}6.${NC} >> Cai dat (install) subdomain WordPress moi"	
+	echo -e "${BLUE}--------------------------------------------------------${NC}"	
+    echo -e "${YELLOW}7.${NC} >> Xoa cai dat (delete) website WordPress"
     echo -e "${BLUE}--------------------------------------------------------${NC}"
     echo -e "${YELLOW}0.${NC} >> Exit (thoat)"
     echo -e "${BLUE}========================================================${NC}"
@@ -79,8 +82,15 @@ while true; do
             else
                 echo -e "${RED}Loi: Khong tim thay file setup_sftp.sh${NC}"
             fi
-            echo -e "\n${BLUE}An Enter de quay lai...${NC}"; read -r ;; # Them -r			
+            echo -e "\n${BLUE}An Enter de quay lai...${NC}"; read -r ;; # Them -r
         6)
+            if [[ -f "$BASE_DIR/install_subdomain_wp.sh" ]]; then
+                bash "$BASE_DIR/install_subdomain_wp.sh"
+            else
+                echo -e "${RED}Loi: Khong tim thay file install_subdomain_wp.sh${NC}"
+            fi
+            echo -e "\n${BLUE}An Enter de quay lai...${NC}"; read -r ;; # Them -r				
+        7)
             if [[ -f "$BASE_DIR/remove_web.sh" ]]; then
                 bash "$BASE_DIR/remove_web.sh"
             else
