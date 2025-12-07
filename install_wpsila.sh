@@ -4,6 +4,9 @@
 # Lưu ý: set -e sẽ được xử lý khéo léo trong hàm download để không ngắt script đột ngột
 set -euo pipefail
 
+# Chạy lệnh
+# curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/install_wpsila.sh | bash
+
 # --- Cấu hình ---
 INSTALL_DIR="/opt/wpsila"
 # Giữ nguyên URL theo yêu cầu của bạn
