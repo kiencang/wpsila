@@ -62,6 +62,7 @@ download_file "$REPO_URL/mariadb_tune.sh" "$INSTALL_DIR/mariadb_tune.sh"
 download_file "$REPO_URL/php_ini_tune.sh" "$INSTALL_DIR/php_ini_tune.sh"
 download_file "$REPO_URL/pool_tune.sh" "$INSTALL_DIR/pool_tune.sh"
 download_file "$REPO_URL/wpp.sh" "$INSTALL_DIR/wpp.sh"
+download_file "$REPO_URL/wpsila.conf" "$INSTALL_DIR/wpsila.conf"
 
 # 6. Phân quyền
 chmod 700 "$INSTALL_DIR/"*.sh
