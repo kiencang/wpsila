@@ -18,18 +18,19 @@ fi
 
 show_menu() {
     clear
-    echo -e "${BLUE}=======================================================${NC}"
+    echo -e "${BLUE}========================================================${NC}"
     echo -e "${GREEN}            WPSILA MANAGER (Local Version)              ${NC}"
-    echo -e "${BLUE}=======================================================${NC}"
-    echo -e "${YELLOW}1.${NC} Cai dat (install) Caddy Web Server (mot lan la du)"
-	echo -e "${YELLOW}2.${NC} Toi uu he thong (mot lan la du)"
-	echo -e "${BLUE}-------------------------------------------------------${NC}"
-    echo -e "${YELLOW}3.${NC} Cai dat (install) Website WordPress moi"
-	echo -e "${YELLOW}4.${NC} Them tai khoan sFTP cho website"
-    echo -e "${YELLOW}5.${NC} Go cai dat (delete) Website WordPress"
-    echo -e "${BLUE}-------------------------------------------------------${NC}"
-    echo -e "${YELLOW}0.${NC} Exit (thoat)"
-    echo -e "${BLUE}=======================================================${NC}"
+    echo -e "${BLUE}========================================================${NC}"
+    echo -e "${YELLOW}1.${NC} <Cai dat (install) Caddy Web Server (mot lan la du)>"
+	echo -e "${YELLOW}2.${NC} <Toi uu he thong (mot lan la du)>"
+	echo -e "${BLUE}--------------------------------------------------------${NC}"
+    echo -e "${YELLOW}3.${NC} >> Cai dat (install) website WordPress moi"
+	echo -e "${YELLOW}4.${NC} >> Xem thong tin pass cua trang WordPress vua tao"
+	echo -e "${YELLOW}5.${NC} >> Them tai khoan sFTP cho website"
+    echo -e "${YELLOW}6.${NC} >> Xoa cai dat (delete) website WordPress"
+    echo -e "${BLUE}--------------------------------------------------------${NC}"
+    echo -e "${YELLOW}0.${NC} >> Exit (thoat)"
+    echo -e "${BLUE}========================================================${NC}"
     echo -n "Nhap lua chon: "
 }
 
@@ -66,13 +67,20 @@ while true; do
             fi
             echo -e "\n${BLUE}An Enter de quay lai...${NC}"; read -r ;; # Them -r	
         4)
+            if [[ -f "$BASE_DIR/wpp.sh" ]]; then
+                bash "$BASE_DIR/wpp.sh"
+            else
+                echo -e "${RED}Loi: Khong tim thay file wpp.sh${NC}"
+            fi
+            echo -e "\n${BLUE}An Enter de quay lai...${NC}"; read -r ;; # Them -r				
+        5)
             if [[ -f "$BASE_DIR/setup_sftp.sh" ]]; then
                 bash "$BASE_DIR/setup_sftp.sh"
             else
                 echo -e "${RED}Loi: Khong tim thay file setup_sftp.sh${NC}"
             fi
             echo -e "\n${BLUE}An Enter de quay lai...${NC}"; read -r ;; # Them -r			
-        5)
+        6)
             if [[ -f "$BASE_DIR/remove_web.sh" ]]; then
                 bash "$BASE_DIR/remove_web.sh"
             else

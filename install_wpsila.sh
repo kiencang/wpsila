@@ -61,6 +61,7 @@ download_file "$REPO_URL/setup_sftp.sh" "$INSTALL_DIR/setup_sftp.sh"
 download_file "$REPO_URL/mariadb_tune.sh" "$INSTALL_DIR/mariadb_tune.sh"
 download_file "$REPO_URL/php_ini_tune.sh" "$INSTALL_DIR/php_ini_tune.sh"
 download_file "$REPO_URL/pool_tune.sh" "$INSTALL_DIR/pool_tune.sh"
+download_file "$REPO_URL/pool_tune.sh" "$INSTALL_DIR/wpp.sh"
 
 # 6. Phân quyền
 chmod 700 "$INSTALL_DIR/"*.sh
