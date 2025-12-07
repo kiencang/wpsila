@@ -152,7 +152,22 @@ WEB_ROOT_DIR_CHECK_RED="/var/www/$RED_DOMAIN"
 # Đường dẫn tới file Caddyfile
 CADDY_CONF_CHECK="/etc/caddy/Caddyfile" 
 
-# 1. Kiểm tra thư mục Web
+# 1. Kiểm tra trong Caddyfile (Deep Scan Check)
+if [ -f "$CADDY_CONF_CHECK" ]; then
+    # Regex Explained:
+    # (^|[[:space:]/])      : Bắt đầu dòng, khoảng trắng hoặc dấu /
+    # $DOMAIN               : Tên miền
+    # ([[:space:],:]|\{|$)  : Kết thúc bằng khoảng trắng, dấu phẩy (,), dấu hai chấm (:) hoặc dấu {
+    
+    if grep -Eq "(^|[[:space:]/])$DOMAIN([[:space:],:]|\{|$)" "$CADDY_CONF_CHECK"; then
+        echo -e "${RED}NGUY HIEM: Ten mien [$DOMAIN] da duoc cau hinh trong Caddyfile!${NC}"
+        echo -e "Script phat hien ten mien nay da ton tai (co the kem theo port hoac trong danh sach)."
+        echo -e "Vui long kiem tra file $CADDY_CONF_CHECK va xoa cau hinh cu truoc khi chay lai."
+        exit 1
+    fi
+fi
+
+# 2. Kiểm tra thư mục Web
 if [ -d "$WEB_ROOT_DIR_CHECK" ]; then
     echo -e "${RED}NGUY HIEM: Thu muc web [$WEB_ROOT_DIR_CHECK] da ton tai!${NC}"
     echo -e "Viec tiep tuc co the ghi de du lieu cu."
@@ -164,13 +179,6 @@ if [ -d "$WEB_ROOT_DIR_CHECK_RED" ]; then
     echo -e "${RED}NGUY HIEM: Thu muc web [$WEB_ROOT_DIR_CHECK_RED] da ton tai!${NC}"
     echo -e "Viec tiep tuc co the gay nham lan."
     echo -e "Vui long xoa thu muc thu cong hoac chon ten mien khac."
-    exit 1
-fi
-
-# 2. Kiểm tra trong Caddyfile
-if grep -Fq "$DOMAIN" "$CADDY_CONF_CHECK"; then
-    echo -e "${RED}NGUY HIEM: Ten mien [$DOMAIN] da duoc cau hinh trong Caddyfile!${NC}"
-    echo -e "Vui long kiem tra file Caddyfile va xoa cau hinh cu truoc khi chay lai."
     exit 1
 fi
 
