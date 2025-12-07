@@ -6,23 +6,39 @@
 # set -o pipefail: Bắt lỗi cả trong chuỗi pipe.
 set -euo pipefail
 
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
 # Chạy lệnh
 # version 0.04.12.25
 # curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/remove_web.sh | bash
+# -------------------------------------------------------------------------------------------------------------------------------
 
-# Màu sắc hiển thị
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
+# A. Màu sắc hiển thị
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
+# -------------------------------------------------------------------------------------------------------------------------------
 
-# 1. Kiểm tra quyền root
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
+# B. Kiểm tra quyền root
 if [[ $EUID -ne 0 ]]; then
     echo -e "${RED}Loi: Vui long chay script voi quyen root (sudo).${NC}"
     exit 1
 fi
+# -------------------------------------------------------------------------------------------------------------------------------
 
-# 2. Nhập liệu
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
+# C. Nhập tên miền cần xóa, chuẩn hóa & chống các lỗi nhập nguy hiểm
+# C1. Thông báo trước sự nguy hiểm của yêu cầu này
 echo -e "${YELLOW}=== CONG CU XOA WEBSITE WORDPRESS (CADDY) ===${NC}"
 echo -e "${RED}LUY Y: HANH DONG NAY KHONG THE HOAN TAC, HAY BACKUP TRUOC!${NC}"
 read -p "Nhap ten mien muon xoa (VD: example.com): " INPUT_DOMAIN < /dev/tty
@@ -30,7 +46,7 @@ read -p "Nhap ten mien muon xoa (VD: example.com): " INPUT_DOMAIN < /dev/tty
 # Sanitize input: Xóa khoảng trắng, chuyển chữ hoa thành chữ thường
 DOMAIN=$(echo "$INPUT_DOMAIN" | tr -d ' ' | tr '[:upper:]' '[:lower:]')
 
-# Validate input
+# Kiểm tra đầu vào
 if [[ -z "$DOMAIN" ]]; then
     echo -e "${RED}Loi: Ten mien khong duoc de trong!${NC}"
     exit 1
@@ -41,28 +57,36 @@ if [[ "$DOMAIN" != *"."* ]]; then
     exit 1
 fi
 
-# Chặn các đường dẫn hệ thống nguy hiểm, mà lệnh xóa có thể gây sụp VPS
+# C2. Chặn các đường dẫn hệ thống nguy hiểm, mà lệnh xóa có thể gây sụp VPS
 if [[ "$DOMAIN" == "/" ]] || [[ "$DOMAIN" == "." ]] || [[ "$DOMAIN" == ".." ]]; then
     echo -e "${RED}Loi: Ten mien khong hop le.${NC}"
     exit 1
 fi
 
-# Thiết lập đường dẫn, cấu trúc này do phần khởi tạo quy định
+# C3. Thiết lập đường dẫn, cấu trúc này do phần khởi tạo quy định
 # Do vậy khi xóa phải lấy lại cấu trúc này
 ROOT_DIR="/var/www/$DOMAIN"
 
-# Tìm đến file wp-config.php để lấy thông tin database & user
+# C4. Tìm đến file wp-config.php để lấy thông tin database & user
 CONFIG_FILE="$ROOT_DIR/public_html/wp-config.php"
+# -------------------------------------------------------------------------------------------------------------------------------
 
-# 3. Kiểm tra thư mục web có tồn tại hay không?
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
+# D. Kiểm tra thư mục web có tồn tại hay không?
 if [ ! -d "$ROOT_DIR" ]; then
     echo -e "${RED}Loi: Thu muc $ROOT_DIR khong ton tai. Script se dung lai.${NC}"
     exit 1
 fi
 
 echo -e "${YELLOW}--- Dang quet thong tin website: $DOMAIN ---${NC}"
+# -------------------------------------------------------------------------------------------------------------------------------
 
-# 4. Lấy thông tin Database (Sử dụng WP-CLI - Reliable Method)
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
+# E. Lấy thông tin Database (Sử dụng WP-CLI - Reliable Method)
 DB_NAME=""
 DB_USER=""
 WP_PATH="$ROOT_DIR/public_html" # Đường dẫn tới thư mục chứa wp-config.php
@@ -95,8 +119,12 @@ if [ -f "$CONFIG_FILE" ]; then
 else
     echo -e "${YELLOW}Khong tim thay wp-config.php. Script se chi xoa thu muc web.${NC}"
 fi
+# -------------------------------------------------------------------------------------------------------------------------------
 
-# 5. Xác nhận
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
+# F. Xác nhận lại người dùng có chắc chắn muốn xóa không, luôn phải làm
 echo -e ""
 read -p "Ban co chac muon XOA VINH VIEN du lieu cua website? (y/n): " confirm < /dev/tty
 
@@ -104,8 +132,12 @@ if [[ ! "$confirm" =~ ^[yY](es)?$ ]]; then
     echo "Da HUY thao tac theo yeu cau. Website CHUA bi xoa."
     exit 0
 fi
+# -------------------------------------------------------------------------------------------------------------------------------
 
-# 6. Xóa Database
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
+# G. Xóa Database và User
 if [ -n "$DB_NAME" ]; then
     echo -e "${YELLOW}Dang xoa Database va User...${NC}"
     
@@ -126,8 +158,12 @@ if [ -n "$DB_NAME" ]; then
         fi
     fi
 fi
+# -------------------------------------------------------------------------------------------------------------------------------
 
-# 7. Xóa File
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
+# G. Xóa thư mục website
 echo -e "${YELLOW}Dang xoa thu muc web: $ROOT_DIR ...${NC}"
 
 # Chốt chặn an toàn cuối cùng cho lệnh rm -rf
@@ -144,18 +180,22 @@ else
     echo -e "${RED}Loi: Khong the xoa thu muc $ROOT_DIR. Kiem tra lai quyen hạn (chattr?).${NC}"
     exit 1
 fi
+# -------------------------------------------------------------------------------------------------------------------------------
 
-# 8. Xóa chứng chỉ https đã xin cấp trước đây
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
+# G. Xóa chứng chỉ https đã xin cấp trước đây lưu trong Caddy
 # Định nghĩa đường dẫn gốc chứa cert
 CERT_PATH="/var/lib/caddy/.local/share/caddy/certificates/acme-v02.api.letsencrypt.org-directory"
 
-# 8.1. Kiểm tra xem biến DOMAIN có rỗng không?
+# G.1. Kiểm tra xem biến DOMAIN có rỗng không? (thừa, nhưng thôi cho chắc!)
 if [ -z "$DOMAIN" ]; then
     echo "LOI: Bien ten mien bi rong! Dung lai de bao ve he thong."
     exit 1
 fi
 
-# 8.2. Kiểm tra xem thư mục cert của tên miền đó có tồn tại không rồi mới xóa
+# G.2. Kiểm tra xem thư mục cert của tên miền đó có tồn tại không rồi mới xóa
 if [ -d "$CERT_PATH/$DOMAIN" ]; then
     echo "Dang xoa chung chi cu cua $DOMAIN..."
     sudo rm -rf "$CERT_PATH/$DOMAIN"
@@ -163,7 +203,7 @@ else
     echo "Khong tim thay chung chi cu cua $DOMAIN (Co the chua duoc tao bao gio)."
 fi
 
-# 8.3. Xử lý luôn cả tên miền chuyển hướng
+# G.3. Xử lý luôn cả tên miền chuyển hướng
 # Xác định tên miền chuyển hướng
 if [[ "$DOMAIN" == www.* ]]; then
     # Nếu bắt đầu bằng www. -> Cắt bỏ 4 ký tự đầu (www.)
@@ -179,15 +219,19 @@ if [ -z "$RED_DOMAIN" ]; then
     exit 1
 fi
 
-# Xóa https của tên miền chuyển hướng
+# Xóa https của cả tên miền chuyển hướng nếu nó có
 if [ -d "$CERT_PATH/$RED_DOMAIN" ]; then
     echo "Dang xoa chung chi cu cua $RED_DOMAIN..."
     sudo rm -rf "$CERT_PATH/$RED_DOMAIN"
 fi
+# -------------------------------------------------------------------------------------------------------------------------------
 
-# 9. Thêm phần xóa cấu hình trong file Caddyfile
+# +++
 
-# 9.1. Khai báo biến
+# -------------------------------------------------------------------------------------------------------------------------------
+# H. Thêm phần xóa cấu hình trong file Caddyfile
+
+# H.1. Khai báo biến
 CADDY_FILE="/etc/caddy/Caddyfile"
 
 # Kiểm tra nếu người dùng chưa nhập domain
@@ -196,12 +240,12 @@ if [ -z "$DOMAIN" ]; then
     exit 1
 fi
 
-# 9.2. Tạo nội dung Marker cần tìm
+# H.2. Tạo nội dung Marker cần tìm
 # Lưu ý: Marker phải khớp chính xác với những gì bạn đã thêm vào trước đó
 START_MARKER="###start_wpsila_kiencang_${DOMAIN}###"
 END_MARKER="###end_wpsila_kiencang_${DOMAIN}###"
 
-# 9.3. Kiểm tra xem Marker có tồn tại trong file không
+# H.3. Kiểm tra xem Marker có tồn tại trong file không
 # Dùng grep -F (fixed string) để tìm chính xác chuỗi, tránh lỗi regex
 if ! grep -Fq "$START_MARKER" "$CADDY_FILE"; then
     echo "Thong bao: KHONG tim thay cau hinh cho domain $DOMAIN trong Caddyfile."
@@ -210,7 +254,7 @@ fi
 
 echo "Dang tien hanh xoa cau hinh cho: $DOMAIN..."
 
-# 9.4. Xử lý tên miền cho Regex (Quan trọng)
+# H.4. Xử lý tên miền cho Regex (Quan trọng)
 # Dấu chấm (.) trong domain (ví dụ abc.com) là ký tự đặc biệt trong Regex
 # Cần chuyển đổi dấu . thành \. để sed hiểu đó là dấu chấm thực sự.
 DOMAIN_ESCAPED=$(echo "$DOMAIN" | sed 's/\./\\./g')
@@ -219,18 +263,18 @@ DOMAIN_ESCAPED=$(echo "$DOMAIN" | sed 's/\./\\./g')
 REGEX_START="^###start_wpsila_kiencang_${DOMAIN_ESCAPED}###$"
 REGEX_END="^###end_wpsila_kiencang_${DOMAIN_ESCAPED}###$"
 
-# 9.5. Backup file Caddyfile hiện tại (An toàn là trên hết)
-# 9.5.1. Lấy timestamp 1 lần duy nhất và lưu vào biến
+# H.5. Backup file Caddyfile hiện tại (An toàn là trên hết)
+# H.5.1. Lấy timestamp 1 lần duy nhất và lưu vào biến
 TIMESTAMP=$(date +%s)
 
-# 9.5.2. Định nghĩa tên file backup cụ thể
+# H.5.2. Định nghĩa tên file backup cụ thể
 BACKUP_FILE="${CADDY_FILE}.bak_${TIMESTAMP}"
 
-# 9.5.3. Tạo file backup cho caddyfile
+# H.5.3. Tạo file backup cho caddyfile
 echo "Dang tao file backup: $BACKUP_FILE"
 sudo cp "$CADDY_FILE" "$BACKUP_FILE"
 
-# 9.6. Thực hiện xóa bằng SED
+# H.6. Thực hiện xóa bằng SED
 # Giải thích lệnh sed:
 # -i : Sửa trực tiếp trên file
 # /^...$/ : Dấu ^ là bắt đầu dòng, $ là kết thúc dòng -> Đảm bảo dòng đó chỉ chứa đúng marker, không thừa thiếu khoảng trắng hay ký tự lạ.
@@ -238,22 +282,27 @@ sudo cp "$CADDY_FILE" "$BACKUP_FILE"
 # d : Delete (xóa)
 sudo sed -i "/$REGEX_START/,/$REGEX_END/d" "$CADDY_FILE"
 
-# 9.7. Kiểm tra tính hợp lệ của Caddyfile mới (Validation)
+# H.7. Kiểm tra tính hợp lệ của Caddyfile mới (Validation)
 # Nếu Caddy báo lỗi cấu hình, lập tức khôi phục file cũ
 if ! sudo caddy validate --config "$CADDY_FILE" --adapter caddyfile > /dev/null 2>&1; then
     echo "CANH BAO: File Caddyfile bi loi sau khi sua. Dang khoi phuc lai file ban dau..."
 	
     sudo cp "$BACKUP_FILE" "$CADDY_FILE"
 	
-    echo "Da khoi phuc lai file goc. Vui long kiem tra lai Caddyfile de xoa thu cong no."
+    echo "Da khoi phuc lai file Caddyfile goc. Vui long kiem tra lai Caddyfile de xoa thu cong phan tuong ung."
     exit 1
 else
-    # 9.8. Nếu mọi thứ OK, Reload lại Caddy
+    # Nếu mọi thứ OK, Reload lại Caddy
     echo "Cau hinh hop le. Dang reload Caddy..."	
     sudo systemctl reload caddy
     echo "Hoan tat! Da xoa cau hinh cho $DOMAIN trong Caddyfile."
 fi
+# -------------------------------------------------------------------------------------------------------------------------------
 
-# 10. Kết thúc
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
+# 10. Kết thúc & thông báo
 echo -e ""
 echo -e "${GREEN}=== XOA WEBSITE THANH CONG! ===${NC}"
+# -------------------------------------------------------------------------------------------------------------------------------
