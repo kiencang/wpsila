@@ -252,6 +252,7 @@ else
     echo "Cau hinh hop le. Dang reload Caddy..."
 	# Ngăn ngừa việc mất quyền hay xảy ra
 	sudo chown -R caddy:caddy /var/www/$DOMAIN/logs
+	
     sudo systemctl reload caddy
     echo "Hoan tat! Da xoa cau hinh cho $DOMAIN trong Caddyfile."
 fi
