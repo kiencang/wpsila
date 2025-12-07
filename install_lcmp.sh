@@ -4,7 +4,28 @@
 set -euo pipefail
 
 # QUAN TRỌNG: CẤU HÌNH PHIÊN BẢN PHP
-PHP_VER="8.3"
+
+# 1. Đặt giá trị mặc định (phòng hờ không tìm thấy file config)
+DEFAULT_PHP_VER="8.3"
+
+# 2. Định nghĩa đường dẫn file config 
+# (Ví dụ: file config nằm cùng thư mục với script đang chạy)
+WPSILA_CONFIG_FILE="./wpsila.conf" 
+
+# 3. Kiểm tra và nạp file config
+if [ -f "$WPSILA_CONFIG_FILE" ]; then
+    # Lệnh 'source' hoặc dấu chấm '.' sẽ đọc biến từ file kia vào script này
+    source "$WPSILA_CONFIG_FILE"
+    echo -e "${GREEN}Da tim thay file cau hinh: ${WPSILA_CONFIG_FILE}${NC}"
+else
+    echo -e "${YELLOW}Khong tim thay file config. Su dung phien ban mac dinh.${NC}"
+fi
+
+# 4. Chốt phiên bản cuối cùng
+# Cú pháp ${BIEN_1:-$BIEN_2} nghĩa là: Nếu BIEN_1 rỗng (chưa set trong config), thì lấy BIEN_2
+PHP_VER="${PHP_VER:-$DEFAULT_PHP_VER}"
+
+echo "Phien ban PHP: $PHP_VER"
 
 # Chạy lệnh
 # version 0.05.12.25
