@@ -2,6 +2,7 @@ Các đoạn mã đang trong giai đoạn thử nghiệm, chỉ cài nó trên w
 Nhiều phần trong đoạn mã được gợi ý bới AI (Gemini, ChatGPT).
 
 Cài đặt với quyền root: 
+
 <code>curl -sL https://vps.wpsila.com | sudo bash</code>
 
 hoặc:
