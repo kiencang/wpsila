@@ -34,7 +34,7 @@ show_menu() {
     echo -e "${BLUE}--------------------------------------------------------${NC}"
     echo -e "${YELLOW}0.${NC} >> Exit (thoat)"
     echo -e "${BLUE}========================================================${NC}"
-    echo -n "Nhap lua chon: "
+    echo -n "Nhap lua chon (chon so): "
 }
 
 while true; do
