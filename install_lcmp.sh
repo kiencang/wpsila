@@ -69,7 +69,12 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 # C2 pre. Kiểm tra sự tồn tại của file xác nhận cài xong wpSila, nhằm có các thông báo phù hợp hơn
-# Cần bổ sung mã cho phần này
+ALREADY_WPSILA= "SCRIPT_DIR/wpsila_success.txt"
+if [ -f "$ALREADY_WPSILA" ]; then
+	echo -e "${YELLOW}Ban da cai wpSila tren VPS nay.${NC}"
+	echo -e "${YELLOW}Enter de thoat.${NC}"
+	exit 0
+fi	
 
 # C2. KIỂM TRA CỔNG 80 & 443(Dùng lệnh ss) 
 # Mục đích: Phát hiện Nginx, Apache, OpenLiteSpeed hoặc bất kỳ Web Server nào đang chạy.
@@ -213,5 +218,18 @@ FLUSH PRIVILEGES;
 EOF
 
 # Cần bổ sung mã để thêm file vào thư mục nhằm xác nhận đã cài thành công LCMP trên VPS
+# Nằm cùng thư mục
+INSTALLED_SUCCESSFULLY="SCRIPT_DIR/wpsila_success.txt"
+
+# Xóa file cũ nếu nó có tồn tại
+sudo rm -f "$INSTALLED_SUCCESSFULLY"
+
+# Tạo file mới xác nhận cài thành công
+cat > "$INSTALLED_SUCCESSFULLY" <<EOF
+----------------------------------------
+wpSila CLI
+Date: $(date)
+----------------------------------------
+EOF
 echo -e "${GREEN}Cai dat thanh cong PHP & MariaDB.${NC}"
 # -------------------------------------------------------------------------------------------------------------------------------
