@@ -69,7 +69,9 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 # C2 pre. Kiểm tra sự tồn tại của file xác nhận cài xong wpSila, nhằm có các thông báo phù hợp hơn
-ALREADY_WPSILA= "SCRIPT_DIR/wpsila_success.txt"
+ALREADY_WPSILA="SCRIPT_DIR/wpsila_success.txt"
+
+# Kiểm tra xem file cài thành công đã có chưa, có rồi thì không cài nữa
 if [ -f "$ALREADY_WPSILA" ]; then
 	echo -e "${YELLOW}Ban da cai wpSila tren VPS nay.${NC}"
 	echo -e "${YELLOW}Enter de thoat.${NC}"
