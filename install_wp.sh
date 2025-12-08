@@ -528,10 +528,31 @@ EOF
 TIMESTAMP=$(date +%s)
 BACKUP_FILE="${CADDY_FILE}.bak_${TIMESTAMP}"
 
+# Hàm xóa các file backup cũ để tránh rác file backup
+rotate_caddy_backup() {
+    local CADDY_PATH="/etc/caddy/Caddyfile"
+    local MAX_BACKUPS=10
+    
+    # 1. Logic tìm và xóa file cũ
+    # ls -1t: Liệt kê 1 cột, sắp xếp theo thời gian (Mới nhất ở trên cùng)
+    # tail -n +11: Bỏ qua 10 dòng đầu, lấy từ dòng 11 đến hết (Đây là các file cũ thừa ra)
+    # xargs -r rm: Nhận danh sách và xóa. -r để không báo lỗi nếu không có file nào cần xóa.
+    
+    ls -1t "${CADDY_PATH}.bak_"* 2>/dev/null | tail -n +$((MAX_BACKUPS + 1)) | xargs -r rm -f
+    
+    # (Optional) Log ra màn hình để debug
+    local CURRENT_COUNT=$(ls -1 "${CADDY_PATH}.bak_"* 2>/dev/null | wc -l)
+    echo "Backup rotation complete. Current backups: $CURRENT_COUNT (Limit: $MAX_BACKUPS)"
+}
+
 # Kiểm tra nếu file tồn tại thì mới backup để tránh lỗi
 if [ -f "$CADDY_FILE" ]; then
     echo "Dang tao file backup: $BACKUP_FILE"
     sudo cp "$CADDY_FILE" "$BACKUP_FILE"
+	
+	# Gọi hàm xoay vòng để dọn dẹp ngay lập tức
+	# Tránh việc có một đống các file backup sau này
+	rotate_caddy_backup
 else
     echo "Day la lan cai dat dau tien, chua co file Caddyfile cu de backup."
     # Tạo file rỗng để tránh lỗi cho các lệnh phía sau
