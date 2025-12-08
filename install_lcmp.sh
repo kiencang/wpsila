@@ -68,6 +68,12 @@ if [[ $EUID -ne 0 ]]; then
    exit 1
 fi
 
+# C2 pre. Kiểm tra sự tồn tại của file cấu hình wpsila.conf, nếu nó đã tồn tại thì wpSila đã cài rồi
+if [ -f "$WPSILA_CONFIG_FILE" ]; then
+    echo -e "${YELLOW}Ban da cai wpSila:${NC} Co ve ban da cai wpSila tren VPS nay. Khong can chay lai lenh nay nua."
+    exit 1
+fi
+
 # C2. KIỂM TRA CỔNG 80 & 443(Dùng lệnh ss) 
 # Mục đích: Phát hiện Nginx, Apache, OpenLiteSpeed hoặc bất kỳ Web Server nào đang chạy.
 # ss -tuln: Hien thi TCP/UDP, Listening, Numeric ports

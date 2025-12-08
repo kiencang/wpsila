@@ -8,7 +8,7 @@ set -euo pipefail
 # -------------------------------------------------------------------------------------------------------------------------------
 # Chạy lệnh
 # version 0.05.12.25
-# curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/install_wp.sh | bash
+# curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/install_wp.sh | sudo bash
 # -------------------------------------------------------------------------------------------------------------------------------
 
 #+++
@@ -83,6 +83,7 @@ fi
 PHP_VER="${PHP_VER:-$DEFAULT_PHP_VER}"
 
 echo "Phien ban PHP: $PHP_VER"
+sleep 2
 # -------------------------------------------------------------------------------------------------------------------------------
 
 #+++
@@ -182,12 +183,13 @@ if [ -d "$WEB_ROOT_DIR_CHECK_RED" ]; then
     exit 1
 fi
 
-echo -e "${GREEN}Kiem tra an toan hoan tat. Ten mien hop le de cai moi.${NC}"
+echo -e "${GREEN}Kiem tra an toan hoan tat.${NC}"
 # -----------------------------------------------
 
 # --- Script tiếp tục chạy từ đây khi dữ liệu đã đúng ---
 echo -e "Thanh cong! Domain duoc chap nhan: $DOMAIN"
 echo -e "${GREEN}>>> Dang tien hanh cai dat cho domain: ${YELLOW}$DOMAIN${NC}"
+sleep 2
 # -------------------------------------------------------------------------------------------------------------------------------
 
 #+++
@@ -299,7 +301,7 @@ sudo rm -f latest.tar.gz
 
 # -------------------------------------------------------------------------------------------------------------------------------
 # G3. TỰ ĐỘNG CẤU HÌNH WP-CONFIG VÀ INSTALL DB
-echo -e "${GREEN}>>> Dang tu dong cau hinh wp-config.php va Database...${NC}"
+echo -e "${GREEN}>>> Dang tu dong cau hinh wp-config.php va database...${NC}"
 
 # G3.1. Cài đặt WP-CLI nếu chưa có
     if ! [ -x "$(command -v wp)" ]; then
@@ -348,7 +350,8 @@ Email      : $WP_ADMIN_EMAIL
 ----------------------------------------
 EOF
 
-echo -e "${GREEN}>>> Da cai dat xong WordPress Core!${NC}"
+echo -e "${GREEN}>>> Da cai dat xong WordPress core!${NC}"
+sleep 2
 # -------------------------------------------------------------------------------------------------------------------------------
 
 #++
@@ -579,7 +582,7 @@ else
 	sudo chown -R caddy:caddy /var/www/$DOMAIN/logs
 	
     sudo systemctl reload caddy
-    echo "Hoan tat! Da cap nhat cau hinh cho $DOMAIN trong Caddyfile."
+    echo "Da cap nhat cau hinh cho $DOMAIN trong Caddyfile."
 fi
 # -------------------------------------------------------------------------------------------------------------------------------
 
@@ -587,5 +590,5 @@ fi
 
 # -------------------------------------------------------------------------------------------------------------------------------
 echo "Hoan tat! Xin chuc mung ban da cai thanh cong WordPress trên Caddy Web Server."
-echo "Nhap muc 4 de xem thong tin pass cua trang WordPress ban vua tao."
+echo "Nhap muc <4> de xem thong tin pass cua trang WordPress ban vua tao."
 # -------------------------------------------------------------------------------------------------------------------------------
