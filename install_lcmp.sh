@@ -69,7 +69,7 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 # C2 pre. Kiểm tra sự tồn tại của file xác nhận cài xong wpSila, nhằm có các thông báo phù hợp hơn
-ALREADY_WPSILA="SCRIPT_DIR/wpsila_success.txt"
+ALREADY_WPSILA="$SCRIPT_DIR/wpsila_success.txt"
 
 # Kiểm tra xem file cài thành công đã có chưa, có rồi thì không cài nữa
 if [ -f "$ALREADY_WPSILA" ]; then
@@ -221,7 +221,7 @@ EOF
 
 # Cần bổ sung mã để thêm file vào thư mục nhằm xác nhận đã cài thành công LCMP trên VPS
 # Nằm cùng thư mục
-INSTALLED_SUCCESSFULLY="SCRIPT_DIR/wpsila_success.txt"
+INSTALLED_SUCCESSFULLY="$SCRIPT_DIR/wpsila_success.txt"
 
 # Xóa file cũ nếu nó có tồn tại
 sudo rm -f "$INSTALLED_SUCCESSFULLY"
