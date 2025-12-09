@@ -42,8 +42,24 @@ echo "-> OK."
 echo "[2/4] Đang tải Adminer..."
 mkdir -p "$INSTALL_DIR"
 rm -f "$INSTALL_DIR/index.php"
-wget -q -O "$INSTALL_DIR/index.php" "https://github.com/vrana/adminer/releases/latest/download/adminer-mysql.php"
-wget -q -O "$INSTALL_DIR/adminer.css" "https://raw.githubusercontent.com/pepa-linha/adminer-theme-hydra/master/adminer.css"
+
+# SỬA LỖI: Dùng link chính chủ Adminer.org để luôn lấy bản mới nhất & bỏ -q để hiện tiến trình
+echo "  -> Đang tải source code..."
+if wget -O "$INSTALL_DIR/index.php" "https://www.adminer.org/latest-mysql.php"; then
+    echo "  -> Tải Adminer thành công."
+else
+    echo "Lỗi: Không thể tải Adminer từ adminer.org"
+    exit 1
+fi
+
+echo "  -> Đang tải giao diện (CSS)..."
+# Link CSS này vẫn ổn, nhưng nên thêm check lỗi
+if wget -O "$INSTALL_DIR/adminer.css" "https://raw.githubusercontent.com/pepa-linha/adminer-theme-hydra/master/adminer.css"; then
+    echo "  -> Tải CSS thành công."
+else
+    echo "Cảnh báo: Không thể tải CSS (Giao diện sẽ về mặc định)."
+    # Không exit ở đây vì CSS không quá quan trọng
+fi
 
 chown -R www-data:www-data "$INSTALL_DIR"
 chmod 755 "$INSTALL_DIR"
