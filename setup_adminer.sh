@@ -29,7 +29,7 @@ fi
 PHP_SOCKET="/run/php/php8.3-fpm.sock"
 INSTALL_DIR="/var/www/adminer"
 CADDY_FILE="/etc/caddy/Caddyfile"
-USER_NAME="adminer"
+USER_NAME="adminer_db"
 
 # Tạo mật khẩu
 DB_PASS=$(openssl rand -base64 12)
@@ -55,15 +55,6 @@ if wget -O "$INSTALL_DIR/index.php" "https://www.adminer.org/latest-mysql.php"; 
 else
     echo "Lỗi: Không thể tải Adminer từ adminer.org"
     exit 1
-fi
-
-echo "  -> Đang tải giao diện (CSS)..."
-# Link CSS này vẫn ổn, nhưng nên thêm check lỗi
-if wget -O "$INSTALL_DIR/adminer.css" "https://raw.githubusercontent.com/pepa-linha/adminer-theme-hydra/master/adminer.css"; then
-    echo "  -> Tải CSS thành công."
-else
-    echo "Cảnh báo: Không thể tải CSS (Giao diện sẽ về mặc định)."
-    # Không exit ở đây vì CSS không quá quan trọng
 fi
 
 chown -R www-data:www-data "$INSTALL_DIR"
