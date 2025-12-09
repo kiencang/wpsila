@@ -100,15 +100,17 @@ download_file "$REPO_URL/wpsila.conf" "$INSTALL_DIR/wpsila.conf"
 download_file "$REPO_URL/wpsila_menu.sh" "$INSTALL_DIR/wpsila_menu.sh"
 #
 download_file "$REPO_URL/install_lcmp.sh" "$INSTALL_DIR/install_lcmp.sh"
-# 
-download_file "$REPO_URL/mariadb_tune.sh" "$INSTALL_DIR/mariadb_tune.sh"
-download_file "$REPO_URL/php_ini_tune.sh" "$INSTALL_DIR/php_ini_tune.sh"
-download_file "$REPO_URL/pool_tune.sh" "$INSTALL_DIR/pool_tune.sh"
+download_file "$REPO_URL/caddy_web_server.sh" "$INSTALL_DIR/caddy_web_server.sh"
+download_file "$REPO_URL/php_mariadb.sh" "$INSTALL_DIR/php_mariadb.sh"
 #
 download_file "$REPO_URL/install_wp.sh" "$INSTALL_DIR/install_wp.sh"
 download_file "$REPO_URL/wordpress.sh" "$INSTALL_DIR/wordpress.sh"
 download_file "$REPO_URL/caddyfile.sh" "$INSTALL_DIR/caddyfile.sh"
 download_file "$REPO_URL/caddyfile_subdomain.sh" "$INSTALL_DIR/caddyfile_subdomain.sh"
+# 
+download_file "$REPO_URL/mariadb_tune.sh" "$INSTALL_DIR/mariadb_tune.sh"
+download_file "$REPO_URL/php_ini_tune.sh" "$INSTALL_DIR/php_ini_tune.sh"
+download_file "$REPO_URL/pool_tune.sh" "$INSTALL_DIR/pool_tune.sh"
 #
 download_file "$REPO_URL/remove_web.sh" "$INSTALL_DIR/remove_web.sh"
 #
