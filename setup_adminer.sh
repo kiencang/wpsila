@@ -9,6 +9,11 @@ if [[ $EUID -ne 0 ]]; then
    exit 1
 fi
 
+# --- ĐẢM BẢO LOG FOLDER TỒN TẠI ---
+# Tạo thư mục nếu chưa có (-p giúp không báo lỗi nếu đã có)
+mkdir -p /var/log/caddy
+
+
 # --- NHẬP THÔNG TIN ---
 echo "========================================================"
 echo "   SETUP ADMINER (PHP 8.3) & AUTO CADDY CONFIG"
@@ -122,6 +127,11 @@ EOF
     
     # Format và Reload
     caddy fmt --overwrite "$CADDY_FILE"
+
+	# Nếu không làm bước này, Caddy không thể ghi file vào đây được
+	# Gán quyền liên quan đến thư mục log
+	chown -R caddy:caddy /var/log/caddy
+	chmod 755 /var/log/caddy	
 	
     systemctl reload caddy
     echo "-> Đã Reload Caddy."
