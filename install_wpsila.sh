@@ -116,6 +116,8 @@ download_file "$REPO_URL/remove_web.sh" "$INSTALL_DIR/remove_web.sh"
 #
 download_file "$REPO_URL/setup_sftp.sh" "$INSTALL_DIR/setup_sftp.sh"
 #
+download_file "$REPO_URL/setup_adminer.sh" "$INSTALL_DIR/setup_adminer.sh"
+#
 download_file "$REPO_URL/wpp.sh" "$INSTALL_DIR/wpp.sh"
 # -------------------------------------------------------------------------------------------------------------------------------
 
