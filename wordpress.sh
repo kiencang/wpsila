@@ -1,6 +1,6 @@
 # -----------------------------------------------------------
 # MODULE: Cài đặt WordPress và phân quyền
-# File này được nhúng vào script chính.
+# File này được nhúng vào script install_wp.sh
 # -----------------------------------------------------------
 # G1. TẠO CẤU TRÚC THƯ MỤC
 echo -e "${GREEN}[1/5] Dang tao thu muc chua ma nguon...${NC}"

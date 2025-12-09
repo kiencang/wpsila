@@ -1,6 +1,6 @@
 # -----------------------------------------------------------
 # MODULE: Caddyfile
-# File này được nhúng vào script chính.
+# File này được nhúng vào script install_wp.sh
 # -----------------------------------------------------------
 # Lưu ý: thêm $MARKER vào nội dung để lần sau chạy nó sẽ nhận diện được
 read -r -d '' CONTENT <<EOF || true

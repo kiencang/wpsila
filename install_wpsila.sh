@@ -106,6 +106,8 @@ download_file "$REPO_URL/php_ini_tune.sh" "$INSTALL_DIR/php_ini_tune.sh"
 download_file "$REPO_URL/pool_tune.sh" "$INSTALL_DIR/pool_tune.sh"
 #
 download_file "$REPO_URL/install_wp.sh" "$INSTALL_DIR/install_wp.sh"
+download_file "$REPO_URL/wordpress.sh" "$INSTALL_DIR/wordpress.sh"
+download_file "$REPO_URL/caddyfile.sh" "$INSTALL_DIR/caddyfile.sh"
 download_file "$REPO_URL/install_subdomain_wp.sh" "$INSTALL_DIR/install_subdomain_wp.sh"
 #
 download_file "$REPO_URL/remove_web.sh" "$INSTALL_DIR/remove_web.sh"
