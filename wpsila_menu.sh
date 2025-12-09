@@ -84,10 +84,10 @@ while true; do
             fi
             echo -e "\n${BLUE}An Enter de quay lai...${NC}"; read -r ;; # Them -r
         6)
-            if [[ -f "$BASE_DIR/install_subdomain_wp.sh" ]]; then
-                bash "$BASE_DIR/install_subdomain_wp.sh"
+            if [[ -f "$BASE_DIR/install_wp.sh" ]]; then
+                bash "$BASE_DIR/install_wp.sh" subdomain
             else
-                echo -e "${RED}Loi: Khong tim thay file install_subdomain_wp.sh${NC}"
+                echo -e "${RED}Loi: Khong tim thay file install_wp.sh${NC}"
             fi
             echo -e "\n${BLUE}An Enter de quay lai...${NC}"; read -r ;; # Them -r				
         7)
