@@ -33,9 +33,9 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 # Xác định kiểu cài đặt có phải là subdomain hay không
-# Mặc định là no, tức là không phải dạng cài subdomain
+# Mặc định là nosd, tức là không phải dạng cài subdomain
 # Tham số đầu vào mặc định ở vị trí đầu tiên (1)
-INSTALL_TYPE="${1:-no}"
+INSTALL_TYPE="${1:-nosd}"
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
@@ -162,7 +162,7 @@ if [ "$INSTALL_TYPE" != "subdomain" ]; then
 	WEB_ROOT_DIR_CHECK_RED="/var/www/$RED_DOMAIN"
 fi
 
-# Đường dẫn tới file Caddyfile
+# Đường dẫn tới file Caddyfile của Webserver, phải ghi đè vào đường dẫn này
 CADDY_CONF_CHECK="/etc/caddy/Caddyfile" 
 
 # 1. Kiểm tra trong Caddyfile (Deep Scan Check)
