@@ -55,7 +55,7 @@ fi
 # -------------------------------------------------------------------------------------------------------------------------------
 # D. CẤU HÌNH PHIÊN BẢN PHP
 
-# D1. Đặt giá trị mặc định (phòng hờ không tìm thấy file config)
+# D1. Đặt giá trị mặc định (phòng hờ không tìm thấy file config / wpsila.conf)
 DEFAULT_PHP_VER="8.3"
 
 # D2. Định nghĩa đường dẫn file config 
@@ -88,7 +88,13 @@ sleep 2
 
 # -------------------------------------------------------------------------------------------------------------------------------
 # E. NHẬP VÀ XỬ LÝ TÊN MIỀN
-echo -e "${GREEN}>>> Vui long nhap ten mien cua ban (vi du: example.com):${NC}"
+if [ "$INSTALL_TYPE" != "subdomain" ]; then
+	echo -e "${GREEN}>>> Vui long nhap ten mien cua ban (vi du: example.com):${NC}"
+fi
+
+if [ "$INSTALL_TYPE" == "subdomain" ]; then
+	echo -e "${GREEN}>>> Vui long nhap SubDomain cua ban (vi du: hello.example.com):${NC}"
+fi
 
 # E1. Cấu hình số lần thử tối đa
 MAX_RETRIES=3
@@ -196,8 +202,17 @@ echo -e "${GREEN}Kiem tra an toan hoan tat.${NC}"
 # -----------------------------------------------
 
 # --- Script tiếp tục chạy từ đây khi dữ liệu đã đúng ---
-echo -e "Thanh cong! Domain duoc chap nhan: $DOMAIN"
-echo -e "${GREEN}>>> Dang tien hanh cai dat cho domain: ${YELLOW}$DOMAIN${NC}"
+if [ "$INSTALL_TYPE" != "subdomain" ]; then
+	echo -e "Thanh cong! Ten mien duoc chap nhan: $DOMAIN"
+	echo -e "${GREEN}>>> Dang tien hanh cai dat cho domain: ${YELLOW}$DOMAIN${NC}"
+fi
+
+# Thông báo cho trường hợp là subdomain
+if [ "$INSTALL_TYPE" == "subdomain" ]; then
+	echo -e "Thanh cong! SubDomain duoc chap nhan: $DOMAIN"
+	echo -e "${GREEN}>>> Dang tien hanh cai dat cho subdomain: ${YELLOW}$DOMAIN${NC}"
+fi
+
 sleep 2
 # -------------------------------------------------------------------------------------------------------------------------------
 
@@ -318,7 +333,8 @@ if [ -f "$CADDY_FILE_TEMP" ]; then
     # Lệnh source quan trọng để nhúng trực tiếp vào file chính
     source "$CADDY_FILE_TEMP"
 else 
-	echo -e "${RED}KHONG TIM THAY Caddyfile (caddyfile.sh)! Hay kiem tra lai su ton tai cua file nay, hoac duong dan cua no.${NC}"
+	echo -e "${RED}KHONG TIM THAY Caddyfile (caddyfile.sh hoac caddyfile_subdomain.sh)!.${NC}"
+	echo -e "${RED}Hay kiem tra lai su ton tai cua file nay, hoac duong dan cua no.${NC}"
 	exit 1
 fi	
 
