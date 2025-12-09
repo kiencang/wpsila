@@ -3,15 +3,15 @@
 # Dừng script ngay lập tức nếu có lệnh bị lỗi
 set -euo pipefail
 
-#+++
+# +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
 # Chạy lệnh
-# version 0.05.12.25
+# version 0.09.12.25
 # curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/install_wp.sh | sudo bash
 # -------------------------------------------------------------------------------------------------------------------------------
 
-#+++
+# +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
 # A. Màu sắc cho thông báo
@@ -21,7 +21,7 @@ RED='\033[0;31m'
 NC='\033[0m' # No Color
 # -------------------------------------------------------------------------------------------------------------------------------
 
-#+++
+# +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
 # B. Quyền chạy
@@ -33,7 +33,7 @@ if [[ $EUID -ne 0 ]]; then
 fi
 # -------------------------------------------------------------------------------------------------------------------------------
 
-#+++
+# +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
 # C. Kiểm tra môi trường
@@ -53,7 +53,7 @@ if ! id "www-data" &>/dev/null; then
 fi
 # -------------------------------------------------------------------------------------------------------------------------------
 
-#+++
+# +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
 # D. CẤU HÌNH PHIÊN BẢN PHP
@@ -63,11 +63,12 @@ DEFAULT_PHP_VER="8.3"
 
 # D2. Định nghĩa đường dẫn file config 
 # (Ví dụ: file config nằm cùng thư mục với script đang chạy)
-# Lấy đường dẫn tuyệt đối của thư mục chứa file script đang chạy
-SCRIPT_DIR="$(dirname "$(realpath "$0")")"
+# Dòng lệnh này đảm bảo biến SCRIPT_WPSILA_DIR luôn là đường dẫn tuyệt đối tới thư mục chứa file này
+# Xác định thư mục
+SCRIPT_WPSILA_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
 # Trỏ vào file config nằm cùng thư mục đó
-WPSILA_CONFIG_FILE="$SCRIPT_DIR/wpsila.conf"
+WPSILA_CONFIG_FILE="$SCRIPT_WPSILA_DIR/wpsila.conf"
 
 # D3. Kiểm tra và nạp file config
 if [ -f "$WPSILA_CONFIG_FILE" ]; then
@@ -86,7 +87,7 @@ echo "Phien ban PHP: $PHP_VER"
 sleep 2
 # -------------------------------------------------------------------------------------------------------------------------------
 
-#+++
+# +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
 # E. NHẬP VÀ XỬ LÝ TÊN MIỀN
@@ -192,7 +193,7 @@ echo -e "${GREEN}>>> Dang tien hanh cai dat cho domain: ${YELLOW}$DOMAIN${NC}"
 sleep 2
 # -------------------------------------------------------------------------------------------------------------------------------
 
-#+++
+# +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
 # F. Tạo Database & User
@@ -258,165 +259,21 @@ sleep 2
 echo "-------------------------------------------------------------------------------------------------"
 # -------------------------------------------------------------------------------------------------------------------------------
 
-#+++
+# +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
-# G. Cai dat WordPress
-# G1. TẠO CẤU TRÚC THƯ MỤC
-echo -e "${GREEN}[1/5] Dang tao thu muc chua ma nguon...${NC}"
-# Tạo thư mục web root (-p giúp không báo lỗi nếu thư mục đã tồn tại)
-sudo mkdir -p /var/www/$DOMAIN/public_html
+# G. Cai dat WordPress (G) & Phân quyền (H)
+# Xác định đường dẫn tuyệt đối đến file cài đặt WordPress
+WORDPRESS_FILE_TEMP="$SCRIPT_WPSILA_DIR/wordpress.sh"
 
-echo -e "${GREEN}[2/5] Dang tao thu muc logs va cap quyen...${NC}"
-# Tạo thư mục logs
-sudo mkdir -p /var/www/$DOMAIN/logs
-# Cấp quyền cho user caddy để ghi được log truy cập
-sudo chown -R caddy:caddy /var/www/$DOMAIN/logs
-# -------------------------------------------------------------------------------------------------------------------------------
-
-#++
-
-# -------------------------------------------------------------------------------------------------------------------------------
-# G2. TẢI VÀ GIẢI NÉN WORDPRESS 
-echo -e "${GREEN}[3/5] Dang tai WordPress phien ban moi nhat...${NC}"
-
-# Di chuyển vào thư mục tên miền
-cd /var/www/$DOMAIN
-
-# Tải file về (thêm cờ -f để báo lỗi nếu link hỏng/404)
-# Xóa file cũ nếu tồn tại để tránh lỗi permission
-sudo rm -f latest.tar.gz
-
-sudo curl -fLO https://wordpress.org/latest.tar.gz
-
-echo -e "${GREEN}[4/5] Dang giai nen ma nguon...${NC}"
-# Giải nén thẳng vào thư mục đích, bỏ qua lớp vỏ 'wordpress' bên ngoài
-sudo tar xzf latest.tar.gz -C /var/www/$DOMAIN/public_html --strip-components=1
-
-# Dọn dẹp file nén 
-sudo rm -f latest.tar.gz
-# -------------------------------------------------------------------------------------------------------------------------------
-
-#++
-
-# -------------------------------------------------------------------------------------------------------------------------------
-# G3. TỰ ĐỘNG CẤU HÌNH WP-CONFIG VÀ INSTALL DB
-echo -e "${GREEN}>>> Dang tu dong cau hinh wp-config.php va database...${NC}"
-
-# G3.1. Cài đặt WP-CLI nếu chưa có
-    if ! [ -x "$(command -v wp)" ]; then
-        echo " -> Dang tai WP-CLI..."
-        sudo curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
-        sudo chmod +x wp-cli.phar
-        sudo mv wp-cli.phar /usr/local/bin/wp
-    fi
-
-# G3.2. Định nghĩa biến nội bộ cho quá trình cài đặt
-    WP_PATH="/var/www/$DOMAIN/public_html"
-    WP_ADMIN_USER="admin"
-    WP_ADMIN_PASS="p_$(openssl rand -hex 12)" # Tạo pass ngẫu nhiên
-    WP_ADMIN_EMAIL="admin@$DOMAIN"
-
-    # Di chuyển vào thư mục code
-    cd "$WP_PATH" || exit
-
-# G3.3. Tạo file wp-config.php từ thông tin DB ở Bước 2
-    # Dùng --allow-root vì script đang chạy quyền sudo
-    wp config create --dbname="$GEN_DB_NAME" \
-                     --dbuser="$GEN_DB_USER" \
-                     --dbpass="$GEN_DB_PASS" \
-                     --dbhost="localhost" \
-                     --allow-root --force
-
-# G3.4. Chạy lệnh Install để nạp dữ liệu vào Database
-    echo " -> Dang khoi tao du lieu WordPress..."
-    wp core install --url="https://$DOMAIN" \
-                    --title="Website $DOMAIN" \
-                    --admin_user="$WP_ADMIN_USER" \
-                    --admin_password="$WP_ADMIN_PASS" \
-                    --admin_email="$WP_ADMIN_EMAIL" \
-                    --skip-email \
-                    --allow-root
-
-# G3.5. Ghi thêm thông tin đăng nhập WP vào file wpp.txt
-cat >> "$CRED_FILE" <<EOF
-----------------------------------------
-WORDPRESS ADMIN INFO
-----------------------------------------
-Login URL  : https://$DOMAIN/wp-admin
-User       : $WP_ADMIN_USER
-Pass       : $WP_ADMIN_PASS
-Email      : $WP_ADMIN_EMAIL
-----------------------------------------
-EOF
-
-echo -e "${GREEN}>>> Da cai dat xong WordPress core!${NC}"
-sleep 2
-# -------------------------------------------------------------------------------------------------------------------------------
-
-#++
-
-# -------------------------------------------------------------------------------------------------------------------------------
-# H. PHÂN QUYỀN (PERMISSIONS) ---
-# Điều chỉnh phân quyền để dễ dàng hơn trong việc tạo tài khoản sFTP sau này.
-echo -e "${GREEN}[5/5] Dang thiet lap quyen han chuan cho WordPress...${NC}"
-
-WP_ROOT="/var/www/$DOMAIN/public_html"
-PARENT_DIR="/var/www/$DOMAIN"
-
-# Gán chủ sở hữu thư mục cha, không đệ quy, không -R
-# Cái này dùng để nhốt user sFTP trong tương lai không leo ra ngoài thư mục web nó có quyền
-# Tức là nó chỉ có quyền trong phạm vi web nó được gán không leo toàn bộ các web trên VPS
-sudo chown root:root $PARENT_DIR
-sudo chmod 755 $PARENT_DIR
-
-# Gán Group www-data là chủ sở hữu (để PHP có thể ghi file, cài plugin, upload ảnh)
-# User sở hữu là root
-sudo chown -R root:www-data $WP_ROOT
-
-# Chuẩn hóa quyền để không mâu thuẫn quyền của nhau sau này khi tạo tài khoản sFTP:
-# - Thư mục: 775 (rwxrwxr-x)
-# - File: 664 (rw-rw-r--)
-# số 2 trước 775 là để các file sau này do sFTP up lên mặc định thuộc quyền sở hữu của group www-data
-# Do vậy user www-data thuộc group www-data sẽ có quyền làm việc với file đó mà không bị lỗi không đủ quyền.
-sudo find $WP_ROOT -type d -exec chmod 2775 {} \;
-sudo find $WP_ROOT -type f -exec chmod 664 {} \;
-
-# Định nghĩa đường dẫn file config 
-WP_CONFIG="$WP_ROOT/wp-config.php"
-
-# Bổ sung để vượt qua sự khó tính về quyền trong WordPress. Dù phân quyền trên đã ổn.
-# Kiểm tra: Nếu chưa có FS_METHOD thì mới thực hiện
-if ! grep -q "FS_METHOD" "$WP_CONFIG"; then
-    # Dùng lệnh sed để chèn ngay sau thẻ mở <?php
-    # Dấu ^ đảm bảo chỉ tìm <?php ở đầu dòng (tránh nhầm lẫn nếu có trong comment)
-    sudo sed -i "0,/<?php/s/<?php/<?php\n\ndefine( 'FS_METHOD', 'direct' );/" "$WP_CONFIG"
-    
-    echo "Da them cau hinh FS_METHOD: direct"
-else
-    echo "Cau hinh FS_METHOD da ton tai."
-fi
-
-# Phân quyền để quản lý chặt file wp-config
-if [ -f "$WP_CONFIG" ]; then
-    sudo chmod 660 $WP_CONFIG
-fi
-
-# Đảm bảo Caddy có thể "đi xuyên qua" thư mục /var/www để đọc file
-sudo chmod +x /var/www
-
-# Khởi động lại để tránh phân quyền bị cache
-sudo systemctl reload php${PHP_VER}-fpm
-
-# --- HOÀN TẤT ---
-echo -e "${GREEN}=============================================${NC}"
-echo -e "${GREEN}   Cai Dat Ma Nguon WordPress Hoan Tat!   ${NC}"
-echo -e "${GREEN}=============================================${NC}"
-echo -e "Domain:        ${YELLOW}$DOMAIN${NC}"
-echo -e "Web Root:      ${YELLOW}$WP_ROOT${NC}"
-echo -e "Logs Directory: ${YELLOW}/var/www/$DOMAIN/logs${NC}"
-echo -e "${GREEN}>>> Buoc tiep theo: Cau hinh Caddyfile.${NC}"
-sleep 2
+# Nhúng cài đặt WordPress vào, kiểm tra sự tồn tại để đảm bảo không lỗi
+if [ -f "$WORDPRESS_FILE_TEMP" ]; then    
+    # Lệnh source quan trọng để nhúng trực tiếp vào file chính
+    source "$WORDPRESS_FILE_TEMP"
+else 
+	echo -e "${RED}KHONG TIM THAY file cài WordPress (wordpress.sh)! Hay kiem tra lai su ton tai cua file nay, hoac duong dan cua no.${NC}"
+	exit 1
+fi	
 
 echo "-------------------------------------------------------------------------------------------------"
 # -------------------------------------------------------------------------------------------------------------------------------
@@ -435,94 +292,17 @@ echo "Domain chinh: $DOMAIN"
 echo "Domain chuyen huong: $RED_DOMAIN"
 
 # I2. Nội dung Caddyfile
-# Lưu ý: thêm $MARKER vào nội dung để lần sau chạy nó sẽ nhận diện được
-read -r -d '' CONTENT <<EOF || true
-###start_wpsila_kiencang_$DOMAIN###
-# 1. Chuyen huong RED_DOMAIN ve DOMAIN 
-$RED_DOMAIN {
-    redir https://$DOMAIN{uri} permanent
-}
+#Xác định đường dẫn tuyệt đối đến file caddyfile
+CADDY_FILE_TEMP="$SCRIPT_WPSILA_DIR/caddyfile.sh"
 
-# 2. Cau hinh chinh
-$DOMAIN {
-    root * /var/www/$DOMAIN/public_html
-    encode zstd gzip
-	
-    # Tang gioi han upload, can chinh them /etc/php/PHP_VER/fpm/php.ini cho dong bo
-    request_body {
-        max_size 50MB
-    }	
-
-    # Log: Tu dong xoay vong
-    log {
-        output file /var/www/$DOMAIN/logs/access.log {
-            roll_size 10mb
-            roll_keep 10
-        }
-    }
-
-    # --- SECURITY HEADERS ---
-    # Sau khi HTTPS da chay on dinh, hay bo comment dong Strict-Transport-Security
-    header {
-        X-Content-Type-Options "nosniff"
-        X-Frame-Options "SAMEORIGIN"
-        X-XSS-Protection "0"
-        Referrer-Policy "strict-origin-when-cross-origin"
-        Permissions-Policy "camera=(), microphone=(), geolocation=(), browsing-topics=()"
-        # Strict-Transport-Security "max-age=31536000; includeSubDomains"
-        -Server
-        -X-Powered-By
-    }
-
-    # --- CACHE CODE (CSS/JS) ---
-    # Khong dung immutable de tranh loi khi update code
-    @code_assets {
-        file
-        path *.css *.js
-    }
-    header @code_assets Cache-Control "public, max-age=604800"
-
-    # --- CACHE MEDIA (ANH/FONT) ---
-    # Dung immutable vi file anh it khi sua noi dung ma giu nguyen ten
-    @media_assets {
-        file
-        path *.ico *.gif *.jpg *.jpeg *.png *.svg *.woff *.woff2 *.webp *.avif
-    }
-    header @media_assets Cache-Control "public, max-age=31536000, immutable"
-
-    # --- CHAN FILE NHAY CAM (SECURITY BLOCK) ---
-    @forbidden {
-        # 1. Block PHP Uploads 
-        path /wp-content/uploads/*.php
-
-        # 2. Block System Files & Directories
-        path /wp-config.php
-        path /.htaccess
-		path /.git
-        path /.git/*     
-        path *.env   
-        path /readme.html
-        path /license.txt
-		
-		# 3. Block xmlrpc 
-		path /xmlrpc.php
-        
-        # 4. Block Backups & Logs
-        path *.sql *.bak *.log *.old
-        # path *.zip *.rar *.tar *.7z
-    }
-    # Tra ve 404
-    respond @forbidden 404
-	
-	# PHP FastCGI, lấy động theo phiên bản PHP thiết lập ở đầu file lệnh.
-    php_fastcgi unix//run/php/php${PHP_VER}-fpm.sock
-
-    file_server
-}
-    # Danh dau maker de nhan dien sau nay
-    $MARKER
-###end_wpsila_kiencang_$DOMAIN###	
-EOF
+# Nhúng caddyfile vào, kiểm tra sự tồn tại để đảm bảo không lỗi
+if [ -f "$CADDY_FILE_TEMP" ]; then    
+    # Lệnh source quan trọng để nhúng trực tiếp vào file chính
+    source "$CADDY_FILE_TEMP"
+else 
+	echo -e "${RED}KHONG TIM THAY Caddyfile (caddyfile.sh)! Hay kiem tra lai su ton tai cua file nay, hoac duong dan cua no.${NC}"
+	exit 1
+fi	
 
 # I3. TẠO BACKUP AN TOÀN 
 TIMESTAMP=$(date +%s)
