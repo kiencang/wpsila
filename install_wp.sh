@@ -31,6 +31,11 @@ if [[ $EUID -ne 0 ]]; then
    echo -e "Vui long vao terminal voi quyen Root, sau do chay lai lenh."
    exit 1
 fi
+
+# Xác định kiểu cài đặt có phải là subdomain hay không
+# Mặc định là no, tức là không phải dạng cài subdomain
+# Tham số đầu vào mặc định ở vị trí đầu tiên (1)
+INSTALL_TYPE="${1:-no}"
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
@@ -137,19 +142,25 @@ done
 # --- BƯỚC MỚI: KIỂM TRA TỒN TẠI (QUAN TRỌNG) ---
 echo "Dang kiem tra an toan he thong..."
 
-# Xác định luôn dạng chuyển hướng của tên miền để tiện kiểm tra thư mục web gốc
-if [[ "$DOMAIN" == www.* ]]; then
-    RED_DOMAIN="${DOMAIN#www.}"
-else
-    RED_DOMAIN="www.$DOMAIN"
+# Không phải subdomain mới cần xác định chuyển hướng
+if [ "$INSTALL_TYPE" != "subdomain" ]; then
+	# Xác định luôn dạng chuyển hướng của tên miền để tiện kiểm tra thư mục web gốc
+	if [[ "$DOMAIN" == www.* ]]; then
+		RED_DOMAIN="${DOMAIN#www.}"
+	else
+		RED_DOMAIN="www.$DOMAIN"
+	fi
 fi
 
 # Định nghĩa đường dẫn
 # Thư mục tên miền người dùng nhập vào
 WEB_ROOT_DIR_CHECK="/var/www/$DOMAIN"
 
-# Dự phòng thư mục tên miền chuyển hướng
-WEB_ROOT_DIR_CHECK_RED="/var/www/$RED_DOMAIN"
+if [ "$INSTALL_TYPE" != "subdomain" ]; then
+	# Dự phòng thư mục tên miền chuyển hướng
+	# Chỉ phải check khi kiểu cài đặt không phải là dạng subdomain
+	WEB_ROOT_DIR_CHECK_RED="/var/www/$RED_DOMAIN"
+fi
 
 # Đường dẫn tới file Caddyfile
 CADDY_CONF_CHECK="/etc/caddy/Caddyfile" 
@@ -177,11 +188,16 @@ if [ -d "$WEB_ROOT_DIR_CHECK" ]; then
     exit 1
 fi
 
-if [ -d "$WEB_ROOT_DIR_CHECK_RED" ]; then
-    echo -e "${RED}NGUY HIEM: Thu muc web [$WEB_ROOT_DIR_CHECK_RED] da ton tai!${NC}"
-    echo -e "Viec tiep tuc co the gay nham lan."
-    echo -e "Vui long xoa thu muc thu cong hoac chon ten mien khac."
-    exit 1
+# Không phải dạng subdomain mới cần kiểm tra
+if [ "$INSTALL_TYPE" != "subdomain" ]; then
+
+	if [ -d "$WEB_ROOT_DIR_CHECK_RED" ]; then
+		echo -e "${RED}NGUY HIEM: Thu muc web [$WEB_ROOT_DIR_CHECK_RED] da ton tai!${NC}"
+		echo -e "Viec tiep tuc co the gay nham lan."
+		echo -e "Vui long xoa thu muc thu cong hoac chon ten mien khac."
+		exit 1
+	fi
+	
 fi
 
 echo -e "${GREEN}Kiem tra an toan hoan tat.${NC}"
@@ -289,11 +305,21 @@ MARKER="#wpsila_kiencang"
 
 # Xác định và chuẩn hóa dạng tên miền
 echo "Domain chinh: $DOMAIN"
-echo "Domain chuyen huong: $RED_DOMAIN"
+
+# Không phải subdomian mới cần thông báo
+if [ "$INSTALL_TYPE" != "subdomain" ]; then
+	echo "Domain chuyen huong: $RED_DOMAIN"
+fi
 
 # I2. Nội dung Caddyfile
-#Xác định đường dẫn tuyệt đối đến file caddyfile
+#Xác định đường dẫn tuyệt đối đến file caddyfile mẫu để ghi đè vào file server Caddyfile
+# Mặc định / Không phải kiểu subdomain
 CADDY_FILE_TEMP="$SCRIPT_WPSILA_DIR/caddyfile.sh"
+
+# Nếu là kiểu subdomain thì chọn file caddy tương ứng
+if [ "$INSTALL_TYPE" == "subdomain" ]; then
+	CADDY_FILE_TEMP="$SCRIPT_WPSILA_DIR/caddyfile_subdomain.sh"
+fi
 
 # Nhúng caddyfile vào, kiểm tra sự tồn tại để đảm bảo không lỗi
 if [ -f "$CADDY_FILE_TEMP" ]; then    
