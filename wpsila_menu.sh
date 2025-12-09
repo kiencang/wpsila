@@ -32,6 +32,8 @@ show_menu() {
 	echo -e "${BLUE}--------------------------------------------------------${NC}"	
     echo -e "${YELLOW}7.${NC} >> Xoa cai dat (delete) website WordPress"
     echo -e "${BLUE}--------------------------------------------------------${NC}"
+    echo -e "${YELLOW}8.${NC} >> Cai dat quan ly database (can thi moi cai)"
+    echo -e "${BLUE}--------------------------------------------------------${NC}"	
     echo -e "${YELLOW}0.${NC} >> Exit (thoat)"
     echo -e "${BLUE}========================================================${NC}"
     echo -n "Nhap lua chon (chon so): "
@@ -97,6 +99,13 @@ while true; do
                 echo -e "${RED}Loi: Khong tim thay file remove_web.sh${NC}"
             fi
             echo -e "\n${BLUE}An Enter de quay lai...${NC}"; read -r ;; # Them -r
+        8)
+            if [[ -f "$BASE_DIR/setup_adminer.sh" ]]; then
+                bash "$BASE_DIR/setup_adminer.sh"
+            else
+                echo -e "${RED}Loi: Khong tim thay file setup_adminer.sh${NC}"
+            fi
+            echo -e "\n${BLUE}An Enter de quay lai...${NC}"; read -r ;; # Them -r			
         0)
             exit 0 ;;
         *)
