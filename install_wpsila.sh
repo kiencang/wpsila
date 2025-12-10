@@ -16,7 +16,8 @@ set -euo pipefail
 # -------------------------------------------------------------------------------------------------------------------------------
 # --- Cấu hình ---
 INSTALL_DIR="/opt/wpsila"
-# Giữ nguyên URL theo yêu cầu của bạn
+
+# Chú ý link Repo, cần cập nhật cả vps.wpsila.com nếu nó có thay đổi
 REPO_URL="https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main" 
 BIN_LINK="/usr/local/bin/wpsila"
 
@@ -95,31 +96,56 @@ download_file() {
 }
 
 # -------------------------------------------------------------------------------------------------------------------------------
+# File cấu hình (chứa định nghĩa phiên bản PHP)
 download_file "$REPO_URL/wpsila.conf" "$INSTALL_DIR/wpsila.conf"
-# 
+# -------------------------
+
+# -------------------------
+# Tải về menu cho chương trình quản trị wpsila
 download_file "$REPO_URL/wpsila_menu.sh" "$INSTALL_DIR/wpsila_menu.sh"
-#
+# -------------------------
+
+# -------------------------
+# Tải về các file phục vụ cho cài đặt LCMP
 download_file "$REPO_URL/install_lcmp.sh" "$INSTALL_DIR/install_lcmp.sh"
 download_file "$REPO_URL/caddy_web_server.sh" "$INSTALL_DIR/caddy_web_server.sh"
 download_file "$REPO_URL/php_mariadb.sh" "$INSTALL_DIR/php_mariadb.sh"
-#
+# -------------------------
+
+# -------------------------
+# Tải về các file phục vụ cho việc cài đặt WordPress
 download_file "$REPO_URL/install_wp.sh" "$INSTALL_DIR/install_wp.sh"
 download_file "$REPO_URL/domain_check.sh" "$INSTALL_DIR/domain_check.sh"
 download_file "$REPO_URL/database_user_wp.sh" "$INSTALL_DIR/database_user_wp.sh"
 download_file "$REPO_URL/wordpress.sh" "$INSTALL_DIR/wordpress.sh"
 download_file "$REPO_URL/caddyfile.sh" "$INSTALL_DIR/caddyfile.sh"
 download_file "$REPO_URL/caddyfile_subdomain.sh" "$INSTALL_DIR/caddyfile_subdomain.sh"
-# 
+# -------------------------
+
+# -------------------------
+# Tải về các file để thiết lập cấu hình cho MariaDB và PHP INI cũng như Poll Tune
 download_file "$REPO_URL/mariadb_tune.sh" "$INSTALL_DIR/mariadb_tune.sh"
 download_file "$REPO_URL/php_ini_tune.sh" "$INSTALL_DIR/php_ini_tune.sh"
 download_file "$REPO_URL/pool_tune.sh" "$INSTALL_DIR/pool_tune.sh"
-#
+# -------------------------
+
+# -------------------------
+# Tải về file phục vụ chức năng xóa website
 download_file "$REPO_URL/remove_web.sh" "$INSTALL_DIR/remove_web.sh"
-#
+# -------------------------
+
+# -------------------------
+# Tải về file tạo tài khoản sFTP
 download_file "$REPO_URL/setup_sftp.sh" "$INSTALL_DIR/setup_sftp.sh"
-#
+# -------------------------
+
+# -------------------------
+# Tải về file cài adminer để tạo trang quản trị database (không cài nếu không cần)
 download_file "$REPO_URL/setup_adminer.sh" "$INSTALL_DIR/setup_adminer.sh"
-#
+# -------------------------
+
+# -------------------------
+# File để hiển thị mật khẩu WordPress
 download_file "$REPO_URL/wpp.sh" "$INSTALL_DIR/wpp.sh"
 # -------------------------------------------------------------------------------------------------------------------------------
 
