@@ -45,7 +45,7 @@ echo "Phien ban PHP: $PHP_VER"
 
 # Kiểm tra xem hệ thống có đang chạy PHP hay không
 if ! command -v php &> /dev/null; then
-    echo "❌ Không tìm thấy PHP. Vui lòng cài đặt PHP trước."
+    echo "Không tìm thấy PHP. Vui lòng cài đặt PHP trước."
     exit 1
 fi
 
@@ -54,7 +54,7 @@ CONF_DIR="/etc/php/${PHP_VER}/fpm/conf.d"
 
 # Kiểm tra xem thư mục có tồn tại không
 if [ ! -d "$CONF_DIR" ]; then
-    echo "❌ KHONG tim thay thu muc cau hinh: $CONF_DIR"
+    echo "KHONG tim thay thu muc cau hinh: $CONF_DIR"
     echo ">> Script nay chi ho tro Ubuntu/Debian voi cau hinh thu muc chuan."
     exit 1
 fi
@@ -107,8 +107,8 @@ EOF
 # --- KHỞI ĐỘNG LẠI PHP ---
 echo ">> Dang reload lai PHP-FPM..."
 if service php${PHP_VER}-fpm reload; then
-    echo "✅ Hoan tat! Cau hinh da duoc ap dung cho PHP $PHP_VER."
-    echo "   File cau hinh: $CONFIG_FILE"
+    echo "Hoan tat! Cau hinh da duoc ap dung cho PHP $PHP_VER."
+    echo "File cau hinh: $CONFIG_FILE"
 else
-    echo "⚠️  KHONG the reload PHP tu dong. Vui long chay lenh: service php${PHP_VER}-fpm reload"
+    echo "KHONG the reload PHP tu dong. Vui long chay lenh: service php${PHP_VER}-fpm reload"
 fi

@@ -156,17 +156,17 @@ echo ">> Dang khoi dong lai MariaDB..."
 
 if systemctl restart mariadb; then
     if systemctl is-active --quiet mariadb; then
-        echo "✅ THANH CONG! MariaDB da san sang cho Blog & Backup."
-        echo "   Max Packet Size: 128M (An toan cho 1000+ bai viet)"
+        echo "THANH CONG! MariaDB da san sang cho Blog & Backup."
+        echo "Max Packet Size: 128M (An toan cho 1000+ bai viet)"
     else
-        echo "⚠️ CANH BAO: Service restart OK nhung KHONG active."
+        echo "CANH BAO: Service restart OK nhung KHONG active."
         rm -f "$CONFIG_FILE"
         systemctl restart mariadb
-        echo "❌ Da hoan tac."
+        echo "Da hoan tac."
     fi
 else
-    echo "❌ Loi: Khong the khoi dong, dang hoan tac..."
+    echo "Loi: Khong the khoi dong, dang hoan tac..."
     rm -f "$CONFIG_FILE"
     systemctl restart mariadb
-    echo "✅ Da khoi phuc lai trang thai cu."
+    echo "Da khoi phuc lai trang thai cu."
 fi

@@ -47,20 +47,20 @@ echo "Phien ban PHP: $PHP_VER"
 
 # 1. KIỂM TRA QUYỀN ROOT
 if [ "$EUID" -ne 0 ]; then
-  echo "❌ Vui long chay script nay voi quyen root (sudo)."
+  echo "Vui long chay script nay voi quyen root (sudo)."
   exit 1
 fi
 
 # Kiểm tra xem có đang cài đặt PHP không?
 if ! command -v php &> /dev/null; then
-    echo "❌ Khong tim thay PHP. Vui long cai dat PHP truoc."
+    echo "Khong tim thay PHP. Vui long cai dat PHP truoc."
     exit 1
 fi
 
 CONF_DIR="/etc/php/${PHP_VER}/fpm/pool.d"
 
 if [ ! -d "$CONF_DIR" ]; then
-    echo "❌ Khong tim thay thu muc cau hinh: $CONF_DIR"
+    echo "Khong tim thay thu muc cau hinh: $CONF_DIR"
     exit 1
 fi
 
@@ -72,8 +72,8 @@ total_ram_kb=$(grep -i 'MemTotal' /proc/meminfo | awk '{print $2}')
 # Dùng phép tính số học của bash $((...)) nhanh hơn dùng lệnh bên ngoài
 TOTAL_RAM=$((total_ram_kb / 1024))
 
-echo ">> 🖥️  Thong tin he thong:"
-echo "   - Tong RAM: ${TOTAL_RAM} MB"
+echo ">> Thong tin he thong:"
+echo "- Tong RAM: ${TOTAL_RAM} MB"
 
 # 4. TÍNH TOÁN THÔNG SỐ (Logic Safe Tuning)
 # Công thức dựa trên mức tiêu thụ trung bình 50-60MB/tiến trình PHP
@@ -112,9 +112,9 @@ else
     PM_MAX_SPARE=30
 fi
 
-echo ">> ⚡ Ap dung cau hinh cho muc RAM: $RAM_PROFILE"
-echo "   - pm.max_children = $PM_MAX_CHILDREN"
-echo "   - pm.start_servers = $PM_START_SERVERS"
+echo ">>Ap dung cau hinh cho muc RAM: $RAM_PROFILE"
+echo "- pm.max_children = $PM_MAX_CHILDREN"
+echo "- pm.start_servers = $PM_START_SERVERS"
 
 # 5. TẠO FILE CẤU HÌNH (GHI ĐÈ)
 # Link dẫn của file
@@ -136,14 +136,14 @@ pm.max_requests = 1000
 EOF
 
 # 6. RELOAD PHP-FPM
-echo ">> 🔄 Dang reload lai PHP-FPM..."
+echo ">>Dang reload lai PHP-FPM..."
 
 # Test cấu hình trước khi reload để tránh sập web
 if php-fpm${PHP_VER} -t; then
     service php${PHP_VER}-fpm reload
-    echo "✅ THANH CONG! Da cap nhat file: $CONFIG_FILE"
+    echo "THANH CONG! Da cap nhat file: $CONFIG_FILE"
 else
-    echo "❌ Loi cau hinh! Da huy bo reload. Vui long kiem tra lai file log."
+    echo "Loi cau hinh! Da huy bo reload. Vui long kiem tra lai file log."
     rm "${CONFIG_FILE}"
-    echo "   Da xoa bo cau hinh loi de khoi phuc lai trang thai cu."
+    echo "Da xoa bo cau hinh loi de khoi phuc lai trang thai cu."
 fi
