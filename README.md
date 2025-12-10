@@ -1,3 +1,5 @@
+Đây là công cụ cài nhanh blog WordPress trên VPS.
+
 Các đoạn mã đang trong giai đoạn thử nghiệm, chỉ cài nó trên website demo của bạn.
 
 Cài đặt với quyền root: 
