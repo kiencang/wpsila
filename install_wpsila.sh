@@ -104,6 +104,8 @@ download_file "$REPO_URL/caddy_web_server.sh" "$INSTALL_DIR/caddy_web_server.sh"
 download_file "$REPO_URL/php_mariadb.sh" "$INSTALL_DIR/php_mariadb.sh"
 #
 download_file "$REPO_URL/install_wp.sh" "$INSTALL_DIR/install_wp.sh"
+download_file "$REPO_URL/domain_check.sh" "$INSTALL_DIR/domain_check.sh"
+download_file "$REPO_URL/database_user_wp.sh" "$INSTALL_DIR/database_user_wp.sh"
 download_file "$REPO_URL/wordpress.sh" "$INSTALL_DIR/wordpress.sh"
 download_file "$REPO_URL/caddyfile.sh" "$INSTALL_DIR/caddyfile.sh"
 download_file "$REPO_URL/caddyfile_subdomain.sh" "$INSTALL_DIR/caddyfile_subdomain.sh"
