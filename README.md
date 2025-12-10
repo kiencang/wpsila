@@ -9,7 +9,7 @@ curl -sL https://vps.wpsila.com | sudo bash
 hoặc
 
 ```bash
-curl -sL [https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/install_wpsila.sh](https://raw.githubusercontent.com/kiencang/wpsila/v0.1.0/install_wpsila.sh) | sudo bash
+curl -sL https://raw.githubusercontent.com/kiencang/wpsila/v0.1.0/install_wpsila.sh | sudo bash
 ```
 
 Nhiều phần trong mã có tham khảo từ AI (chủ yếu là Gemini).
