@@ -49,8 +49,45 @@ fi
 # +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
+# Dx. CẤU HÌNH PHIÊN BẢN PHP
+
+# Dx1. Đặt giá trị mặc định (phòng hờ không tìm thấy file config / wpsila.conf)
+DEFAULT_PHP_VER="8.3"
+
+# Dx2. Định nghĩa đường dẫn file config 
+# (Ví dụ: file config nằm cùng thư mục với script đang chạy)
+# Dòng lệnh này đảm bảo biến SCRIPT_WPSILA_DIR luôn là đường dẫn tuyệt đối tới thư mục chứa file này
+# Xác định thư mục
+SCRIPT_WPSILA_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+
+# Trỏ vào file config nằm cùng thư mục đó
+WPSILA_CONFIG_FILE="$SCRIPT_WPSILA_DIR/wpsila.conf"
+
+# Dx3. Kiểm tra và nạp file config
+if [ -f "$WPSILA_CONFIG_FILE" ]; then
+    # Lệnh 'source' hoặc dấu chấm '.' sẽ đọc biến từ file kia vào script này
+    source "$WPSILA_CONFIG_FILE"
+    echo -e "${GREEN}Da tim thay file cau hinh: ${WPSILA_CONFIG_FILE}${NC}"
+else
+    echo -e "${YELLOW}Khong tim thay file config. Su dung phien ban mac dinh.${NC}"
+fi
+
+# Dx4. Chốt phiên bản cuối cùng
+# Cú pháp ${BIEN_1:-$BIEN_2} nghĩa là: Nếu BIEN_1 rỗng (chưa set trong config), thì lấy BIEN_2
+PHP_VER="${PHP_VER:-$DEFAULT_PHP_VER}"
+
+echo "Phien ban PHP: $PHP_VER"
+sleep 2
+# -------------------------------------------------------------------------------------------------------------------------------
+
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
 # D. CẤU HÌNH
-PHP_SOCKET="/run/php/php8.3-fpm.sock"
+# Gán socket phiên bản PHP tương ứng
+PHP_SOCKET="/run/php/php${PHP_VER}-fpm.sock"
+
+# Thư mục cài adminer
 INSTALL_DIR="/var/www/adminer"
 CADDY_FILE="/etc/caddy/Caddyfile"
 
@@ -62,7 +99,7 @@ DB_PASS=$(openssl rand -base64 12)
 WEB_PASS=$(openssl rand -base64 12)
 
 # --- 1. KIỂM TRA MÔI TRƯỜNG ---
-echo "[1/4] Kiem tra moi truong PHP 8.3..."
+echo "[1/4] Kiem tra moi truong PHP ${PHP_VER}..."
 if [ ! -S "$PHP_SOCKET" ]; then
     echo "Loi: Khong tim thay socket tai $PHP_SOCKET."
     exit 1
@@ -109,6 +146,7 @@ mysql -e "FLUSH PRIVILEGES;"
 
 # -------------------------------------------------------------------------------------------------------------------------------
 # --- F. TỰ ĐỘNG CẤU HÌNH CADDY (DÙNG EOF) ---
+MARKER="#wpsila_kiencang"
 echo "[4/4] Dang xu ly Caddyfile..."
 
 if ! command -v caddy &> /dev/null; then
@@ -134,8 +172,9 @@ else
 
     # Dùng EOF để chèn nội dung vào cuối file Caddyfile
     # Lưu ý: Các biến $VAR vẫn được hiểu bên trong EOF
+	# Nối vào file Caddyfile
     cat >> "$CADDY_FILE" <<EOF 
-
+###start_wpsila_kiencang_$DOMAIN###
 $DOMAIN_NAME {
     root * $INSTALL_DIR
     php_fastcgi unix/$PHP_SOCKET
@@ -160,6 +199,9 @@ $DOMAIN_NAME {
         }
     }
 }
+    # Danh dau maker de nhan dien sau nay
+    $MARKER
+###end_wpsila_kiencang_$DOMAIN###
 EOF
 
     echo "-> Da them cau hinh vao Caddyfile."
