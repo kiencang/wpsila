@@ -38,12 +38,25 @@ mkdir -p /var/log/caddy
 echo "========================================================"
 echo "   SETUP ADMINER (PHP 8.3) & AUTO CADDY CONFIG"
 echo "========================================================"
-read -p "Nhap ten mien cho Adminer (VD: db.domain.com): " DOMAIN_NAME
+read -p "Nhap ten mien cho Adminer (VD: db.domain.com): " INPUT_DOMAIN
 
-if [ -z "$DOMAIN_NAME" ]; then
-    echo "Loi: Ten mien de truy cap database khong duoc de trong."
-    exit 1
-fi
+    # Xử lý chuỗi
+    TEMP_DOMAIN=$(echo "$INPUT_DOMAIN" | tr -d ' ' | tr '[:upper:]' '[:lower:]')
+    DOMAIN=$(echo "$TEMP_DOMAIN" | sed -e 's|^https\?://||' -e 's|/.*$||')
+    
+    # Validation cơ bản
+    if [[ -z "$DOMAIN" ]]; then
+        echo -e "${RED}Loi: Ten mien khong duoc de trong!${NC}"
+		exit 1
+    elif [[ "$DOMAIN" != *"."* ]]; then
+        echo -e "${RED}Loi: Ten mien '$DOMAIN' khong hop le (thieu dau cham).${NC}"
+		exit 1
+    else
+        if [[ "$INPUT_DOMAIN" != "$DOMAIN" ]]; then
+             echo -e "${GREEN}Script da tu dong chuan hoa input '${INPUT_DOMAIN}' thanh '${DOMAIN}'${NC}"
+        fi
+        break
+    fi
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
