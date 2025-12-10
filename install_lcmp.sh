@@ -125,8 +125,8 @@ CADDYWS_INSTALL_FILE="$SCRIPT_WPSILA_DIR/caddy_web_server.sh"
 
 # Kiểm tra xem tệp tin có tồn tại không thì mới nhúng
 if [ -f "$CADDYWS_INSTALL_FILE" ]; then
-    source "$CADDYWS_INSTALL_FILE"
 	echo -e "${GREEN}Chuan bi cai Caddy Web Server...${NC}"
+    source "$CADDYWS_INSTALL_FILE"
 else
     echo -e "${YELLOW}Khong tim thay file cai Caddy Web Server (caddy_web_server.sh).${NC}"
 	echo -e "${YELLOW}Kiem tra su ton tai cua file, hoac duong dan co chinh xác khong.${NC}"
@@ -143,9 +143,9 @@ sleep 2
 PHP_MARIADB_FILE="$SCRIPT_WPSILA_DIR/php_mariadb.sh"
 
 if [ -f "$PHP_MARIADB_FILE" ]; then
+	echo -e "${GREEN}Chuan bi cai PHP & MariaDB...${NC}"
 	# Nhúng file
     source "$PHP_MARIADB_FILE"
-	echo -e "${GREEN}Chuan bi cai PHP & MariaDB...${NC}"
 else
     echo -e "${YELLOW}Khong tim thay file cai PHP & MariaDB (php_mariadb.sh).${NC}"
 	echo -e "${YELLOW}Kiem tra su ton tai cua file, hoac duong dan co chinh xác khong.${NC}"
