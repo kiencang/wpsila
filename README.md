@@ -1,4 +1,4 @@
-Đây là công cụ cài nhanh blog WordPress trên VPS.
+Đây là công cụ cài nhanh blog WordPress trên VPS (chỉ blog & nói chung là website không bao gồm giỏ hàng).
 
 Các đoạn mã đang trong giai đoạn thử nghiệm, chỉ cài nó trên website demo của bạn.
 
