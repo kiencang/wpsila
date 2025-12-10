@@ -26,7 +26,7 @@ fi
 # +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
-# --- ĐẢM BẢO LOG FOLDER TỒN TẠI ---
+# C. ĐẢM BẢO LOG FOLDER TỒN TẠI
 # Tạo thư mục nếu chưa có (-p giúp không báo lỗi nếu đã có)
 mkdir -p /var/log/caddy
 # -------------------------------------------------------------------------------------------------------------------------------
@@ -34,14 +34,14 @@ mkdir -p /var/log/caddy
 # +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
-# --- NHẬP THÔNG TIN ---
+# D. NHẬP THÔNG TIN TÊN MIỀN CHO QUẢN TRỊ DATABASE
 echo "========================================================"
 echo "   SETUP ADMINER (PHP 8.3) & AUTO CADDY CONFIG"
 echo "========================================================"
 read -p "Nhap ten mien cho Adminer (VD: db.domain.com): " DOMAIN_NAME
 
 if [ -z "$DOMAIN_NAME" ]; then
-    echo "Loi: Ten mien cho truy cap database khong duoc de trong."
+    echo "Loi: Ten mien de truy cap database khong duoc de trong."
     exit 1
 fi
 # -------------------------------------------------------------------------------------------------------------------------------
@@ -49,7 +49,7 @@ fi
 # +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
-# --- CẤU HÌNH ---
+# D. CẤU HÌNH
 PHP_SOCKET="/run/php/php8.3-fpm.sock"
 INSTALL_DIR="/var/www/adminer"
 CADDY_FILE="/etc/caddy/Caddyfile"
@@ -93,7 +93,7 @@ chmod 755 "$INSTALL_DIR"
 # +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
-# --- 3. TẠO USER MARIADB ---
+# E. TẠO USER MARIADB 
 echo "[3/4] Dang cau hinh User MariaDB..."
 if ! systemctl is-active --quiet mariadb; then
     systemctl start mariadb
@@ -108,7 +108,7 @@ mysql -e "FLUSH PRIVILEGES;"
 # +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
-# --- 4. TỰ ĐỘNG CẤU HÌNH CADDY (DÙNG EOF) ---
+# --- F. TỰ ĐỘNG CẤU HÌNH CADDY (DÙNG EOF) ---
 echo "[4/4] Dang xu ly Caddyfile..."
 
 if ! command -v caddy &> /dev/null; then
@@ -198,7 +198,7 @@ fi
 # +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
-# --- XUẤT KẾT QUẢ ---
+# G. XUẤT KẾT QUẢ
 echo ""
 echo "======================================="
 echo "   CAI DAT THANH CONG!"
