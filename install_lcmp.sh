@@ -59,13 +59,14 @@ echo "Dang kiem tra moi truong VPS (Clean OS Check)..."
 echo "--------------------------------------------------------"
 
 # C. Kiểm tra trước môi trường server, phòng lỗi cài đè, cài nhầm
-# C1. KIỂM TRA QUYỀN ROOT
+# C1. NÂNG QUYỀN NẾU KHÔNG PHẢI LÀ ROOT
 
-# Bắt buộc phải chạy bằng root để cài đặt phần mềm
+# 1. Kiểm tra xem đang chạy với quyền gì
 if [[ $EUID -ne 0 ]]; then
-   echo -e "${RED}Loi: Ban phai chay script nay bang quyen Root.${NC}"
-   echo -e "Vui long vao terminal voi quyen Root, sau do chay lai lenh."
-   exit 1
+   # 2. Nếu không phải root, tự động chạy lại script này bằng sudo
+   sudo "$0" "$@"
+   # 3. Thoát tiến trình cũ (không phải root) để tiến trình mới (có root) chạy
+   exit $?
 fi
 
 # C2 pre. Kiểm tra sự tồn tại của file xác nhận cài xong wpSila, nhằm có các thông báo phù hợp hơn
@@ -165,7 +166,7 @@ sleep 2
 INSTALLED_SUCCESSFULLY="$SCRIPT_DIR/wpsila_success.txt"
 
 # Xóa file cũ nếu nó có tồn tại
-sudo rm -f "$INSTALLED_SUCCESSFULLY"
+rm -f "$INSTALLED_SUCCESSFULLY"
 
 # Tạo file mới xác nhận cài thành công LCMP
 cat > "$INSTALLED_SUCCESSFULLY" <<EOF

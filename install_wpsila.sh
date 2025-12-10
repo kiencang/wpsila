@@ -33,9 +33,14 @@ error_exit() {
 echo "=== DANG CAI DAT WPSILA ==="
 
 # -------------------------------------------------------------------------------------------------------------------------------
-# 1. Kiểm tra quyền Root
+# 1. Kiểm tra quyền
+# NÂNG QUYỀN NẾU KHÔNG PHẢI LÀ ROOT
+# 1. Kiểm tra xem đang chạy với quyền gì
 if [[ $EUID -ne 0 ]]; then
-   error_exit "Ban phai chay lenh nay duoi quyen Root!"
+   # 2. Nếu không phải root, tự động chạy lại script này bằng sudo
+   sudo "$0" "$@"
+   # 3. Thoát tiến trình cũ (không phải root) để tiến trình mới (có root) chạy
+   exit $?
 fi
 # -------------------------------------------------------------------------------------------------------------------------------
 

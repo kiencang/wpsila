@@ -17,10 +17,14 @@ NC='\033[0m'
 # B. Định nghĩa thư mục gốc 
 BASE_DIR=$(dirname "$(readlink -f "$0")")
 
-# Kiểm tra quyền Root
+# Kiểm tra quyền
+# NÂNG QUYỀN NẾU KHÔNG PHẢI LÀ ROOT (cho nhóm có quyền gọi sudo)
+# 1. Kiểm tra xem đang chạy với quyền gì
 if [[ $EUID -ne 0 ]]; then
-   echo -e "${RED}Loi: Ban phai chay lenh nay duoi quyen Root!${NC}" 
-   exit 1
+   # 2. Nếu không phải root, tự động chạy lại script này bằng sudo
+   sudo "$0" "$@"
+   # 3. Thoát tiến trình cũ (không phải root) để tiến trình mới (có root) chạy
+   exit $?
 fi
 # -------------------------------------------------------------------------------------------------------------------------------
 

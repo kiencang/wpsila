@@ -16,12 +16,14 @@ NC='\033[0m' # No Color
 # +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
-# B. Quyền chạy
-# Bắt buộc phải chạy bằng root để cài đặt WordPress
+# B. Kiểm tra quyền chạy
+# NÂNG QUYỀN NẾU KHÔNG PHẢI LÀ ROOT
+# 1. Kiểm tra xem đang chạy với quyền gì
 if [[ $EUID -ne 0 ]]; then
-   echo -e "${RED}Loi: Ban phai chay script nay bang quyen Root.${NC}"
-   echo -e "Vui long vao terminal voi quyen Root, sau do chay lai lenh."
-   exit 1
+   # 2. Nếu không phải root, tự động chạy lại script này bằng sudo
+   sudo "$0" "$@"
+   # 3. Thoát tiến trình cũ (không phải root) để tiến trình mới (có root) chạy
+   exit $?
 fi
 
 # Xác định kiểu cài đặt có phải là subdomain hay không
@@ -204,7 +206,7 @@ rotate_caddy_backup() {
 # Kiểm tra nếu file tồn tại thì mới backup để tránh lỗi
 if [ -f "$CADDY_FILE" ]; then
     echo "Dang tao file backup: $BACKUP_FILE"
-    sudo cp "$CADDY_FILE" "$BACKUP_FILE"
+    cp "$CADDY_FILE" "$BACKUP_FILE"
 	
 	# Gọi hàm xoay vòng để dọn dẹp ngay lập tức
 	# Tránh việc có một đống các file backup sau này
@@ -212,40 +214,40 @@ if [ -f "$CADDY_FILE" ]; then
 else
     echo "Day la lan cai dat dau tien, chua co file Caddyfile cu de backup."
     # Tạo file rỗng để tránh lỗi cho các lệnh phía sau
-    sudo touch "$CADDY_FILE"
+    touch "$CADDY_FILE"
 fi
 
 # I4. Thực hiện ghi vào Caddyfile chính
 if grep -q "$MARKER" "$CADDY_FILE" 2>/dev/null; then
     echo "TIM THAY marker '$MARKER'. Dang them cau hinh vao cuoi file Caddyfile..."
-    echo "$CONTENT" | sudo tee -a "$CADDY_FILE" > /dev/null
+    echo "$CONTENT" | tee -a "$CADDY_FILE" > /dev/null
 else
     echo "CAI DAT WORDPRESS lan dau! Tao file Caddyfile moi..."
-    echo "$CONTENT" | sudo tee "$CADDY_FILE" > /dev/null
+    echo "$CONTENT" | tee "$CADDY_FILE" > /dev/null
 fi
 
 # Format lại cho đẹp
-sudo caddy fmt --overwrite "$CADDY_FILE" > /dev/null 2>&1
+caddy fmt --overwrite "$CADDY_FILE" > /dev/null 2>&1
 
 # I5. VALIDATE & ROLLBACK
 echo "Dang kiem tra cu phap Caddyfile..."
 
 # Kiểm tra tính hợp lệ
-if ! sudo caddy validate --config "$CADDY_FILE" --adapter caddyfile > /dev/null 2>&1; then
+if ! caddy validate --config "$CADDY_FILE" --adapter caddyfile > /dev/null 2>&1; then
     echo -e "${RED}CANH BAO: File Caddyfile bi loi cu phap!${NC}"
     
     # In ra lỗi cụ thể cho người dùng xem sai ở đâu
-    sudo caddy validate --config "$CADDY_FILE" --adapter caddyfile
+    caddy validate --config "$CADDY_FILE" --adapter caddyfile
     
     echo -e "${YELLOW}Dang khoi phuc lai file ban dau...${NC}"
     
     if [ -f "$BACKUP_FILE" ]; then
-        sudo cp "$BACKUP_FILE" "$CADDY_FILE"
+        cp "$BACKUP_FILE" "$CADDY_FILE"
         echo "Da khoi phuc lai file goc an toan."
     else
         # Trường hợp cài lần đầu mà lỗi luôn thì xóa file lỗi đi
         echo "Khong co file backup (cai lan dau). Xoa file loi..."
-        sudo rm "$CADDY_FILE"
+        rm "$CADDY_FILE"
     fi
     
     exit 1
@@ -256,9 +258,9 @@ else
 	# Nguyên nhân là vì mặc dù phân quyền đã làm, nhưng trong quá trình cài đặt có thể root ghi vào file log.
 	# Nó thành chủ sở hữu và không cho user caddy can thiệp vào nữa, cách phòng thủ tốt nhất là tái lập lại quyền.
 	# Rất dễ xảy ra với việc cài lần đầu tiên.
-	sudo chown -R caddy:caddy /var/www/$DOMAIN/logs
+	chown -R caddy:caddy /var/www/$DOMAIN/logs
 	
-    sudo systemctl reload caddy
+    systemctl reload caddy
     echo "Da cap nhat cau hinh cho $DOMAIN trong Caddyfile."
 fi
 # -------------------------------------------------------------------------------------------------------------------------------

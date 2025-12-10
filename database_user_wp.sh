@@ -23,27 +23,27 @@ GEN_DB_PASS="p_$(openssl rand -hex 16)"
 # Lưu ý: Vì biến chỉ chứa chữ cái thường và số nên không cần escape phức tạp, rất an toàn.
 
 # 1. Tạo Database
-sudo mariadb -e "CREATE DATABASE IF NOT EXISTS ${GEN_DB_NAME} DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+mariadb -e "CREATE DATABASE IF NOT EXISTS ${GEN_DB_NAME} DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
 
 # 2. Tạo User cho đường Socket (localhost) - ĐỂ TỐI ƯU HIỆU NĂNG
 # Dành cho trường hợp wp-config dùng 'localhost'
-sudo mariadb -e "CREATE USER IF NOT EXISTS '${GEN_DB_USER}'@'localhost' IDENTIFIED BY '${GEN_DB_PASS}';"
-sudo mariadb -e "GRANT ALL PRIVILEGES ON ${GEN_DB_NAME}.* TO '${GEN_DB_USER}'@'localhost';"
+mariadb -e "CREATE USER IF NOT EXISTS '${GEN_DB_USER}'@'localhost' IDENTIFIED BY '${GEN_DB_PASS}';"
+mariadb -e "GRANT ALL PRIVILEGES ON ${GEN_DB_NAME}.* TO '${GEN_DB_USER}'@'localhost';"
 
 # 3. Tạo User cho đường TCP/IP (127.0.0.1) - ĐỂ TƯƠNG THÍCH TUYỆT ĐỐI
 # Dành cho trường hợp wp-config dùng '127.0.0.1' và tương thích với skip-name-resolve
-sudo mariadb -e "CREATE USER IF NOT EXISTS '${GEN_DB_USER}'@'127.0.0.1' IDENTIFIED BY '${GEN_DB_PASS}';"
-sudo mariadb -e "GRANT ALL PRIVILEGES ON ${GEN_DB_NAME}.* TO '${GEN_DB_USER}'@'127.0.0.1';"
+mariadb -e "CREATE USER IF NOT EXISTS '${GEN_DB_USER}'@'127.0.0.1' IDENTIFIED BY '${GEN_DB_PASS}';"
+mariadb -e "GRANT ALL PRIVILEGES ON ${GEN_DB_NAME}.* TO '${GEN_DB_USER}'@'127.0.0.1';"
 
 # 4. Flush
-sudo mariadb -e "FLUSH PRIVILEGES;"
+mariadb -e "FLUSH PRIVILEGES;"
 
 # F5. Xuất thông tin
 # Lưu thông tin vào file để tra cứu sau này (Quan trọng vì mật khẩu là ngẫu nhiên)
 CRED_FILE="$HOME/wpp.txt"
 
 # Kiểm tra nếu file tồn tại thì mới xóa
-sudo rm -f "$CRED_FILE"
+rm -f "$CRED_FILE"
 
 # Tạo file mới cho trang WordPress đang cài
 cat > "$CRED_FILE" <<EOF

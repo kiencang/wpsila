@@ -3,39 +3,39 @@
 # File này được nhúng vào script install_lcmp.sh
 # -----------------------------------------------------------
 echo -e "${GREEN}[1/6] Dang cap nhat he thong...${NC}"
-sudo apt update && sudo apt upgrade -y
+apt update && apt upgrade -y
 
 echo -e "${GREEN}[2/6] Dang cai dat cac goi phu thuoc...${NC}"
-sudo apt install -y debian-keyring debian-archive-keyring apt-transport-https curl
+apt install -y debian-keyring debian-archive-keyring apt-transport-https curl
 
 echo -e "${GREEN}[3/6] Dang them GPG Key va Repository cua Caddy...${NC}"
 
 # Lưu ý: Đã thêm cờ --yes để cho phép ghi đè nếu file đã tồn tại
-curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | sudo gpg --dearmor --yes -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
-curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | sudo tee /etc/apt/sources.list.d/caddy-stable.list > /dev/null
+curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | gpg --dearmor --yes -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | tee /etc/apt/sources.list.d/caddy-stable.list > /dev/null
 
 echo -e "${GREEN}[4/6] Dang thiet lap quyen han cho file key va list...${NC}"
 # Cần sudo để chmod các file hệ thống này
-sudo chmod o+r /usr/share/keyrings/caddy-stable-archive-keyring.gpg
-sudo chmod o+r /etc/apt/sources.list.d/caddy-stable.list
+chmod o+r /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+chmod o+r /etc/apt/sources.list.d/caddy-stable.list
 
 echo -e "${GREEN}[5/6] Dang cap nhat apt va cai dat Caddy...${NC}"
-sudo apt update && sudo apt install caddy -y
+apt update && apt install caddy -y
 
 echo -e "${GREEN}[6/6] Dang cau hinh tuong lua (UFW)...${NC}"
 # xóa quy tắc cũ
-sudo ufw delete allow ssh || true
+ufw delete allow ssh || true
 
 # bật ssh kèm giới hạn để hạn chế tấn công
-sudo ufw limit ssh 
+ufw limit ssh 
 
 # bật các cổng
-sudo ufw allow 80
-sudo ufw allow 443
+ufw allow 80
+ufw allow 443
 
 # chính thức áp dụng các quy tắc
-sudo ufw --force enable
+ufw --force enable
 
 echo -e "${GREEN}>>> Cai dat hoan tat! Kiem tra trang thai Caddy:${NC}"
-sudo systemctl status caddy --no-pager
+systemctl status caddy --no-pager
 echo -e "${GREEN}>>> Buoc tiep theo: Cai dat PHP & MariaDB.${NC}"

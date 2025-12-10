@@ -27,10 +27,14 @@ NC='\033[0m' # No Color
 # +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
-# B. Kiểm tra quyền root
+# B. Kiểm tra quyền 
+# NÂNG QUYỀN NẾU KHÔNG PHẢI LÀ ROOT
+# 1. Kiểm tra xem đang chạy với quyền gì
 if [[ $EUID -ne 0 ]]; then
-    echo -e "${RED}Loi: Vui long chay script voi quyen root (sudo).${NC}"
-    exit 1
+   # 2. Nếu không phải root, tự động chạy lại script này bằng sudo
+   sudo "$0" "$@"
+   # 3. Thoát tiến trình cũ (không phải root) để tiến trình mới (có root) chạy
+   exit $?
 fi
 # -------------------------------------------------------------------------------------------------------------------------------
 
@@ -198,7 +202,7 @@ fi
 # G.2. Kiểm tra xem thư mục cert của tên miền đó có tồn tại không rồi mới xóa
 if [ -d "$CERT_PATH/$DOMAIN" ]; then
     echo "Dang xoa chung chi cu cua $DOMAIN..."
-    sudo rm -rf "$CERT_PATH/$DOMAIN"
+    rm -rf "$CERT_PATH/$DOMAIN"
 else
     echo "Khong tim thay chung chi cu cua $DOMAIN (Co the chua duoc tao bao gio)."
 fi
@@ -222,7 +226,7 @@ fi
 # Xóa https của cả tên miền chuyển hướng nếu nó có
 if [ -d "$CERT_PATH/$RED_DOMAIN" ]; then
     echo "Dang xoa chung chi cu cua $RED_DOMAIN..."
-    sudo rm -rf "$CERT_PATH/$RED_DOMAIN"
+    rm -rf "$CERT_PATH/$RED_DOMAIN"
 fi
 # -------------------------------------------------------------------------------------------------------------------------------
 
@@ -272,7 +276,7 @@ BACKUP_FILE="${CADDY_FILE}.bak_${TIMESTAMP}"
 
 # H.5.3. Tạo file backup cho caddyfile
 echo "Dang tao file backup: $BACKUP_FILE"
-sudo cp "$CADDY_FILE" "$BACKUP_FILE"
+cp "$CADDY_FILE" "$BACKUP_FILE"
 
 # H.6. Thực hiện xóa bằng SED
 # Giải thích lệnh sed:
@@ -280,21 +284,21 @@ sudo cp "$CADDY_FILE" "$BACKUP_FILE"
 # /^...$/ : Dấu ^ là bắt đầu dòng, $ là kết thúc dòng -> Đảm bảo dòng đó chỉ chứa đúng marker, không thừa thiếu khoảng trắng hay ký tự lạ.
 # , : Là phạm vi từ Regex Start đến Regex End
 # d : Delete (xóa)
-sudo sed -i "/$REGEX_START/,/$REGEX_END/d" "$CADDY_FILE"
+sed -i "/$REGEX_START/,/$REGEX_END/d" "$CADDY_FILE"
 
 # H.7. Kiểm tra tính hợp lệ của Caddyfile mới (Validation)
 # Nếu Caddy báo lỗi cấu hình, lập tức khôi phục file cũ
-if ! sudo caddy validate --config "$CADDY_FILE" --adapter caddyfile > /dev/null 2>&1; then
+if ! caddy validate --config "$CADDY_FILE" --adapter caddyfile > /dev/null 2>&1; then
     echo "CANH BAO: File Caddyfile bi loi sau khi sua. Dang khoi phuc lai file ban dau..."
 	
-    sudo cp "$BACKUP_FILE" "$CADDY_FILE"
+    cp "$BACKUP_FILE" "$CADDY_FILE"
 	
     echo "Da khoi phuc lai file Caddyfile goc. Vui long kiem tra lai Caddyfile de xoa thu cong phan tuong ung."
     exit 1
 else
     # Nếu mọi thứ OK, Reload lại Caddy
     echo "Cau hinh hop le. Dang reload Caddy..."	
-    sudo systemctl reload caddy
+    systemctl reload caddy
     echo "Hoan tat! Da xoa cau hinh cho $DOMAIN trong Caddyfile."
 fi
 # -------------------------------------------------------------------------------------------------------------------------------

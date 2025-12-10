@@ -16,10 +16,14 @@ NC='\033[0m' # No Color
 # +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
-# B. KIỂM TRA QUYỀN ROOT
+# B. KIỂM TRA QUYỀN
+# NÂNG QUYỀN NẾU KHÔNG PHẢI LÀ ROOT (cho nhóm có quyền gọi sudo)
+# 1. Kiểm tra xem đang chạy với quyền gì
 if [[ $EUID -ne 0 ]]; then
-   echo "Loi: Script nay phai duoc chay voi quyen root (sudo)."
-   exit 1
+   # 2. Nếu không phải root, tự động chạy lại script này bằng sudo
+   sudo "$0" "$@"
+   # 3. Thoát tiến trình cũ (không phải root) để tiến trình mới (có root) chạy
+   exit $?
 fi
 # -------------------------------------------------------------------------------------------------------------------------------
 
@@ -222,16 +226,16 @@ EOF
     caddy fmt --overwrite "$CADDY_FILE"
 	
 	# Kiểm tra tính hợp lệ của file Caddydile
-	if ! sudo caddy validate --config "$CADDY_FILE" --adapter caddyfile > /dev/null 2>&1; then
+	if ! caddy validate --config "$CADDY_FILE" --adapter caddyfile > /dev/null 2>&1; then
 		echo -e "${RED}CANH BAO: File Caddyfile bi loi cu phap!${NC}"
 		
 		# In ra lỗi cụ thể cho người dùng xem sai ở đâu
-		sudo caddy validate --config "$CADDY_FILE" --adapter caddyfile
+		caddy validate --config "$CADDY_FILE" --adapter caddyfile
 		
 		echo -e "${YELLOW}Dang khoi phuc lai file ban dau...${NC}"
 		
 		if [ -f "$BACKUP_FILE" ]; then
-			sudo cp "$BACKUP_FILE" "$CADDY_FILE"
+			cp "$BACKUP_FILE" "$CADDY_FILE"
 			echo "Da khoi phuc lai file goc an toan."
 		fi
 		

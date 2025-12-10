@@ -6,10 +6,10 @@
 echo -e "${GREEN}[1/3] Dang cai dat PHP ${PHP_VER} va cac module can thiet...${NC}"
 
 # Thêm repository và cài đặt PHP
-sudo apt update
-sudo apt install -y lsb-release ca-certificates apt-transport-https software-properties-common
-sudo add-apt-repository ppa:ondrej/php -y
-sudo apt update
+apt update
+apt install -y lsb-release ca-certificates apt-transport-https software-properties-common
+add-apt-repository ppa:ondrej/php -y
+apt update
 
 # ==============================================================
 # DANH SÁCH CÁC GÓI PHP ĐƯỢC CÀI. CÁC GÓI CHỈ CẦN DÀNH CHO BLOG.
@@ -39,7 +39,7 @@ apt install -y "${PHP_PACKAGES[@]}"
 echo -e "${GREEN}[2/3] Dang cai dat MariaDB Server...${NC}"
 # Thường là phiên bản 10.11 trên Ubuntu 24.04 LTS
 # Cách kiểm tra: mariadb --version, việc biết được phiên bản cụ thể sẽ giúp chúng ta có những cài đặt chính xác hơn sau này.
-sudo apt install -y mariadb-server
+apt install -y mariadb-server
 
 # E3. BẢO MẬT MARIADB (HARDENING)
 echo -e "${GREEN}[3/3] Dang thuc hien bao mat MariaDB (Secure Installation)...${NC}"
@@ -50,7 +50,7 @@ echo -e "${GREEN}[3/3] Dang thuc hien bao mat MariaDB (Secure Installation)...${
 # 3. Xóa database 'test' và quyền truy cập vào nó
 # 4. Reload privileges
 
-sudo mariadb <<EOF
+mariadb <<EOF
 DELETE FROM mysql.user WHERE User='';
 DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
 DROP DATABASE IF EXISTS test;
