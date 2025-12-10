@@ -55,7 +55,6 @@ read -p "Nhap ten mien cho Adminer (VD: db.domain.com): " INPUT_DOMAIN
         if [[ "$INPUT_DOMAIN" != "$DOMAIN" ]]; then
              echo -e "${GREEN}Script da tu dong chuan hoa input '${INPUT_DOMAIN}' thanh '${DOMAIN}'${NC}"
         fi
-        break
     fi
 # -------------------------------------------------------------------------------------------------------------------------------
 
@@ -188,7 +187,7 @@ else
 	# Nối vào file Caddyfile
     cat >> "$CADDY_FILE" <<EOF 
 ###start_wpsila_kiencang_$DOMAIN###
-$DOMAIN_NAME {
+$DOMAIN {
     root * $INSTALL_DIR
     php_fastcgi unix/$PHP_SOCKET
     file_server
@@ -258,7 +257,7 @@ echo ""
 echo "======================================="
 echo "   CAI DAT THANH CONG!"
 echo "======================================="
-echo "URL: https://$DOMAIN_NAME"
+echo "URL: https://$DOMAIN"
 echo ""
 echo "[LOP 1] WEB LOGIN (Basic Auth):"
 echo "   User: $USER_NAME"
