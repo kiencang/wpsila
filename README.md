@@ -1,4 +1,4 @@
-Phiên bản bash script bạn tải vể: v0.1.2
+Version của bash script: v0.1.2
 ---
 Đây là công cụ cài nhanh blog WordPress trên VPS (chỉ blog & nói chung là website không bao gồm giỏ hàng).
 
