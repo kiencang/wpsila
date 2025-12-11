@@ -14,4 +14,19 @@ hoặc
 curl -sL https://raw.githubusercontent.com/kiencang/wpsila/v0.1.1/install_wpsila.sh | sudo bash
 ```
 
-Nhiều phần trong mã có tham khảo từ AI (chủ yếu là Gemini).
+Quá trình viết code có tham khảo từ Gemini.
+
+-
+
+Tuyên bố miễn trừ trách nhiệm (Disclaimer)
+
+Script này được cung cấp miễn phí và mã nguồn mở. Mặc dù tôi đã cố gắng hết sức để kiểm tra kỹ lưỡng, nhưng việc sử dụng script này hoàn toàn thuộc về rủi ro của bạn (Use at your own risk).
+
+Tác giả không chịu trách nhiệm cho bất kỳ thiệt hại nào liên quan đến:
+
+- Mất mát dữ liệu.
+
+- Lỗi cấu hình hệ thống.
+
+- Các vấn đề bảo mật phát sinh do môi trường máy chủ cụ thể.
+
