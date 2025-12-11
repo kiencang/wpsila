@@ -14,7 +14,7 @@ curl -sL https://vps.wpsila.com | sudo bash
 hoặc
 
 ```bash
-curl -sL https://raw.githubusercontent.com/kiencang/wpsila/v0.1.1/install_wpsila.sh | sudo bash
+curl -sL https://raw.githubusercontent.com/kiencang/wpsila/v0.1.2/install_wpsila.sh | sudo bash
 ```
 
 Quá trình viết code có tham khảo từ Gemini.
