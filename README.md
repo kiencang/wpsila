@@ -29,3 +29,5 @@ Tác giả không chịu trách nhiệm cho bất kỳ thiệt hại nào liên 
 
 - Các vấn đề bảo mật phát sinh.
 
+Tuyên bố miễn trừ trách nhiệm đầy đủ được tôi công bố tại đây: https://wpsila.com/disclaimer
+
