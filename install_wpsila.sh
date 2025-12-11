@@ -96,6 +96,8 @@ rm -f "$INSTALL_DIR/"*.conf
 
 # -------------------------------------------------------------------------------------------------------------------------------
 # === KET QUA: MA BASH DE DAN VAO install_wpsila.sh ===
+# Sử dụng mã generate_checksum chạy để lấy mã này về
+# Dev bắt buộc phải dùng trước khi công bố phiên bản mới
 declare -A CHECKSUMS=(
     ["wpsila.conf"]="5eb2ca775745af452d4c66bca812c212061803204acae32f8470d3e0a51debcb"
     ["wpsila_menu.sh"]="12387deb4dccadbb899d2fa44f8778af7f9dc2fb011bb3a3f22de81e3af8548d"
@@ -161,6 +163,10 @@ download_file() {
 # +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
+# Nếu thay đổi, bổ sung file tải về (hoặc thay đổi nội dung trong file) thì  >
+# > bắt buộc phải cập nhật cả checksum được khai báo bên trên.
+# Nếu thiếu mã checksum sẽ không thể tải về được, dev cần lưu ý.
+
 # File cấu hình (chứa định nghĩa phiên bản PHP)
 download_file "wpsila.conf" "$INSTALL_DIR/wpsila.conf"
 # -------------------------

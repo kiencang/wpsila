@@ -1,5 +1,18 @@
 #!/bin/bash
 
+# Dừng script ngay lập tức nếu có lệnh bị lỗi
+set -euo pipefail
+
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
+# Mã này dùng để tạo checksum cho các file tải về nhằm đảm bảo dữ liệu toàn vẹn.
+# Xuất mã rồi chèn vào install_wpsila.sh
+# Đoạn mã này dành cho dev, không phải người dùng cuối.
+# Mỗi bản cập nhật bắt buộc phải làm để đảm bảo mã nguồn tải được.
+# Có thể chạy mã này trong WSL trên Windows.
+# -------------------------------------------------------------------------------------------------------------------------------
+
 # --- Cấu hình ---
 REPO_URL="https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main"
 TEMP_DIR="/tmp/wpsila_checksum_temp"
