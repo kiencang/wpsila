@@ -1,5 +1,8 @@
 Đây là công cụ cài nhanh blog WordPress trên VPS (chỉ blog & nói chung là website không bao gồm giỏ hàng).
 
+- Yêu cầu hệ thống: Ubuntu LTS 24.04, cài mới trên VPS (tức là bạn chưa có bất cứ website nào hoặc cài bất cứ chương trình gì ngoài Ubuntu trên VPS đó).
+- RAM tối thiểu 1GB.
+
 Các đoạn mã đang trong giai đoạn thử nghiệm, chỉ cài nó trên website demo của bạn.
 
 Cài đặt với quyền root: 
@@ -28,5 +31,5 @@ Tác giả không chịu trách nhiệm cho bất kỳ thiệt hại nào liên 
 
 - Lỗi cấu hình hệ thống.
 
-- Các vấn đề bảo mật phát sinh do môi trường máy chủ cụ thể.
+- Các vấn đề bảo mật phát sinh.
 
