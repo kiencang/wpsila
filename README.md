@@ -16,7 +16,7 @@ curl -sL https://raw.githubusercontent.com/kiencang/wpsila/v0.1.1/install_wpsila
 
 Quá trình viết code có tham khảo từ Gemini.
 
--
+---
 
 Tuyên bố miễn trừ trách nhiệm (Disclaimer)
 
