@@ -27,5 +27,5 @@ Tác giả không chịu trách nhiệm cho bất kỳ thiệt hại nào liên 
 
 - Lỗi cấu hình hệ thống.
 
-- Các vấn đề bảo mật phát sinh ngoài ý muốn.
+- Các vấn đề bảo mật phát sinh.
 
