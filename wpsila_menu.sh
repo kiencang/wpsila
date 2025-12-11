@@ -35,12 +35,12 @@ fi
 show_menu() {
     clear
     echo -e "${BLUE}===========================================================${NC}"
-    echo -e "${GREEN}            WPSILA MANAGER (Local Version)              ${NC}"
+    echo -e "${GREEN}              WPSILA WORDPRESS BLOG              ${NC}"
     echo -e "${BLUE}===========================================================${NC}"
     echo -e "  ${YELLOW}1.${NC} <Cai dat (install) Caddy Web Server (mot lan la du)>"
 	echo -e "  ${YELLOW}2.${NC} <Toi uu he thong (mot lan la du)>"
 	echo -e "${BLUE}-----------------------------------------------------------${NC}"
-    echo -e "  ${YELLOW}3.${NC} >> [Cai dat (install) website WordPress moi]"
+    echo -e "  ${YELLOW}3.${NC} >> Cai dat (install) website WordPress moi"
 	echo -e "  ${YELLOW}4.${NC} >> Xem thong tin pass cua trang WordPress vua tao"
 	echo -e "  ${YELLOW}5.${NC} >> Them tai khoan sFTP cho website"
 	echo -e "${BLUE}-----------------------------------------------------------${NC}"
