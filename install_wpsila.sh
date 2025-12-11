@@ -1,5 +1,18 @@
 #!/bin/bash
 
+# -------------------------------------------------------------------------
+# wpsila - install WordPress blog
+# -------------------------------------------------------------------------
+# Website:      https://wpsila.com
+# GitHub:        https://github.com/kiencang/wpsila
+# Copyright (c) 2025 - wpsila
+# This script is licensed under M.I.T
+# -------------------------------------------------------------------------
+# curl -sL https://vps.wpsila.com | sudo bash
+# -------------------------------------------------------------------------
+# Version 0.1.1 - 11/12/2025
+# -------------------------------------------------------------------------
+
 # Dừng script ngay lập tức nếu có biến chưa khai báo hoặc pipeline bị lỗi
 # Lưu ý: set -e sẽ được xử lý khéo léo trong hàm download để không ngắt script đột ngột
 set -euo pipefail
