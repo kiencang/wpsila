@@ -125,30 +125,27 @@ declare -A CHECKSUMS=(
 echo "Dang tai cac module..."
 
 download_file() {
-    local filename="$1" # Tên file, ví dụ: "wpsila.conf"
-    local dest="$2"    # Đường dẫn đích, ví dụ: "/opt/wpsila/wpsila.conf"
-    local url="$REPO_URL/$filename" # Tự động tạo URL
+    local filename="$1"
+    local dest="$2"
+    local url="$REPO_URL/$filename"
+    local expected_checksum="${CHECKSUMS[$filename]}"
 
-    # Lấy checksum mong đợi từ mảng CHECKSUMS
-    local expected_checksum="${CHECKSUMS[$filename]}"
-    
-    # 1. Tiến hành tải file
-    if ! wget -q --no-cache "$url" -O "$dest"; then
-        echo -e "\033[0;31m[DOWNLOAD FAIL]\033[0m Khong the tai: $url"
-        rm -f "$dest" # Xóa file rác nếu có
-        error_exit "Loi ket noi hoac duong dan khong chinh xac."
-    fi
-    
-    # 2. Kiểm tra file tải về có dữ liệu không
-    if [[ ! -s "$dest" ]]; then
-        rm -f "$dest"
-        error_exit "File tai ve bi rong (0 bytes): $dest"
-    fi
+    # 1. Tien hang tai file
+    if ! wget -q --no-cache "$url" -O "$dest"; then
+        echo -e "\033[0;31m[DOWNLOAD FAIL]\033[0m Khong the tai: $url"
+        rm -f "$dest"
+        error_exit "Loi ket noi hoac duong dan khong chinh xac."
+    fi
 
-    # 3. KIỂM TRA CHECKSUM (Bước bảo mật mới)
+    # 2. Kiem tra file tai ve co du lieu khong
+    if [[ ! -s "$dest" ]]; then
+        rm -f "$dest"
+        error_exit "File tai ve bi rong (0 bytes): $dest"
+    fi
+
+    # 3. KIEM TRA CHECKSUM
     if [[ -n "$expected_checksum" ]]; then
         local actual_checksum
-        # Tính toán checksum thực tế của file vừa tải
         actual_checksum=$(sha256sum "$dest" | awk '{print $1}')
 
         if [[ "$actual_checksum" != "$expected_checksum" ]]; then
