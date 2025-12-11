@@ -1,13 +1,10 @@
 #!/bin/bash
 
 # --- Cấu hình ---
-# Đường dẫn Repository GỐC chứa các file thành phần
 REPO_URL="https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main"
-# Thư mục tạm thời để tải file
 TEMP_DIR="/tmp/wpsila_checksum_temp"
 
-# Danh sách Tên file CẦN TÍNH CHECKSUM
-# Bạn có thể sao chép và dán danh sách này trực tiếp từ phần 5 của script cài đặt
+# Danh sách file
 FILE_LIST=(
     "wpsila.conf"
     "wpsila_menu.sh"
@@ -28,22 +25,20 @@ FILE_LIST=(
     "setup_adminer.sh"
     "wpp.sh"
 )
-# -----------------
 
-# Kiểm tra sự tồn tại của wget và sha256sum
+# Kiểm tra dependency
 if ! command -v wget &> /dev/null || ! command -v sha256sum &> /dev/null; then
-    echo "Loi: Can cai dat 'wget' va 'sha256sum' truoc khi chay script nay."
+    echo "Loi: Thieu 'wget' hoac 'sha256sum'."
     exit 1
 fi
 
 echo "=== BAT DAU TAO CHECKSUM (Lay file tu GitHub) ==="
 
-# Tạo thư mục tạm và đảm bảo thư mục sạch
+# Tạo thư mục tạm an toàn
+rm -rf "$TEMP_DIR"
 mkdir -p "$TEMP_DIR"
 cd "$TEMP_DIR" || exit 1
 
-# Tải và Tính toán Checksum
-echo "Dang tai ve va tinh toan checksum..."
 declare -A CHECKSUMS_RESULT
 TOTAL_FILES=${#FILE_LIST[@]}
 COUNT=0
@@ -52,32 +47,46 @@ for filename in "${FILE_LIST[@]}"; do
     COUNT=$((COUNT + 1))
     URL="$REPO_URL/$filename"
     
-    # 1. Tải file
-    echo "[$COUNT/$TOTAL_FILES] Dang tai: $filename..."
-    if ! wget -q "$URL" -O "$filename"; then
-        echo "Loi tai file $filename. Bo qua."
+    # In ra dòng đang xử lý để user biết tiến độ
+    echo -n "[$COUNT/$TOTAL_FILES] Downloading $filename ... "
+    
+    # 1. Tải file (Thêm --no-cache để đảm bảo lấy code mới nhất vừa push)
+    if ! wget -q --no-cache "$URL" -O "$filename"; then
+        echo "FAIL (Loi tai file)"
         continue
     fi
 
     # 2. Tính checksum
     CHECKSUM=$(sha256sum "$filename" | awk '{print $1}')
+    
+    # Kiểm tra nếu file rỗng (đề phòng link đúng nhưng file 0 byte)
+    if [[ ! -s "$filename" ]]; then
+         echo "FAIL (File rong)"
+         continue
+    fi
+
     CHECKSUMS_RESULT["$filename"]="$CHECKSUM"
+    echo "OK"
 done
 
-# Xóa thư mục tạm
+# Dọn dẹp
 cd ..
 rm -rf "$TEMP_DIR"
 
-# Xuất mã Bash cho script cài đặt
+# Xuất kết quả
 echo
-echo "=== KET QUA: MA BASH DE DAN VAO install_wpsila.sh ==="
-echo "----------------------------------------------------------------------------------------------------------------"
+echo "=== KET QUA: Copy doan duoi day va thay vao script cai dat ==="
+echo "--------------------------------------------------------------------------------"
 echo "declare -A CHECKSUMS=("
 
-for filename in "${!CHECKSUMS_RESULT[@]}"; do
-    checksum="${CHECKSUMS_RESULT[$filename]}"
-    echo "    [\"$filename\"]=\"$checksum\""
+# Lặp qua FILE_LIST gốc để giữ đúng thứ tự sắp xếp
+for filename in "${FILE_LIST[@]}"; do
+    # Chỉ in ra nếu file đó đã được tính checksum thành công
+    if [[ -n "${CHECKSUMS_RESULT[$filename]+abc}" ]]; then
+        checksum="${CHECKSUMS_RESULT[$filename]}"
+        echo "    [\"$filename\"]=\"$checksum\""
+    fi
 done
 
 echo ")"
-echo "# ----------------------------------------------------------------------------------------------------------------"
+echo "--------------------------------------------------------------------------------"
