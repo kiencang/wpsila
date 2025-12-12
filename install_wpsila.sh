@@ -10,17 +10,20 @@
 # -------------------------------------------------------------------------
 # curl -sL https://vps.wpsila.com | sudo bash
 # -------------------------------------------------------------------------
-# Version 0.1.1 - 11/12/2025
+# Version 0.1.2 - 11/12/2025
 # -------------------------------------------------------------------------
 
 # Dừng script ngay lập tức nếu có biến chưa khai báo hoặc pipeline bị lỗi
 # Lưu ý: set -e sẽ được xử lý khéo léo trong hàm download để không ngắt script đột ngột
 set -euo pipefail
 
+# Phiên bản của bash script
+VERSION="v0.1.2"
+
 # +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
-# Chạy lệnh
+# Chạy lệnh (nếu là phiên bản mới nhất nó sẽ trùng với main của repo)
 # curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/install_wpsila.sh | sudo bash
 # -------------------------------------------------------------------------------------------------------------------------------
 
@@ -31,7 +34,7 @@ set -euo pipefail
 INSTALL_DIR="/opt/wpsila"
 
 # Chú ý link Repo, cần cập nhật cả vps.wpsila.com nếu nó có thay đổi
-REPO_URL="https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main" 
+REPO_URL="https://raw.githubusercontent.com/kiencang/wpsila/${VERSION}"
 BIN_LINK="/usr/local/bin/wpsila"
 
 # Hàm báo lỗi và thoát
