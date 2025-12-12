@@ -1,6 +1,6 @@
 Version của bash script: v0.1.2
 ---
-Website: https://wpsila.com/
+Website: https://wpsila.com
 
 Đây là công cụ cài nhanh blog WordPress trên VPS (chỉ blog & nói chung là website không bao gồm giỏ hàng).
 
