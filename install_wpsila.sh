@@ -5,7 +5,7 @@
 # -------------------------------------------------------------------------
 # Website: https://wpsila.com
 # GitHub: https://github.com/kiencang/wpsila
-# Copyright (c) 2025 - wpsila
+# Copyright (c) 2025 - Nguyen Duc Anh
 # This script is licensed under M.I.T
 # -------------------------------------------------------------------------
 # curl -sL https://vps.wpsila.com | sudo bash
@@ -17,23 +17,18 @@
 # Lưu ý: set -e sẽ được xử lý khéo léo trong hàm download để không ngắt script đột ngột
 set -euo pipefail
 
-# Phiên bản của bash script
+# Phiên bản của bash script / rất quan trọng để tải đúng phiên bản các file cài tương ứng
 VERSION="v0.1.2"
 
 # +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
-# Chạy lệnh (nếu là phiên bản mới nhất nó sẽ trùng với main của repo)
-# curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/install_wpsila.sh | sudo bash
-# -------------------------------------------------------------------------------------------------------------------------------
-
-# +++
-
-# -------------------------------------------------------------------------------------------------------------------------------
 # --- Cấu hình ---
+# Thư mục lưu các file cài đặt
 INSTALL_DIR="/opt/wpsila"
 
 # Chú ý link Repo, cần cập nhật cả vps.wpsila.com nếu nó có thay đổi
+# vps.wpsila.com là nơi chứa mã nguồn này, làm khó thêm một bước trong trường hợp GitHub bị tấn công.
 REPO_URL="https://raw.githubusercontent.com/kiencang/wpsila/${VERSION}"
 BIN_LINK="/usr/local/bin/wpsila"
 
@@ -67,7 +62,7 @@ fi
 # Cài đặt wget và ca-certificates
 if ! command -v wget &> /dev/null || ! command -v sha256sum &> /dev/null; then
     echo "Dang cai dat wget va coreutils..."
-    # Cài đặt wget (cho tải file) và coreutils (cho sha256sum)
+    # Cài đặt wget (cho tải file) và coreutils (cho sha256sum để dùng kiểm tra checksum)
     apt-get update -qq && apt-get install -y wget ca-certificates coreutils -qq || error_exit "Khong the cai dat cac phu thuoc co ban (wget/coreutils)."
 fi
 # -------------------------------------------------------------------------------------------------------------------------------
@@ -75,7 +70,7 @@ fi
 # +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
-# 3. Tạo thư mục cho mã nguồn của wpSila
+# 3. Tạo thư mục cho mã nguồn của wpsila
 if [[ ! -d "$INSTALL_DIR" ]]; then
     mkdir -p "$INSTALL_DIR"
 fi
@@ -94,11 +89,7 @@ rm -f "$INSTALL_DIR/"*.conf
 # +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
-
-# +++
-
-# -------------------------------------------------------------------------------------------------------------------------------
-# === KET QUA: MA BASH DE DAN VAO install_wpsila.sh ===
+# 4.1 MA BASH DE DAN VAO install_wpsila.sh
 # Sử dụng mã generate_checksum chạy để lấy mã này về
 # Dev bắt buộc phải dùng trước khi công bố phiên bản mới
 declare -A CHECKSUMS=(

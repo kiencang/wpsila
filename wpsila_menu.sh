@@ -35,7 +35,7 @@ fi
 show_menu() {
     clear
     echo -e "${BLUE}===========================================================${NC}"
-    echo -e "${GREEN}              WPSILA WORDPRESS BLOG              ${NC}"
+    echo -e "${GREEN}                     WPSILA WORDPRESS BLOG                    ${NC}"
     echo -e "${BLUE}===========================================================${NC}"
     echo -e "  ${YELLOW}1.${NC} <Cai dat (install) Caddy Web Server (mot lan la du)>"
 	echo -e "  ${YELLOW}2.${NC} <Toi uu he thong (mot lan la du)>"
