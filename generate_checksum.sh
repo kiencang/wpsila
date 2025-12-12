@@ -3,6 +3,9 @@
 # Dừng script ngay lập tức nếu có lệnh bị lỗi
 set -euo pipefail
 
+# Phiên bản của bash script
+VERSION="v0.1.2"
+
 # +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
@@ -14,7 +17,7 @@ set -euo pipefail
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # --- Cấu hình ---
-REPO_URL="https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main"
+REPO_URL="https://raw.githubusercontent.com/kiencang/wpsila/${VERSION}"
 TEMP_DIR="/tmp/wpsila_checksum_temp"
 
 # Danh sách file
