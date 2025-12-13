@@ -41,6 +41,9 @@ echo -e "${GREEN}[2/3] Dang cai dat MariaDB Server...${NC}"
 # Cách kiểm tra: mariadb --version, việc biết được phiên bản cụ thể sẽ giúp chúng ta có những cài đặt chính xác hơn sau này.
 apt install -y mariadb-server
 
+# Khởi chạy ngay lập tức & Ubuntu khởi động lại thì mariadb cũng khởi động lại cùng mà không cần thao tác thủ công
+systemctl enable --now mariadb
+
 # E3. BẢO MẬT MARIADB (HARDENING)
 echo -e "${GREEN}[3/3] Dang thuc hien bao mat MariaDB (Secure Installation)...${NC}"
 
@@ -57,3 +60,14 @@ DROP DATABASE IF EXISTS test;
 DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';
 FLUSH PRIVILEGES;
 EOF
+
+# E4. Kiểm tra trạng thái
+if systemctl is-active --quiet mariadb; then
+    echo "MariaDB da cai dat va dang chay thanh cong!"
+    
+    # In ra phiên bản để kiểm tra
+    mariadb --version
+else
+    echo "Co loi xay ra, MariaDB khong khoi dong duoc."
+	exit 1
+fi
