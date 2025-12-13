@@ -3,13 +3,9 @@
 # Dừng script ngay lập tức nếu có lệnh bị lỗi
 set -euo pipefail
 
-# +++
-
-# -------------------------------------------------------------------------------------------------------------------------------
-# Chạy lệnh
-# version 0.05.12.25
-# curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/install_lcmp.sh | bash
-# -------------------------------------------------------------------------------------------------------------------------------
+# Thiet lap moi truong chuan cho Automation
+export LC_ALL=C.UTF-8
+export DEBIAN_FRONTEND=noninteractive
 
 # +++
 
@@ -159,7 +155,7 @@ sleep 2
 # +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
-# E. Lưu lại thông tin để biết là đã cài thành công
+# F. Lưu lại thông tin để biết là đã cài thành công
 # Cần bổ sung mã để thêm file vào thư mục nhằm xác nhận đã cài thành công LCMP trên VPS
 # Nằm cùng thư mục
 INSTALLED_SUCCESSFULLY="$SCRIPT_DIR/wpsila_success.txt"
