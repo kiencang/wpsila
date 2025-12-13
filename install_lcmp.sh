@@ -152,7 +152,6 @@ else
 	echo -e "${YELLOW}Kiem tra su ton tai cua file, hoac duong dan co chinh xác khong.${NC}"
 fi
 
-echo -e "${GREEN}Cai dat thanh cong PHP & MariaDB.${NC}"
 echo "--------------------------------------------------------"
 sleep 2
 # -------------------------------------------------------------------------------------------------------------------------------
