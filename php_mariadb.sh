@@ -75,6 +75,9 @@ DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';
 FLUSH PRIVILEGES;
 EOF
 
+# Câu lệnh dùng để kiểm tra xem database đã được bảo mật đúng cách chưa
+# sudo mariadb -e "SELECT User, Host, Plugin FROM mysql.user; SHOW DATABASES LIKE 'test';"
+
 # E4. Kiểm tra trạng thái cuoi cung
 if systemctl is-active --quiet mariadb && systemctl is-active --quiet "php${PHP_VER}-fpm"; then
     echo -e "${GREEN}PHP ${PHP_VER} va MariaDB da cai dat THANH CONG!${NC}"
