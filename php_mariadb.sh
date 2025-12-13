@@ -3,24 +3,14 @@
 # File này được nhúng vào script install_lcmp.sh
 # -----------------------------------------------------------
 
-# Kiem tra bien PHP_VER de tranh loi nghiem trong
-if [ -z "${PHP_VER}" ]; then
-    echo -e "${RED}[Loi] Bien PHP_VER chua duoc khai bao. Script dung lai.${NC}"
-    exit 1
-fi
-
 echo -e "${GREEN}[1/3] Dang cai dat PHP ${PHP_VER} va cac module can thiet...${NC}"
 
 # Setup Repository (Them -y cho apt update dau tien de tranh hoi)
 # Dung && de dam bao lenh truoc chay xong lenh sau moi chay
 apt update -y && apt install -y lsb-release ca-certificates apt-transport-https software-properties-common curl zip unzip
 
-# Them repo Ondrej (Tu dong update apt sau khi them)
-if ! grep -q "ondrej/php" /etc/apt/sources.list.d/*; then
-    add-apt-repository ppa:ondrej/php -y
-else
-    echo "Repo ondrej/php da ton tai, bo qua buoc them."
-fi
+# Repo ondrej/php
+add-apt-repository ppa:ondrej/php -y
 
 # ==============================================================
 # DANH SÁCH CÁC GÓI PHP ĐƯỢC CÀI.
