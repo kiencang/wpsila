@@ -1,26 +1,11 @@
 # -----------------------------------------------------------
 # MODULE: Cài đặt PHP & MariaDB
+# File: php_mariadb.sh
 # File này được nhúng vào script install_lcmp.sh
 # -----------------------------------------------------------
 
 echo -e "${GREEN}[1/3] Dang cai dat PHP ${PHP_VER} va cac module can thiet...${NC}"
-
 # Setup Repository (Them -y cho apt update dau tien de tranh hoi)
-# Dung && de dam bao lenh truoc chay xong lenh sau moi chay
-# --no-install-recommends để không cài thêm các gói không cần thiết
-
-# Chạy update và install
-apt-get update && \
-apt-get install -y --no-install-recommends \
-    lsb-release \
-    ca-certificates \
-    apt-transport-https \
-    software-properties-common \
-    curl \
-    zip \
-    unzip \
-    gnupg && \
-
 # Repo ondrej/php
 add-apt-repository ppa:ondrej/php -y
 

@@ -7,8 +7,6 @@ set -euo pipefail
 export LC_ALL=C.UTF-8
 export DEBIAN_FRONTEND=noninteractive
 
-# +++
-
 # -------------------------------------------------------------------------------------------------------------------------------
 # A. Màu sắc cho thông báo
 GREEN='\033[0;32m'
@@ -20,99 +18,92 @@ NC='\033[0m' # No Color (ngắt màu)
 # +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
-# B. CẤU HÌNH PHIÊN BẢN PHP
-# B1. Đặt giá trị mặc định (phòng hờ không tìm thấy file config)
+# B. CẤU HÌNH & ĐƯỜNG DẪN
 DEFAULT_PHP_VER="8.3"
 
-# B2. Định nghĩa đường dẫn file config 
-# Lấy đường dẫn tuyệt đối của thư mục chứa file script đang chạy
-SCRIPT_WPSILA_DIR="$(dirname "$(realpath "$0")")"
+# B2. Định nghĩa đường dẫn (Sử dụng cách an toàn nhất, không phụ thuộc realpath)
+SCRIPT_WPSILA_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
-# ---
-# Hoặc có thể sử dụng cách này:
-# SCRIPT_WPSILA_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
-# ---
-
-# Trỏ vào file config nằm cùng thư mục đó
+# Trỏ vào file config nằm cùng thư mục
 WPSILA_CONFIG_FILE="$SCRIPT_WPSILA_DIR/wpsila.conf"
 
 # B3. Kiểm tra và nạp file config
 if [ -f "$WPSILA_CONFIG_FILE" ]; then
-    # Lệnh 'source' hoặc dấu chấm '.' sẽ đọc biến từ file kia vào script này
     source "$WPSILA_CONFIG_FILE"
     echo -e "${GREEN}Da tim thay file cau hinh: ${WPSILA_CONFIG_FILE}${NC}"
 else
     echo -e "${YELLOW}Khong tim thay file config. Su dung phien ban mac dinh.${NC}"
 fi
 
-# B4. Chốt phiên bản cuối cùng
-# Cú pháp ${BIEN_1:-$BIEN_2} nghĩa là: Nếu BIEN_1 rỗng (chưa set trong config), thì lấy BIEN_2
-PHP_VER="${PHP_VER:-$DEFAULT_PHP_VER}"
+# B4. Chốt phiên bản & Export biến
+# Export ngay lập tức để toàn bộ quy trình bên dưới nhận diện được
+export PHP_VER="${PHP_VER:-$DEFAULT_PHP_VER}"
+export SCRIPT_WPSILA_DIR
 
-echo "Phien ban PHP: $PHP_VER"
+echo -e "Phien ban PHP se cai dat: ${GREEN}$PHP_VER${NC}"
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
+# C. KIỂM TRA MÔI TRƯỜNG (PRE-FLIGHT CHECK)
+
 echo "--------------------------------------------------------"
 echo "Dang kiem tra moi truong VPS (Clean OS Check)..."
-echo "--------------------------------------------------------"
 
-# C. Kiểm tra trước môi trường server, phòng lỗi cài đè, cài nhầm
-# C1. NÂNG QUYỀN NẾU KHÔNG PHẢI LÀ ROOT
-
-# 1. Kiểm tra xem đang chạy với quyền gì
+# C1. Kiểm tra quyền Root
 if [[ $EUID -ne 0 ]]; then
-   # 2. Nếu không phải root, tự động chạy lại script này bằng sudo
-   sudo "$0" "$@"
-   # 3. Thoát tiến trình cũ (không phải root) để tiến trình mới (có root) chạy
+   # Thêm tham số -E cho sudo để giữ lại các biến môi trường (nếu có)
+   sudo -E "$0" "$@"
    exit $?
 fi
 
-# C2 pre. Kiểm tra sự tồn tại của file xác nhận cài xong wpSila, nhằm có các thông báo phù hợp hơn
+# C2 pre. Kiểm tra file lock (đã cài rồi)
 ALREADY_WPSILA="$SCRIPT_WPSILA_DIR/wpsila_success.txt"
-
-# Kiểm tra xem file cài thành công đã có chưa, có rồi thì không cài nữa
 if [ -f "$ALREADY_WPSILA" ]; then
-	echo -e "${YELLOW}Ban da cai wpsila tren VPS nay.${NC}"
+	echo -e "${YELLOW}Ban da cai wpsila tren VPS nay roi.${NC}"
 	exit 0
 fi	
 
-# C2. KIỂM TRA CỔNG 80 & 443(Dùng lệnh ss) 
-# Mục đích: Phát hiện Nginx, Apache, OpenLiteSpeed hoặc bất kỳ Web Server nào đang chạy.
-# ss -tuln: Hien thi TCP/UDP, Listening, Numeric ports
-# grep -q ":80 ": Tim chuoi ":80 " (co dau cach de tranh nham voi 8080)
-
-if ss -tuln | grep -q ":80 "; then
-    echo -e "${RED}[X] LOI NGHIEM TRONG: Cong 80 (HTTP) dang ban!${NC}"
-    echo -e "${YELLOW}Nguyen nhan:${NC} VPS nay dang chay mot Web Server nao do (Caddy, Nginx, Apache, hoac Docker...)."
-    echo -e "${YELLOW}Giai phap:${NC} Vui long su dung mot VPS moi tinh (Clean OS) de tranh xung dot va loi he thong."
-    echo -e "Script da dung lai de bao ve VPS cua ban."
+# C2. Kiểm tra Port 80 & 443
+# Dùng grep -E để gộp lệnh, code gọn hơn
+if ss -tuln | grep -qE ":(80|443) "; then
+    echo -e "${RED}[X] LOI NGHIEM TRONG: Cong 80 hoac 443 dang ban!${NC}"
+    echo -e "${YELLOW}Nguyen nhan:${NC} VPS dang chay Web Server khac (Apache, Nginx...)."
+    echo -e "${YELLOW}Giai phap:${NC} Vui long su dung VPS moi tinh (Clean OS)."
     exit 1
 fi
 
-if ss -tuln | grep -q ":443 "; then
-    echo -e "${RED}[X] LOI NGHIEM TRONG: Cong 443 (HTTPS) dang ban!${NC}"
-    echo -e "${YELLOW}Nguyen nhan:${NC} VPS nay dang chay mot Web Server nao do (Caddy, Nginx, Apache, hoac Docker...)."
-    echo -e "${YELLOW}Giai phap:${NC} Vui long su dung mot VPS moi tinh (Clean OS) de tranh xung dot va loi he thong."
-    echo -e "Script da dung lai de bao ve VPS cua ban."
-    exit 1
-fi
-
-# C3. KIỂM TRA USER "CADDY" 
-# Mục đích: Phát hiện tàn dư của Caddy cũ (dù đã tắt nhưng còn config rác).
+# C3. Kiểm tra user "caddy"
 if id "caddy" &>/dev/null; then
     echo -e "${RED}[X] LOI: User 'caddy' da ton tai.${NC}"
-    echo -e "${YELLOW}Nguyen nhan:${NC} VPS nay da tung duoc cai dat Caddy Web Server truoc day."
-    echo -e "${YELLOW}Giai phap:${NC} De dam bao on dinh, vui long Reinstall OS (Cai lai he dieu hanh) ve trang thai ban dau."
+    echo -e "${YELLOW}Giai phap:${NC} Reinstall OS ve trang thai ban dau."
     exit 1
 fi
 
-# --- NẾU VƯỢT QUA TẤT CẢ ---
-echo -e "${GREEN}[OK] Kiem tra hoan tat. Moi truong sach se.${NC}"
-echo "Dang bat dau qua trinh cai dat..."
+echo -e "${GREEN}[OK] Moi truong sach se.${NC}"
+sleep 1
+
+# -------------------------------------------------------------------------------------------------------------------------------
+# C4. UPDATE SYSTEM & DEPENDENCIES
 echo "--------------------------------------------------------"
+echo "Cap nhat he thong va cai dat cac goi co ban..."
+
+# Cập nhật và cài đặt gói bổ trợ
+# Đã xóa dấu '&& \' bị thừa ở cuối lệnh để tránh lỗi cú pháp
+apt-get update
+apt-get install -y --no-install-recommends \
+	curl \
+	wget \
+    lsb-release \
+    ca-certificates \
+    apt-transport-https \
+    software-properties-common \
+    zip \
+    unzip \
+    gnupg
+
+echo -e "${GREEN}[OK] Da cai dat xong dependencies.${NC}"
 sleep 2
 # -------------------------------------------------------------------------------------------------------------------------------
 
@@ -120,17 +111,13 @@ sleep 2
 
 # -------------------------------------------------------------------------------------------------------------------------------
 # D. Cài Caddy Web Server
-# Nhúng file cài caddy web server, dễ chỉnh sửa & cập nhật thêm sau này
-# Xác định thư mục, đây là cách khác nếu muốn dùng, đang ưu tiên cách đơn giản hơn
 CADDYWS_INSTALL_FILE="$SCRIPT_WPSILA_DIR/caddy_web_server.sh"
 
-# Kiểm tra xem tệp tin có tồn tại không thì mới nhúng
 if [ -f "$CADDYWS_INSTALL_FILE" ]; then
 	echo -e "${GREEN}Chuan bi cai Caddy Web Server...${NC}"
     source "$CADDYWS_INSTALL_FILE"
 else
-    echo -e "${YELLOW}Khong tim thay file cai Caddy Web Server (caddy_web_server.sh).${NC}"
-	echo -e "${YELLOW}Kiem tra su ton tai cua file, hoac duong dan co chinh xác khong.${NC}"
+    echo -e "${RED}Khong tim thay file: caddy_web_server.sh${NC}"
 	exit 1
 fi
 echo "--------------------------------------------------------"
@@ -141,16 +128,13 @@ sleep 2
 
 # -------------------------------------------------------------------------------------------------------------------------------
 # E. Cài PHP & MariaDB
-# File cài PHP & MariaDB, tách riêng cho dễ chỉnh sửa, cập nhật
 PHP_MARIADB_FILE="$SCRIPT_WPSILA_DIR/php_mariadb.sh"
 
 if [ -f "$PHP_MARIADB_FILE" ]; then
 	echo -e "${GREEN}Chuan bi cai PHP & MariaDB...${NC}"
-	# Nhúng file
     source "$PHP_MARIADB_FILE"
 else
-    echo -e "${YELLOW}Khong tim thay file cai PHP & MariaDB (php_mariadb.sh).${NC}"
-	echo -e "${YELLOW}Kiem tra su ton tai cua file, hoac duong dan co chinh xác khong.${NC}"
+    echo -e "${RED}Khong tim thay file: php_mariadb.sh${NC}"
 	exit 1
 fi
 
@@ -161,29 +145,27 @@ sleep 2
 # +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
-# F. Lưu lại thông tin để biết là đã cài thành công
-# Cần bổ sung mã để thêm file vào thư mục nhằm xác nhận đã cài thành công LCMP trên VPS
-# Nằm cùng thư mục
+# F. HOÀN TẤT
 INSTALLED_SUCCESSFULLY="$SCRIPT_WPSILA_DIR/wpsila_success.txt"
 
-# Xóa file cũ nếu nó có tồn tại
+# Xóa file cũ (cho chắc chắn)
 rm -f "$INSTALLED_SUCCESSFULLY"
 
-# Tạo file mới xác nhận cài thành công LCMP
+# Ghi file log
 cat > "$INSTALLED_SUCCESSFULLY" <<EOF
 ----------------------------------------
 wpSila CLI
 Cai thanh cong LCMP
+PHP Version: $PHP_VER
 Date: $(date)
 ----------------------------------------
 EOF
 
-echo "Dọn dẹp rác..."
+echo "Don dep rac he thong..."
 apt-get autoremove -y
 apt-get clean
 rm -rf /var/lib/apt/lists/*
 
-echo -e "${GREEN}Da luu lai thong tin cai LCMP thanh cong.${NC}"
 echo "--------------------------------------------------------"
-sleep 2
-# -------------------------------------------------------------------------------------------------------------------------------
+echo -e "${GREEN}Cài đặt LCMP hoàn tất!${NC}"
+echo "--------------------------------------------------------"
