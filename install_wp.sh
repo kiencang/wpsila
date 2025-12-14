@@ -62,8 +62,13 @@ DEFAULT_PHP_VER="8.3"
 # D2. Định nghĩa đường dẫn file config 
 # (Ví dụ: file config nằm cùng thư mục với script đang chạy)
 # Dòng lệnh này đảm bảo biến SCRIPT_WPSILA_DIR luôn là đường dẫn tuyệt đối tới thư mục chứa file này
-# Xác định thư mục
-SCRIPT_WPSILA_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+# Xác định thư mục, sử dụng cách đơn giản
+SCRIPT_WPSILA_DIR="$(dirname "$(realpath "$0")")"
+
+# ---
+# Hoặc có thể dùng cách này:
+# SCRIPT_WPSILA_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+# ----
 
 # Trỏ vào file config nằm cùng thư mục đó
 WPSILA_CONFIG_FILE="$SCRIPT_WPSILA_DIR/wpsila.conf"

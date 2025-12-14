@@ -26,10 +26,15 @@ DEFAULT_PHP_VER="8.3"
 
 # B2. Định nghĩa đường dẫn file config 
 # Lấy đường dẫn tuyệt đối của thư mục chứa file script đang chạy
-SCRIPT_DIR="$(dirname "$(realpath "$0")")"
+SCRIPT_WPSILA_DIR="$(dirname "$(realpath "$0")")"
+
+# ---
+# Hoặc có thể sử dụng cách này:
+# SCRIPT_WPSILA_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+# ---
 
 # Trỏ vào file config nằm cùng thư mục đó
-WPSILA_CONFIG_FILE="$SCRIPT_DIR/wpsila.conf"
+WPSILA_CONFIG_FILE="$SCRIPT_WPSILA_DIR/wpsila.conf"
 
 # B3. Kiểm tra và nạp file config
 if [ -f "$WPSILA_CONFIG_FILE" ]; then
@@ -66,7 +71,7 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 # C2 pre. Kiểm tra sự tồn tại của file xác nhận cài xong wpSila, nhằm có các thông báo phù hợp hơn
-ALREADY_WPSILA="$SCRIPT_DIR/wpsila_success.txt"
+ALREADY_WPSILA="$SCRIPT_WPSILA_DIR/wpsila_success.txt"
 
 # Kiểm tra xem file cài thành công đã có chưa, có rồi thì không cài nữa
 if [ -f "$ALREADY_WPSILA" ]; then
@@ -117,8 +122,7 @@ sleep 2
 # D. Cài Caddy Web Server
 # Nhúng file cài caddy web server, dễ chỉnh sửa & cập nhật thêm sau này
 # Xác định thư mục, đây là cách khác nếu muốn dùng, đang ưu tiên cách đơn giản hơn
-# SCRIPT_WPSILA_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
-CADDYWS_INSTALL_FILE="$SCRIPT_DIR/caddy_web_server.sh"
+CADDYWS_INSTALL_FILE="$SCRIPT_WPSILA_DIR/caddy_web_server.sh"
 
 # Kiểm tra xem tệp tin có tồn tại không thì mới nhúng
 if [ -f "$CADDYWS_INSTALL_FILE" ]; then
@@ -138,7 +142,7 @@ sleep 2
 # -------------------------------------------------------------------------------------------------------------------------------
 # E. Cài PHP & MariaDB
 # File cài PHP & MariaDB, tách riêng cho dễ chỉnh sửa, cập nhật
-PHP_MARIADB_FILE="$SCRIPT_DIR/php_mariadb.sh"
+PHP_MARIADB_FILE="$SCRIPT_WPSILA_DIR/php_mariadb.sh"
 
 if [ -f "$PHP_MARIADB_FILE" ]; then
 	echo -e "${GREEN}Chuan bi cai PHP & MariaDB...${NC}"
@@ -160,7 +164,7 @@ sleep 2
 # F. Lưu lại thông tin để biết là đã cài thành công
 # Cần bổ sung mã để thêm file vào thư mục nhằm xác nhận đã cài thành công LCMP trên VPS
 # Nằm cùng thư mục
-INSTALLED_SUCCESSFULLY="$SCRIPT_DIR/wpsila_success.txt"
+INSTALLED_SUCCESSFULLY="$SCRIPT_WPSILA_DIR/wpsila_success.txt"
 
 # Xóa file cũ nếu nó có tồn tại
 rm -f "$INSTALLED_SUCCESSFULLY"
