@@ -63,7 +63,7 @@ fi
 if ! command -v wget &> /dev/null || ! command -v sha256sum &> /dev/null; then
     echo "Dang cai dat wget va coreutils..."
     # Cài đặt wget (cho tải file) và coreutils (cho sha256sum để dùng kiểm tra checksum)
-    apt-get update -qq && apt-get install -y --no-install-recommends wget ca-certificates coreutils -qq || error_exit "Khong the cai dat cac phu thuoc co ban (wget/coreutils)."
+    apt-get update -qq && apt-get install -y wget ca-certificates coreutils -qq || error_exit "Khong the cai dat cac phu thuoc co ban (wget/coreutils)."
 fi
 # -------------------------------------------------------------------------------------------------------------------------------
 

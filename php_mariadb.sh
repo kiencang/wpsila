@@ -58,7 +58,7 @@ systemctl enable --now "php${PHP_VER}-fpm"
 echo -e "${GREEN}[2/3] Dang cai dat MariaDB Server...${NC}"
 
 # Cai dat MariaDB
-apt-get install -y --no-install-recommends mariadb-server mariadb-client
+apt-get install -y mariadb-server mariadb-client
 
 # Khoi dong MariaDB
 systemctl enable --now mariadb
