@@ -70,7 +70,7 @@ ALREADY_WPSILA="$SCRIPT_DIR/wpsila_success.txt"
 
 # Kiểm tra xem file cài thành công đã có chưa, có rồi thì không cài nữa
 if [ -f "$ALREADY_WPSILA" ]; then
-	echo -e "${YELLOW}Ban da cai wpSila tren VPS nay.${NC}"
+	echo -e "${YELLOW}Ban da cai wpsila tren VPS nay.${NC}"
 	exit 0
 fi	
 
@@ -116,9 +116,9 @@ sleep 2
 # -------------------------------------------------------------------------------------------------------------------------------
 # D. Cài Caddy Web Server
 # Nhúng file cài caddy web server, dễ chỉnh sửa & cập nhật thêm sau này
-# Xác định thư mục
-SCRIPT_WPSILA_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
-CADDYWS_INSTALL_FILE="$SCRIPT_WPSILA_DIR/caddy_web_server.sh"
+# Xác định thư mục, đây là cách khác nếu muốn dùng, đang ưu tiên cách đơn giản hơn
+# SCRIPT_WPSILA_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+CADDYWS_INSTALL_FILE="$SCRIPT_DIR/caddy_web_server.sh"
 
 # Kiểm tra xem tệp tin có tồn tại không thì mới nhúng
 if [ -f "$CADDYWS_INSTALL_FILE" ]; then
@@ -127,6 +127,7 @@ if [ -f "$CADDYWS_INSTALL_FILE" ]; then
 else
     echo -e "${YELLOW}Khong tim thay file cai Caddy Web Server (caddy_web_server.sh).${NC}"
 	echo -e "${YELLOW}Kiem tra su ton tai cua file, hoac duong dan co chinh xác khong.${NC}"
+	exit 1
 fi
 echo "--------------------------------------------------------"
 sleep 2
@@ -137,7 +138,7 @@ sleep 2
 # -------------------------------------------------------------------------------------------------------------------------------
 # E. Cài PHP & MariaDB
 # File cài PHP & MariaDB, tách riêng cho dễ chỉnh sửa, cập nhật
-PHP_MARIADB_FILE="$SCRIPT_WPSILA_DIR/php_mariadb.sh"
+PHP_MARIADB_FILE="$SCRIPT_DIR/php_mariadb.sh"
 
 if [ -f "$PHP_MARIADB_FILE" ]; then
 	echo -e "${GREEN}Chuan bi cai PHP & MariaDB...${NC}"
@@ -146,6 +147,7 @@ if [ -f "$PHP_MARIADB_FILE" ]; then
 else
     echo -e "${YELLOW}Khong tim thay file cai PHP & MariaDB (php_mariadb.sh).${NC}"
 	echo -e "${YELLOW}Kiem tra su ton tai cua file, hoac duong dan co chinh xác khong.${NC}"
+	exit 1
 fi
 
 echo "--------------------------------------------------------"
@@ -171,6 +173,11 @@ Cai thanh cong LCMP
 Date: $(date)
 ----------------------------------------
 EOF
+
+echo "Dọn dẹp rác..."
+apt-get autoremove -y
+apt-get clean
+rm -rf /var/lib/apt/lists/*
 
 echo -e "${GREEN}Da luu lai thong tin cai LCMP thanh cong.${NC}"
 echo "--------------------------------------------------------"

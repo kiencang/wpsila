@@ -3,10 +3,10 @@
 # File này được nhúng vào script install_lcmp.sh
 # -----------------------------------------------------------
 echo -e "${GREEN}[1/6] Dang cap nhat he thong...${NC}"
-apt update && apt upgrade -y
+apt-get update && apt upgrade -y
 
 echo -e "${GREEN}[2/6] Dang cai dat cac goi phu thuoc...${NC}"
-apt install -y debian-keyring debian-archive-keyring apt-transport-https curl
+apt-get install -y --no-install-recommends debian-keyring debian-archive-keyring apt-transport-https curl gnupg ufw
 
 echo -e "${GREEN}[3/6] Dang them GPG Key va Repository cua Caddy...${NC}"
 
@@ -20,7 +20,7 @@ chmod o+r /usr/share/keyrings/caddy-stable-archive-keyring.gpg
 chmod o+r /etc/apt/sources.list.d/caddy-stable.list
 
 echo -e "${GREEN}[5/6] Dang cap nhat apt va cai dat Caddy...${NC}"
-apt update && apt install caddy -y
+apt-get update && apt-get install caddy -y
 
 echo -e "${GREEN}[6/6] Dang cau hinh tuong lua (UFW)...${NC}"
 # xóa quy tắc cũ

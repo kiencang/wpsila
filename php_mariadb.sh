@@ -7,10 +7,25 @@ echo -e "${GREEN}[1/3] Dang cai dat PHP ${PHP_VER} va cac module can thiet...${N
 
 # Setup Repository (Them -y cho apt update dau tien de tranh hoi)
 # Dung && de dam bao lenh truoc chay xong lenh sau moi chay
-apt update -y && apt install -y lsb-release ca-certificates apt-transport-https software-properties-common curl zip unzip
+# --no-install-recommends để không cài thêm các gói không cần thiết
+
+# Chạy update và install
+apt-get update && \
+apt-get install -y --no-install-recommends \
+    lsb-release \
+    ca-certificates \
+    apt-transport-https \
+    software-properties-common \
+    curl \
+    zip \
+    unzip \
+    gnupg && \
 
 # Repo ondrej/php
 add-apt-repository ppa:ondrej/php -y
+
+# Thêm repo thì cập nhật lại
+apt-get update
 
 # ==============================================================
 # DANH SÁCH CÁC GÓI PHP ĐƯỢC CÀI.
@@ -35,7 +50,7 @@ PHP_PACKAGES=(
 )
 
 # Cai dat PHP va cac module
-apt install -y "${PHP_PACKAGES[@]}"
+apt-get install -y "${PHP_PACKAGES[@]}"
 
 # Dam bao PHP-FPM khoi dong
 systemctl enable --now "php${PHP_VER}-fpm"
@@ -43,7 +58,7 @@ systemctl enable --now "php${PHP_VER}-fpm"
 echo -e "${GREEN}[2/3] Dang cai dat MariaDB Server...${NC}"
 
 # Cai dat MariaDB
-apt install -y mariadb-server mariadb-client
+apt-get install -y --no-install-recommends mariadb-server mariadb-client
 
 # Khoi dong MariaDB
 systemctl enable --now mariadb
