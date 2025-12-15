@@ -3,6 +3,10 @@
 # Dừng script ngay lập tức nếu có lệnh bị lỗi
 set -euo pipefail
 
+# Thiet lap moi truong chuan cho Automation
+export LC_ALL=C.UTF-8
+export DEBIAN_FRONTEND=noninteractive
+
 # +++
 
 # -------------------------------------------------------------------------------------------------------------------------------

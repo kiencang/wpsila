@@ -151,10 +151,10 @@ INSTALLED_SUCCESSFULLY="$SCRIPT_WPSILA_DIR/wpsila_success.txt"
 # Xóa file cũ (cho chắc chắn)
 rm -f "$INSTALLED_SUCCESSFULLY"
 
-# Ghi file log
+# Ghi file log (ghi đè)
 cat > "$INSTALLED_SUCCESSFULLY" <<EOF
 ----------------------------------------
-wpSila CLI
+wpsila CLI
 Cai thanh cong LCMP
 PHP Version: $PHP_VER
 Date: $(date)
