@@ -1,5 +1,13 @@
 #!/bin/bash
 
+# =========================================
+# Cài đặt LCMP cho VPS
+# 3 file module được source vào là:
+# a. caddy_web_server.sh
+# b. php.sh
+# c. mariadb.sh
+# =========================================
+
 # Dừng script ngay lập tức nếu có lệnh bị lỗi
 set -euo pipefail
 
@@ -127,14 +135,14 @@ sleep 2
 # +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
-# E. Cài PHP & MariaDB
-PHP_MARIADB_FILE="$SCRIPT_WPSILA_DIR/php_mariadb.sh"
+# E. Cài PHP Repo ondrej
+PHP_FILE="$SCRIPT_WPSILA_DIR/php.sh"
 
-if [ -f "$PHP_MARIADB_FILE" ]; then
-	echo -e "${GREEN}Chuan bi cai PHP & MariaDB...${NC}"
-    source "$PHP_MARIADB_FILE"
+if [ -f "$PHP_FILE" ]; then
+	echo -e "${GREEN}Chuan bi cai PHP...${NC}"
+    source "$PHP_FILE"
 else
-    echo -e "${RED}Khong tim thay file: php_mariadb.sh${NC}"
+    echo -e "${RED}Khong tim thay file: php.sh${NC}"
 	exit 1
 fi
 
@@ -145,7 +153,25 @@ sleep 2
 # +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
-# F. HOÀN TẤT
+# F. Cài MariaDB
+MARIADB_FILE="$SCRIPT_WPSILA_DIR/mariadb.sh"
+
+if [ -f "$MARIADB_FILE" ]; then
+	echo -e "${GREEN}Chuan bi cai MariaDB...${NC}"
+    source "$MARIADB_FILE"
+else
+    echo -e "${RED}Khong tim thay file: mariadb.sh${NC}"
+	exit 1
+fi
+
+echo "--------------------------------------------------------"
+sleep 2
+# -------------------------------------------------------------------------------------------------------------------------------
+
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
+# G. HOÀN TẤT
 INSTALLED_SUCCESSFULLY="$SCRIPT_WPSILA_DIR/wpsila_success.txt"
 
 # Xóa file cũ (cho chắc chắn)
