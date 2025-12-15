@@ -3,6 +3,13 @@
 # Dừng script ngay lập tức nếu có lệnh bị lỗi
 set -euo pipefail
 
+# Kiểm tra quyền root & nâng quyền
+if [[ $EUID -ne 0 ]]; then
+   # Thêm tham số -E cho sudo để giữ lại các biến môi trường (nếu có)
+   sudo -E "$0" "$@"
+   exit $?
+fi
+
 # Màu sắc cho thông báo
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -39,9 +46,6 @@ echo "Phien ban PHP: $PHP_VER"
 # ==============================================================================
 # SCRIPT TỰ ĐỘNG TỐI ƯU PHP INI (Dành cho Ubuntu)
 # ==============================================================================
-
-# Test lệnh
-# curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/php_ini_tune.sh | sudo bash
 
 # Kiểm tra xem hệ thống có đang chạy PHP hay không
 if ! command -v php &> /dev/null; then

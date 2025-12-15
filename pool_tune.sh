@@ -3,6 +3,13 @@
 # Dừng script ngay lập tức nếu có lệnh bị lỗi
 set -euo pipefail
 
+# Kiểm tra quyền root & nâng quyền
+if [[ $EUID -ne 0 ]]; then
+   # Thêm tham số -E cho sudo để giữ lại các biến môi trường (nếu có)
+   sudo -E "$0" "$@"
+   exit $?
+fi
+
 # Màu sắc cho thông báo
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -36,20 +43,9 @@ PHP_VER="${PHP_VER:-$DEFAULT_PHP_VER}"
 
 echo "Phien ban PHP: $PHP_VER"
 
-# ver 0.06.12.25
-
 # ==============================================================================
 # SCRIPT TỰ ĐỘNG TỐI ƯU PHP-FPM POOL THEO RAM (Dành cho Ubuntu/Debian)
 # ==============================================================================
-
-# Test lệnh
-# curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/pool_tune.sh | sudo bash
-
-# 1. KIỂM TRA QUYỀN ROOT
-if [ "$EUID" -ne 0 ]; then
-  echo "Vui long chay script nay voi quyen root (sudo)."
-  exit 1
-fi
 
 # Kiểm tra xem có đang cài đặt PHP không?
 if ! command -v php &> /dev/null; then

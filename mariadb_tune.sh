@@ -3,20 +3,18 @@
 # Dừng script ngay lập tức nếu có lệnh bị lỗi
 set -euo pipefail
 
+# Kiểm tra quyền root & nâng quyền
+if [[ $EUID -ne 0 ]]; then
+   # Thêm tham số -E cho sudo để giữ lại các biến môi trường (nếu có)
+   sudo -E "$0" "$@"
+   exit $?
+fi
+
 # ======================================================
 # WP SILA MARIADB TUNER (BACKUP SAFE EDITION)
 # Target: Ubuntu 24.04 | MariaDB 10.11 | PHP 8.3 | Caddy
 # Use Case: Blog 1000+ Posts & Frequent Backups
 # ======================================================
-
-# Test lệnh
-# curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/mariadb_tune.sh | sudo bash
-
-# Kiểm tra quyền root
-if [[ $EUID -ne 0 ]]; then
-   echo "Loi: Ban phai chay script nay voi quyen root (sudo)."
-   exit 1
-fi
 
 echo ">> Dang kiem tra cau hinh he thong..."
 
