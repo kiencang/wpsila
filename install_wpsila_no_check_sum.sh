@@ -113,8 +113,9 @@ download_file "$REPO_URL/wpsila_menu.sh" "$INSTALL_DIR/wpsila_menu.sh"
 # -------------------------
 # Tải về các file phục vụ cho cài đặt LCMP
 download_file "$REPO_URL/install_lcmp.sh" "$INSTALL_DIR/install_lcmp.sh"
-download_file "$REPO_URL/caddy_web_server.sh" "$INSTALL_DIR/caddy_web_server.sh"
-download_file "$REPO_URL/php_mariadb.sh" "$INSTALL_DIR/php_mariadb.sh"
+download_file "$REPO_URL/caddy_web_server.sh" "$INSTALL_DIR/install_caddyserver.sh"
+download_file "$REPO_URL/php_mariadb.sh" "$INSTALL_DIR/install_php.sh"
+download_file "$REPO_URL/php_mariadb.sh" "$INSTALL_DIR/install_mariadb.sh"
 # -------------------------
 
 # -------------------------
