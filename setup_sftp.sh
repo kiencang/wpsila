@@ -101,10 +101,10 @@ if [ $NEED_RESTART -eq 1 ]; then
     # Kiểm tra cú pháp file config trước (Safety First)
     if sshd -t; then
         systemctl reload ssh
-        echo "   ✅ Da reload dich vu SSH (Cau hinh an toan)."
+        echo "Da reload dich vu SSH (Cau hinh an toan)."
     else
-        echo "   ❌ NGUY HIEM: File sshd_config bi loi cu phap!"
-        echo "   ❌ Khong reload SSH de tranh mat ket noi server."
+        echo "NGUY HIEM: File sshd_config bi loi cu phap!"
+        echo "Khong reload SSH de tranh mat ket noi server."
         # Khôi phục lại file backup nếu cần thiết (tuỳ chọn)
         cp "${SSHD_CONFIG}.bak" "$SSHD_CONFIG"
         echo "   -> Da khoi phuc lai file config cu."
@@ -151,7 +151,7 @@ fi
 # Mã hóa mật khẩu và gán trực tiếp (Bypass PAM check)
 ENCRYPTED_PASS=$(openssl passwd -6 "$SFTP_PASS")
 usermod -p "$ENCRYPTED_PASS" "$SFTP_USER"
-echo "   ✅ Da thiet lap mat khau thanh cong."
+echo "Da thiet lap mat khau thanh cong."
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
