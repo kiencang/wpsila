@@ -3,9 +3,9 @@
 # =========================================
 # Cài đặt LCMP cho VPS
 # 3 file module được source vào là:
-# a. caddy_web_server.sh
-# b. php.sh
-# c. mariadb.sh
+# a. install_caddyserver.sh
+# b. install_php.sh
+# c. install_mariadb.sh
 # =========================================
 
 # Dừng script ngay lập tức nếu có lệnh bị lỗi
@@ -119,13 +119,13 @@ sleep 2
 
 # -------------------------------------------------------------------------------------------------------------------------------
 # D. Cài Caddy Web Server
-CADDYWS_INSTALL_FILE="$SCRIPT_WPSILA_DIR/caddy_web_server.sh"
+CADDYWS_INSTALL_FILE="$SCRIPT_WPSILA_DIR/install_caddyserver.sh"
 
-if [ -f "$CADDYWS_INSTALL_FILE" ]; then
+if [[ -f "$CADDYWS_INSTALL_FILE" ]]; then
 	echo -e "${GREEN}Chuan bi cai Caddy Web Server...${NC}"
     source "$CADDYWS_INSTALL_FILE"
 else
-    echo -e "${RED}Khong tim thay file: caddy_web_server.sh${NC}"
+    echo -e "${RED}Khong tim thay file: install_caddyserver.sh${NC}"
 	exit 1
 fi
 echo "--------------------------------------------------------"
@@ -136,13 +136,13 @@ sleep 2
 
 # -------------------------------------------------------------------------------------------------------------------------------
 # E. Cài PHP Repo ondrej
-PHP_FILE="$SCRIPT_WPSILA_DIR/php.sh"
+PHP_INSTALL_FILE="$SCRIPT_WPSILA_DIR/install_php.sh"
 
-if [ -f "$PHP_FILE" ]; then
+if [[ -f "$PHP_INSTALL_FILE" ]]; then
 	echo -e "${GREEN}Chuan bi cai PHP...${NC}"
-    source "$PHP_FILE"
+    source "$PHP_INSTALL_FILE"
 else
-    echo -e "${RED}Khong tim thay file: php.sh${NC}"
+    echo -e "${RED}Khong tim thay file: install_php.sh${NC}"
 	exit 1
 fi
 
@@ -154,13 +154,13 @@ sleep 2
 
 # -------------------------------------------------------------------------------------------------------------------------------
 # F. Cài MariaDB
-MARIADB_FILE="$SCRIPT_WPSILA_DIR/mariadb.sh"
+MARIADB_INSTALL_FILE="$SCRIPT_WPSILA_DIR/install_mariadb.sh"
 
-if [ -f "$MARIADB_FILE" ]; then
+if [[ -f "$MARIADB_INSTALL_FILE" ]]; then
 	echo -e "${GREEN}Chuan bi cai MariaDB...${NC}"
-    source "$MARIADB_FILE"
+    source "$MARIADB_INSTALL_FILE"
 else
-    echo -e "${RED}Khong tim thay file: mariadb.sh${NC}"
+    echo -e "${RED}Khong tim thay file: install_mariadb.sh${NC}"
 	exit 1
 fi
 
