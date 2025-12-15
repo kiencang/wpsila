@@ -16,9 +16,14 @@ set -euo pipefail
 
 # -------------------------------------------------------------------------------------------------------------------------------
 # 1. KIỂM TRA QUYỀN ROOT
-if [ "$EUID" -ne 0 ]; then
-  echo "Vui long chay script bang quyen root (sudo)."
-  exit 1
+# NÂNG QUYỀN NẾU KHÔNG PHẢI LÀ ROOT
+# 1. Kiểm tra xem đang chạy với quyền gì
+if [[ $EUID -ne 0 ]]; then
+   # 2. Nếu không phải root, tự động chạy lại script này bằng sudo
+   # Thêm tham số -E cho sudo để giữ lại các biến môi trường (nếu có)
+   sudo -E "$0" "$@"
+   # 3. Thoát tiến trình cũ (không phải root) để tiến trình mới (có root) chạy
+   exit $?
 fi
 # -------------------------------------------------------------------------------------------------------------------------------
 
