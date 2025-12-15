@@ -36,7 +36,7 @@ SCRIPT_WPSILA_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd 
 WPSILA_CONFIG_FILE="$SCRIPT_WPSILA_DIR/wpsila.conf"
 
 # B3. Kiểm tra và nạp file config
-if [ -f "$WPSILA_CONFIG_FILE" ]; then
+if [[ -f "$WPSILA_CONFIG_FILE" ]]; then
     source "$WPSILA_CONFIG_FILE"
     echo -e "${GREEN}Da tim thay file cau hinh: ${WPSILA_CONFIG_FILE}${NC}"
 else
@@ -68,7 +68,7 @@ fi
 
 # C2 pre. Kiểm tra file lock (đã cài rồi)
 ALREADY_WPSILA="$SCRIPT_WPSILA_DIR/wpsila_success.txt"
-if [ -f "$ALREADY_WPSILA" ]; then
+if [[ -f "$ALREADY_WPSILA" ]]; then
 	echo -e "${YELLOW}Ban da cai wpsila tren VPS nay roi.${NC}"
 	exit 0
 fi	
