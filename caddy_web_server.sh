@@ -2,6 +2,7 @@
 # MODULE: Cài đặt Caddy Web Server
 # File: caddy_web_server.sh
 # File này được nhúng vào script install_lcmp.sh
+# Tuân thủ hướng dẫn: https://caddyserver.com/docs/install
 # -----------------------------------------------------------
 
 echo "--------------------------------------------------------"
@@ -30,8 +31,8 @@ curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | gpg --dearmo
 curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | tee /etc/apt/sources.list.d/caddy-stable.list > /dev/null
 
 # Quan trọng: Cấp quyền đọc cho user '_apt'
-chmod 644 /usr/share/keyrings/caddy-stable-archive-keyring.gpg
-chmod 644 /etc/apt/sources.list.d/caddy-stable.list
+chmod o+r /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+chmod o+r /etc/apt/sources.list.d/caddy-stable.list
 
 # 3. Cài đặt Caddy
 echo -e "${GREEN}[3/5] Tien hanh cai dat Caddy...${NC}"
