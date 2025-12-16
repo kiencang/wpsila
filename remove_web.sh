@@ -80,7 +80,7 @@ CONFIG_FILE="$ROOT_DIR/public_html/wp-config.php"
 
 # -------------------------------------------------------------------------------------------------------------------------------
 # D. Kiểm tra thư mục web có tồn tại hay không?
-if [ ! -d "$ROOT_DIR" ]; then
+if [[ ! -d "$ROOT_DIR" ]]; then
     echo -e "${RED}Loi: Thu muc $ROOT_DIR khong ton tai. Script se dung lai.${NC}"
     exit 1
 fi
@@ -96,7 +96,7 @@ DB_NAME=""
 DB_USER=""
 WP_PATH="$ROOT_DIR/public_html" # Đường dẫn tới thư mục chứa wp-config.php
 
-if [ -f "$CONFIG_FILE" ]; then
+if [[ -f "$CONFIG_FILE" ]]; then
     echo -e "${GREEN}Da tim thay wp-config.php.${NC}"
 
     # Kiểm tra xem lệnh wp có tồn tại không
@@ -113,7 +113,7 @@ if [ -f "$CONFIG_FILE" ]; then
     fi
 
     # Kiểm tra kết quả trả về
-    if [ -z "$DB_NAME" ]; then
+    if [[ -z "$DB_NAME" ]]; then
         echo -e "${YELLOW}Canh bao: Khong the trich xuat ten Database (co the file config loi hoac WP-CLI gap su co).${NC}"
         echo -e "${YELLOW}Hanh dong: Script se chi xoa file, DATABASE CHUA XOA.${NC}"
     else
@@ -143,7 +143,7 @@ fi
 
 # -------------------------------------------------------------------------------------------------------------------------------
 # G. Xóa Database và User
-if [ -n "$DB_NAME" ]; then
+if [[ -n "$DB_NAME" ]]; then
     echo -e "${YELLOW}Dang xoa Database va User...${NC}"
     
     if ! command -v mysql &> /dev/null; then
@@ -179,7 +179,7 @@ fi
 
 rm -rf "$ROOT_DIR"
 
-if [ ! -d "$ROOT_DIR" ]; then
+if [[ ! -d "$ROOT_DIR" ]]; then
     echo -e "${GREEN}Da xoa thu muc $ROOT_DIR thanh cong.${NC}"
 else
     echo -e "${RED}Loi: Khong the xoa thu muc $ROOT_DIR. Kiem tra lai quyen hạn (chattr?).${NC}"
@@ -195,13 +195,13 @@ fi
 CERT_PATH="/var/lib/caddy/.local/share/caddy/certificates/acme-v02.api.letsencrypt.org-directory"
 
 # G.1. Kiểm tra xem biến DOMAIN có rỗng không? (thừa, nhưng thôi cho chắc!)
-if [ -z "$DOMAIN" ]; then
+if [[ -z "$DOMAIN" ]]; then
     echo "LOI: Bien ten mien bi rong! Dung lai de bao ve he thong."
     exit 1
 fi
 
 # G.2. Kiểm tra xem thư mục cert của tên miền đó có tồn tại không rồi mới xóa
-if [ -d "$CERT_PATH/$DOMAIN" ]; then
+if [[ -d "$CERT_PATH/$DOMAIN" ]]; then
     echo "Dang xoa chung chi cu cua $DOMAIN..."
     rm -rf "$CERT_PATH/$DOMAIN"
 else
@@ -219,13 +219,13 @@ else
 fi
 
 # Phòng thủ
-if [ -z "$RED_DOMAIN" ]; then
+if [[ -z "$RED_DOMAIN" ]]; then
     echo "LOI: Bien ten mien bi rong! Dung lai de bao ve he thong."
     exit 1
 fi
 
 # Xóa https của cả tên miền chuyển hướng nếu nó có
-if [ -d "$CERT_PATH/$RED_DOMAIN" ]; then
+if [[ -d "$CERT_PATH/$RED_DOMAIN" ]]; then
     echo "Dang xoa chung chi cu cua $RED_DOMAIN..."
     rm -rf "$CERT_PATH/$RED_DOMAIN"
 fi
@@ -240,7 +240,7 @@ fi
 CADDY_FILE="/etc/caddy/Caddyfile"
 
 # Kiểm tra nếu người dùng chưa nhập domain
-if [ -z "$DOMAIN" ]; then
+if [[ -z "$DOMAIN" ]]; then
     echo "Loi: Ten mien trong. Thoat chuong trinh, cau hinh trong Caddyfile chua duoc xoa."
     exit 1
 fi
