@@ -173,14 +173,30 @@ fi
 # +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
-# 7. HOÀN TẤT
+# 7. Tìm cổng SSH 
+# grep tim dong "port", head lay dong dau, awk lay cot 2, || true chong loi
+DETECTED_PORT=$(sshd -T 2>/dev/null | grep "^port " | head -n 1 | awk '{print $2}' || true)
+
+# B2: Neu B1 that bai (rong), fallback sang grep file config
+if [[ -z "$DETECTED_PORT" ]]; then
+    DETECTED_PORT=$(grep -i "^[[:space:]]*Port" /etc/ssh/sshd_config | head -n 1 | awk '{print $2}' || true)
+fi
+
+# B3: Neu ca 2 deu that bai, mac dinh la 22
+SSH_PORT=${DETECTED_PORT:-22}
+# -------------------------------------------------------------------------------------------------------------------------------
+
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
+# 8. HOÀN TẤT
 echo ""
 echo "========================================================"
 echo "✅ TAO TAI KHOAN SFTP THANH CONG!"
 echo "========================================================"
 echo "📂 Thong tin ket noi FileZilla / WinSCP:"
 echo "   - Host:       (IP VPS cua ban)"
-echo "   - Port:       22"
+echo "   - Port:       $SSH_PORT"
 echo "   - Protocol:   SFTP (SSH File Transfer Protocol)"
 echo "   - User:       $SFTP_USER"
 echo "   - Password:   (Mat khau ban vua nhap)"
