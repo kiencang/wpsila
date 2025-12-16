@@ -51,23 +51,22 @@ ufw --force reset > /dev/null
 ufw default deny incoming
 ufw default allow outgoing
 
-# --- PHÁT HIỆN SSH PORT CHÍNH XÁC (FIXED) ---
-# Sử dụng sshd -T để lấy cấu hình Effective (bao gồm cả file include)
-# Nếu lệnh sshd lỗi, fallback về mặc định 22
-# Ưu tiên 1: Hỏi trực tiếp tiến trình SSH (Chính xác 100%)
-DETECTED_PORT=$(sshd -T 2>/dev/null | grep "^port " | awk '{print $2}' | head -n 1 || true)
+# --- TỰ ĐỘNG PHÁT HIỆN CỔNG SSH ---
+echo -e "${GREEN}[INFO] Dang phat hien SSH Port...${NC}"
 
-# Ưu tiên 2: Nếu lệnh trên rỗng (hiếm gặp), mới dùng cách grep file (Backup)
+# B1: Thu dung sshd -T (Chinh xac nhat)
+# grep tim dong "port", head lay dong dau, awk lay cot 2, || true chong loi
+DETECTED_PORT=$(sshd -T 2>/dev/null | grep "^port " | head -n 1 | awk '{print $2}' || true)
+
+# B2: Neu B1 that bai (rong), fallback sang grep file config
 if [[ -z "$DETECTED_PORT" ]]; then
     DETECTED_PORT=$(grep -i "^[[:space:]]*Port" /etc/ssh/sshd_config | head -n 1 | awk '{print $2}' || true)
 fi
 
-# Nếu cả 2 đều rỗng -> Mặc định 22
+# B3: Neu ca 2 deu that bai, mac dinh la 22
 SSH_PORT=${DETECTED_PORT:-22}
 
-echo -e "${YELLOW}   -> Phat hien SSH Port thuc te: ${SSH_PORT}${NC}"
-
-# Mở port SSH (Limit để chống brute-force cơ bản)
+echo -e "${YELLOW}   -> Phat hien SSH Port dang chay: ${SSH_PORT}${NC}"
 ufw limit "$SSH_PORT"/tcp comment 'SSH Port'
 
 # Mở Web Ports
