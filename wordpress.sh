@@ -138,7 +138,7 @@ else
 fi
 
 # Phân quyền để quản lý chặt file wp-config
-if [ -f "$WP_CONFIG" ]; then
+if [[ -f "$WP_CONFIG" ]]; then
     chmod 660 $WP_CONFIG
 fi
 

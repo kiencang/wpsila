@@ -81,7 +81,7 @@ SCRIPT_WPSILA_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd 
 WPSILA_CONFIG_FILE="$SCRIPT_WPSILA_DIR/wpsila.conf"
 
 # Dx3. Kiểm tra và nạp file config
-if [ -f "$WPSILA_CONFIG_FILE" ]; then
+if [[ -f "$WPSILA_CONFIG_FILE" ]]; then
     # Lệnh 'source' hoặc dấu chấm '.' sẽ đọc biến từ file kia vào script này
     source "$WPSILA_CONFIG_FILE"
     echo -e "${GREEN}Da tim thay file cau hinh: ${WPSILA_CONFIG_FILE}${NC}"
@@ -117,7 +117,7 @@ WEB_PASS=$(openssl rand -base64 12)
 
 # --- 1. KIỂM TRA MÔI TRƯỜNG ---
 echo "[1/4] Kiem tra moi truong PHP ${PHP_VER}..."
-if [ ! -S "$PHP_SOCKET" ]; then
+if [[ ! -S "$PHP_SOCKET" ]]; then
     echo "Loi: Khong tim thay socket tai $PHP_SOCKET."
     exit 1
 fi
@@ -235,7 +235,7 @@ EOF
 		
 		echo -e "${YELLOW}Dang khoi phuc lai file ban dau...${NC}"
 		
-		if [ -f "$BACKUP_FILE" ]; then
+		if [[ -f "$BACKUP_FILE" ]]; then
 			cp "$BACKUP_FILE" "$CADDY_FILE"
 			echo "Da khoi phuc lai file goc an toan."
 		fi

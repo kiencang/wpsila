@@ -45,7 +45,7 @@ JAIL_DIR="/var/www/$DOMAIN"
 
 # -------------------------------------------------------------------------------------------------------------------------------
 # 3. KIỂM TRA ĐẦU VÀO
-if [ ! -d "$JAIL_DIR" ]; then
+if [[ ! -d "$JAIL_DIR" ]]; then
     echo "Loi: Thu muc $JAIL_DIR KHONG ton tai!"
     echo "Hay chac chan trang web co ton tai."
     exit 1
@@ -97,7 +97,7 @@ else
 fi
 
 # Áp dụng cấu hình SSH mới, sử dụng reload, đừng sử dụng restart vì nó có khả năng ngắt kết nối giữa chừng.
-if [ $NEED_RESTART -eq 1 ]; then
+if [[ $NEED_RESTART -eq 1 ]]; then
     # Kiểm tra cú pháp file config trước (Safety First)
     if sshd -t; then
         systemctl reload ssh
@@ -141,7 +141,7 @@ read -p " -> Nhap lai mat khau: " SFTP_PASS_CONFIRM < /dev/tty
 echo ""
 
 # Kiểm tra khớp mật khẩu
-if [ "$SFTP_PASS" != "$SFTP_PASS_CONFIRM" ]; then
+if [[ "$SFTP_PASS" != "$SFTP_PASS_CONFIRM" ]]; then
     echo "Loi: Mat khau nhap lai khong khop!"
     # Xóa user vừa tạo để tránh rác
     userdel "$SFTP_USER"
@@ -162,7 +162,7 @@ echo "Da thiet lap mat khau thanh cong."
 CURRENT_OWNER=$(stat -c '%U:%G' $JAIL_DIR)
 CURRENT_PERM=$(stat -c '%a' $JAIL_DIR)
 
-if [ "$CURRENT_OWNER" != "root:root" ] || [ "$CURRENT_PERM" != "755" ]; then
+if [[ "$CURRENT_OWNER" != "root:root" ]] || [[ "$CURRENT_PERM" != "755" ]]; then
     echo "Phat hien sai quyen thu muc vo. Dang sua lai cho dung chuan Chroot..."
     chown root:root "$JAIL_DIR"
     chmod 755 "$JAIL_DIR"
