@@ -8,16 +8,28 @@ echo -e "${GREEN}Dang tao Database va User cho WordPress...${NC}"
 # F1. DB Name (Thoải mái độ dài, MySQL cho phép 64 ký tự)
 # Kết quả ví dụ: wp_a1b2c3d4e5f67890
 GEN_DB_NAME="wp_$(openssl rand -hex 8)"
+# -------------------------------------------------------------------------------------------------------------------------------
 
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
 # F2. User Name (Nên giữ <= 16 ký tự để tương thích mọi phiên bản MySQL)
 # Giảm xuống hex 7 (14 ký tự) + "u_" (2 ký tự) = 16 ký tự
 # Kết quả ví dụ: u_a1b2c3d4e5f6g7
 GEN_DB_USER="u_$(openssl rand -hex 7)"
+# -------------------------------------------------------------------------------------------------------------------------------
 
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
 # F3. Password (32 ký tự là rất mạnh rồi)
 # Kết quả ví dụ: p_890123456789abcdef0123456789abcd
 GEN_DB_PASS="p_$(openssl rand -hex 16)"
+# -------------------------------------------------------------------------------------------------------------------------------
 
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
 # F4. Tạo bảng trong MariaDB
 # Sử dụng biến đã tạo ở trên vào câu lệnh SQL
 # Lưu ý: Vì biến chỉ chứa chữ cái thường và số nên không cần escape phức tạp, rất an toàn.
@@ -37,7 +49,11 @@ mariadb -e "GRANT ALL PRIVILEGES ON ${GEN_DB_NAME}.* TO '${GEN_DB_USER}'@'127.0.
 
 # 4. Flush
 mariadb -e "FLUSH PRIVILEGES;"
+# -------------------------------------------------------------------------------------------------------------------------------
 
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
 # F5. Xuất thông tin
 # Lưu thông tin vào file để tra cứu sau này (Quan trọng vì mật khẩu là ngẫu nhiên)
 CRED_FILE="$HOME/wpp.txt"
@@ -61,7 +77,11 @@ chmod 600 "$CRED_FILE" # Chỉ user hiện tại mới đọc được file này
 # Để xem lại nội dung dùng lệnh sau trên terminal: cat ~/wpp.txt (đã bổ sung vào menu để người dùng cuối xem)
 # Copy bằng cách bôi đen ở terminal, sau đó paste (ctrl + V) như bình thường ở giao diện cài đặt
 # Sau khi cài xong WordPress cần xóa file này đi bằng lệnh: rm ~/wpp.txt
+# -------------------------------------------------------------------------------------------------------------------------------
 
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
 echo -e "${GREEN}>>> Cai dat hoan tat!${NC}"
 echo -e "${YELLOW}Thong tin Database (Da duoc luu tai $CRED_FILE):${NC}"
 echo -e "  - Database: ${GEN_DB_NAME}"
@@ -71,3 +91,4 @@ echo -e "${YELLOW}Kiem tra PHP version:${NC}"
 php -v
 echo -e "${GREEN}>>> Buoc tiep theo: Cai dat WordPress.${NC}"
 sleep 2
+# -------------------------------------------------------------------------------------------------------------------------------
