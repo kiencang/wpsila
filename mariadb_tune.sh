@@ -31,7 +31,7 @@ echo "- Tong RAM he thong: ${total_ram_mb} MB"
 # Phân tách cấu hình tùy chỉnh ra khỏi cấu hình hệ thống
 CONF_DIR="/etc/mysql/mariadb.conf.d"
 
-if [ ! -d "$CONF_DIR" ]; then
+if [[ ! -d "$CONF_DIR" ]]; then
     echo "Loi: Khong tim thay thu muc cau hinh MariaDB ($CONF_DIR)."
     exit 1
 fi

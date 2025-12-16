@@ -29,7 +29,7 @@ SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 WPSILA_CONFIG_FILE="$SCRIPT_DIR/wpsila.conf"
 
 # 3. Kiểm tra và nạp file config
-if [ -f "$WPSILA_CONFIG_FILE" ]; then
+if [[ -f "$WPSILA_CONFIG_FILE" ]]; then
     # Lệnh 'source' hoặc dấu chấm '.' sẽ đọc biến từ file kia vào script này
     source "$WPSILA_CONFIG_FILE"
     echo -e "${GREEN}Da tim thay file cau hinh: ${WPSILA_CONFIG_FILE}${NC}"
@@ -55,7 +55,7 @@ fi
 
 CONF_DIR="/etc/php/${PHP_VER}/fpm/pool.d"
 
-if [ ! -d "$CONF_DIR" ]; then
+if [[ ! -d "$CONF_DIR" ]]; then
     echo "Khong tim thay thu muc cau hinh: $CONF_DIR"
     exit 1
 fi
@@ -75,7 +75,7 @@ echo "- Tong RAM: ${TOTAL_RAM} MB"
 # Công thức dựa trên mức tiêu thụ trung bình 50-60MB/tiến trình PHP
 # Dành lại RAM cho OS và MySQL.
 
-if [ "$TOTAL_RAM" -le 1500 ]; then
+if [[ "$TOTAL_RAM" -le 1500 ]]; then
     # --- CẤU HÌNH CHO VPS ~1GB RAM ---
     RAM_PROFILE="1GB (Low End)"
     PM_MAX_CHILDREN=5
@@ -83,7 +83,7 @@ if [ "$TOTAL_RAM" -le 1500 ]; then
     PM_MIN_SPARE=1
     PM_MAX_SPARE=3
 
-elif [ "$TOTAL_RAM" -le 3500 ]; then
+elif [[ "$TOTAL_RAM" -le 3500 ]]; then
     # --- CẤU HÌNH CHO VPS ~2GB RAM ---
     RAM_PROFILE="2GB (Entry Level)"
     PM_MAX_CHILDREN=15
@@ -91,7 +91,7 @@ elif [ "$TOTAL_RAM" -le 3500 ]; then
     PM_MIN_SPARE=2
     PM_MAX_SPARE=6
 
-elif [ "$TOTAL_RAM" -le 7000 ]; then
+elif [[ "$TOTAL_RAM" -le 7000 ]]; then
     # --- CẤU HÌNH CHO VPS ~4GB RAM ---
     RAM_PROFILE="4GB (Mid Range)"
     PM_MAX_CHILDREN=40

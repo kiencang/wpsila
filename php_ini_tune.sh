@@ -29,7 +29,7 @@ SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 WPSILA_CONFIG_FILE="$SCRIPT_DIR/wpsila.conf"
 
 # 3. Kiểm tra và nạp file config
-if [ -f "$WPSILA_CONFIG_FILE" ]; then
+if [[ -f "$WPSILA_CONFIG_FILE" ]]; then
     # Lệnh 'source' hoặc dấu chấm '.' sẽ đọc biến từ file kia vào script này
     source "$WPSILA_CONFIG_FILE"
     echo -e "${GREEN}Da tim thay file cau hinh: ${WPSILA_CONFIG_FILE}${NC}"
@@ -57,7 +57,7 @@ fi
 CONF_DIR="/etc/php/${PHP_VER}/fpm/conf.d"
 
 # Kiểm tra xem thư mục có tồn tại không
-if [ ! -d "$CONF_DIR" ]; then
+if [[ ! -d "$CONF_DIR" ]]; then
     echo "KHONG tim thay thu muc cau hinh: $CONF_DIR"
     echo ">> Script nay chi ho tro Ubuntu/Debian voi cau hinh thu muc chuan."
     exit 1
