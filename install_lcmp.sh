@@ -6,6 +6,7 @@
 # a. install_caddyserver.sh
 # b. install_php.sh
 # c. install_mariadb.sh
+# wpsila.conf chứa thông tin phiên bản PHP & MariaDB
 # =========================================
 
 # Dừng script ngay lập tức nếu có lệnh bị lỗi
@@ -27,7 +28,9 @@ NC='\033[0m' # No Color (ngắt màu)
 
 # -------------------------------------------------------------------------------------------------------------------------------
 # B. CẤU HÌNH & ĐƯỜNG DẪN
+# Thiết lập các giá trị mặc định, phòng trường hợp config lỗi
 DEFAULT_PHP_VER="8.3"
+DEFAULT_MARIADB_VER="10.11"
 
 # B2. Định nghĩa đường dẫn (Sử dụng cách an toàn nhất, không phụ thuộc realpath)
 SCRIPT_WPSILA_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
@@ -46,6 +49,7 @@ fi
 # B4. Chốt phiên bản & Export biến
 # Export ngay lập tức để toàn bộ quy trình bên dưới nhận diện được
 export PHP_VER="${PHP_VER:-$DEFAULT_PHP_VER}"
+export MARIADB_VER="${MARIADB_VER:-$DEFAULT_MARIADB_VER}"
 export SCRIPT_WPSILA_DIR
 
 echo -e "Phien ban PHP se cai dat: ${GREEN}$PHP_VER${NC}"

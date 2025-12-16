@@ -11,9 +11,9 @@ mkdir -p /etc/apt/keyrings
 curl -o /etc/apt/keyrings/mariadb-keyring.pgp 'https://mariadb.org/mariadb_release_signing_key.pgp'
 
 # File source list (Tự động detect OS codename: jammy (22.04) or noble (24.04))
-# Sử dụng MariaDB 10.11 (Bản LTS rất ổn định cho WordPress hiện tại)
+# Sử dụng MariaDB 10.11 hoặc từ config (Bản LTS rất ổn định cho WordPress hiện tại)
 . /etc/os-release
-echo "deb [signed-by=/etc/apt/keyrings/mariadb-keyring.pgp] https://deb.mariadb.org/10.11/ubuntu $VERSION_CODENAME main" | tee /etc/apt/sources.list.d/mariadb.list
+echo "deb [signed-by=/etc/apt/keyrings/mariadb-keyring.pgp] https://deb.mariadb.org/${MARIADB_VER}/ubuntu $VERSION_CODENAME main" | tee /etc/apt/sources.list.d/mariadb.list
 apt-get update
 
 # Cài đặt MariaDB
