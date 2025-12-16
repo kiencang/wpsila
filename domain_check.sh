@@ -3,11 +3,11 @@
 # File này được nhúng vào script install_wp.sh
 # -----------------------------------------------------------
 
-if [ "$INSTALL_TYPE" != "subdomain" ]; then
+if [[ "$INSTALL_TYPE" != "subdomain" ]]; then
 	echo -e "${GREEN}>>> Vui long nhap ten mien cua ban (vi du: example.com):${NC}"
 fi
 
-if [ "$INSTALL_TYPE" == "subdomain" ]; then
+if [[ "$INSTALL_TYPE" == "subdomain" ]]; then
 	echo -e "${GREEN}>>> Vui long nhap SubDomain cua ban (vi du: hello.example.com):${NC}"
 fi
 
@@ -56,7 +56,7 @@ done
 echo "Dang kiem tra an toan he thong..."
 
 # Không phải subdomain mới cần xác định chuyển hướng
-if [ "$INSTALL_TYPE" != "subdomain" ]; then
+if [[ "$INSTALL_TYPE" != "subdomain" ]]; then
 	# Xác định luôn dạng chuyển hướng của tên miền để tiện kiểm tra thư mục web gốc
 	if [[ "$DOMAIN" == www.* ]]; then
 		RED_DOMAIN="${DOMAIN#www.}"
@@ -69,7 +69,7 @@ fi
 # Thư mục tên miền người dùng nhập vào
 WEB_ROOT_DIR_CHECK="/var/www/$DOMAIN"
 
-if [ "$INSTALL_TYPE" != "subdomain" ]; then
+if [[ "$INSTALL_TYPE" != "subdomain" ]]; then
 	# Dự phòng thư mục tên miền chuyển hướng
 	# Chỉ phải check khi kiểu cài đặt không phải là dạng subdomain
 	WEB_ROOT_DIR_CHECK_RED="/var/www/$RED_DOMAIN"
@@ -79,7 +79,7 @@ fi
 CADDY_CONF_CHECK="/etc/caddy/Caddyfile" 
 
 # 1. Kiểm tra trong Caddyfile (Deep Scan Check)
-if [ -f "$CADDY_CONF_CHECK" ]; then
+if [[ -f "$CADDY_CONF_CHECK" ]]; then
     # Regex Explained:
     # (^|[[:space:]/])      : Bắt đầu dòng, khoảng trắng hoặc dấu /
     # $DOMAIN               : Tên miền
@@ -94,7 +94,7 @@ if [ -f "$CADDY_CONF_CHECK" ]; then
 fi
 
 # 2. Kiểm tra thư mục Web
-if [ -d "$WEB_ROOT_DIR_CHECK" ]; then
+if [[ -d "$WEB_ROOT_DIR_CHECK" ]]; then
     echo -e "${RED}NGUY HIEM: Thu muc web [$WEB_ROOT_DIR_CHECK] da ton tai!${NC}"
     echo -e "Viec tiep tuc co the ghi de du lieu cu."
     echo -e "Vui long xoa thu muc thu cong hoac chon ten mien khac."
@@ -102,9 +102,9 @@ if [ -d "$WEB_ROOT_DIR_CHECK" ]; then
 fi
 
 # Không phải dạng subdomain mới cần kiểm tra
-if [ "$INSTALL_TYPE" != "subdomain" ]; then
+if [[ "$INSTALL_TYPE" != "subdomain" ]]; then
 
-	if [ -d "$WEB_ROOT_DIR_CHECK_RED" ]; then
+	if [[ -d "$WEB_ROOT_DIR_CHECK_RED" ]]; then
 		echo -e "${RED}NGUY HIEM: Thu muc web [$WEB_ROOT_DIR_CHECK_RED] da ton tai!${NC}"
 		echo -e "Viec tiep tuc co the gay nham lan."
 		echo -e "Vui long xoa thu muc thu cong hoac chon ten mien khac."
@@ -117,13 +117,13 @@ echo -e "${GREEN}Kiem tra an toan hoan tat.${NC}"
 # -----------------------------------------------
 
 # --- Script tiếp tục chạy từ đây khi dữ liệu đã đúng ---
-if [ "$INSTALL_TYPE" != "subdomain" ]; then
+if [[ "$INSTALL_TYPE" != "subdomain" ]]; then
 	echo -e "Thanh cong! Ten mien duoc chap nhan: $DOMAIN"
 	echo -e "${GREEN}>>> Dang tien hanh cai dat cho domain: ${YELLOW}$DOMAIN${NC}"
 fi
 
 # Thông báo cho trường hợp là subdomain
-if [ "$INSTALL_TYPE" == "subdomain" ]; then
+if [[ "$INSTALL_TYPE" == "subdomain" ]]; then
 	echo -e "Thanh cong! SubDomain duoc chap nhan: $DOMAIN"
 	echo -e "${GREEN}>>> Dang tien hanh cai dat cho subdomain: ${YELLOW}$DOMAIN${NC}"
 fi
