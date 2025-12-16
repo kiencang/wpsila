@@ -4,6 +4,7 @@
 # -----------------------------------------------------------
 echo -e "${GREEN}Dang tao Database va User cho WordPress...${NC}"
 
+# -------------------------------------------------------------------------------------------------------------------------------
 # --- CẤU HÌNH BIẾN NGẪU NHIÊN ---
 # F1. DB Name (Thoải mái độ dài, MySQL cho phép 64 ký tự)
 # Kết quả ví dụ: wp_a1b2c3d4e5f67890
@@ -34,20 +35,20 @@ GEN_DB_PASS="p_$(openssl rand -hex 16)"
 # Sử dụng biến đã tạo ở trên vào câu lệnh SQL
 # Lưu ý: Vì biến chỉ chứa chữ cái thường và số nên không cần escape phức tạp, rất an toàn.
 
-# 1. Tạo Database
+# 4.1. Tạo Database
 mariadb -e "CREATE DATABASE IF NOT EXISTS ${GEN_DB_NAME} DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
 
-# 2. Tạo User cho đường Socket (localhost) - ĐỂ TỐI ƯU HIỆU NĂNG
+# 4.2. Tạo User cho đường Socket (localhost) - ĐỂ TỐI ƯU HIỆU NĂNG
 # Dành cho trường hợp wp-config dùng 'localhost'
 mariadb -e "CREATE USER IF NOT EXISTS '${GEN_DB_USER}'@'localhost' IDENTIFIED BY '${GEN_DB_PASS}';"
 mariadb -e "GRANT ALL PRIVILEGES ON ${GEN_DB_NAME}.* TO '${GEN_DB_USER}'@'localhost';"
 
-# 3. Tạo User cho đường TCP/IP (127.0.0.1) - ĐỂ TƯƠNG THÍCH TUYỆT ĐỐI
+# 4.3. Tạo User cho đường TCP/IP (127.0.0.1) - ĐỂ TƯƠNG THÍCH TUYỆT ĐỐI
 # Dành cho trường hợp wp-config dùng '127.0.0.1' và tương thích với skip-name-resolve
 mariadb -e "CREATE USER IF NOT EXISTS '${GEN_DB_USER}'@'127.0.0.1' IDENTIFIED BY '${GEN_DB_PASS}';"
 mariadb -e "GRANT ALL PRIVILEGES ON ${GEN_DB_NAME}.* TO '${GEN_DB_USER}'@'127.0.0.1';"
 
-# 4. Flush
+# 4.4. Flush
 mariadb -e "FLUSH PRIVILEGES;"
 # -------------------------------------------------------------------------------------------------------------------------------
 
