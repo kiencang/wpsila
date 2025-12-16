@@ -43,33 +43,41 @@ apt-get install caddy -y
 systemctl enable caddy
 systemctl start caddy
 
-# 4. Cấu hình Firewall (UFW) - Xử lý thông minh
+# 4. Cấu hình Firewall (UFW) - AN TOÀN CAO
 echo -e "${GREEN}[4/5] Cau hinh bao mat UFW...${NC}"
 
-# Reset UFW về mặc định để tránh quy tắc rác
+# Reset UFW (Cẩn thận: Chỉ nên dùng khi cài mới)
 ufw --force reset > /dev/null
-
-# Chính sách mặc định: Chặn tất cả vào, mở tất cả ra
 ufw default deny incoming
 ufw default allow outgoing
 
-# --- TỰ ĐỘNG PHÁT HIỆN CỔNG SSH ---
-# Lấy cổng SSH hiện tại từ file config, nếu không tìm thấy thì mặc định là 22
-# Dùng grep -i và regex bắt khoảng trắng để an toàn tuyệt đối với file config
-SSH_PORT=$(grep -i "^[[:space:]]*Port" /etc/ssh/sshd_config | head -n 1 | awk '{print $2}')
-SSH_PORT=${SSH_PORT:-22}
+# --- PHÁT HIỆN SSH PORT CHÍNH XÁC (FIXED) ---
+# Sử dụng sshd -T để lấy cấu hình Effective (bao gồm cả file include)
+# Nếu lệnh sshd lỗi, fallback về mặc định 22
+# Ưu tiên 1: Hỏi trực tiếp tiến trình SSH (Chính xác 100%)
+DETECTED_PORT=$(sshd -T 2>/dev/null | grep "^port " | awk '{print $2}' | head -n 1 || true)
 
-echo -e "${YELLOW}   -> Phat hien SSH Port dang chay: ${SSH_PORT}${NC}"
+# Ưu tiên 2: Nếu lệnh trên rỗng (hiếm gặp), mới dùng cách grep file (Backup)
+if [[ -z "$DETECTED_PORT" ]]; then
+    DETECTED_PORT=$(grep -i "^[[:space:]]*Port" /etc/ssh/sshd_config | head -n 1 | awk '{print $2}' || true)
+fi
+
+# Nếu cả 2 đều rỗng -> Mặc định 22
+SSH_PORT=${DETECTED_PORT:-22}
+
+echo -e "${YELLOW}   -> Phat hien SSH Port thuc te: ${SSH_PORT}${NC}"
+
+# Mở port SSH (Limit để chống brute-force cơ bản)
 ufw limit "$SSH_PORT"/tcp comment 'SSH Port'
 
-# Mở cổng Web
+# Mở Web Ports
 ufw allow 80/tcp comment 'HTTP'
 ufw allow 443/tcp comment 'HTTPS'
-# Mở cổng HTTP/3 (QUIC) cho Caddy (UDP 443) - Caddy hỗ trợ rất mạnh cái này
-ufw allow 443/udp comment 'HTTPS QUIC'
+ufw allow 443/udp comment 'HTTPS QUIC' # Rất quan trọng cho tốc độ Caddy
 
 # Kích hoạt UFW
-ufw --force enable
+# Dùng --force để không hỏi confirmation (Y/n) làm ngắt script
+echo "y" | ufw enable > /dev/null
 
 # 5. Kiểm tra trạng thái
 echo -e "${GREEN}[5/5] Kiem tra trang thai dich vu...${NC}"
