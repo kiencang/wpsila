@@ -78,7 +78,7 @@ SCRIPT_WPSILA_DIR="$(dirname "$(realpath "$0")")"
 WPSILA_CONFIG_FILE="$SCRIPT_WPSILA_DIR/wpsila.conf"
 
 # D3. Kiểm tra và nạp file config
-if [ -f "$WPSILA_CONFIG_FILE" ]; then
+if [[ -f "$WPSILA_CONFIG_FILE" ]]; then
     # Lệnh 'source' hoặc dấu chấm '.' sẽ đọc biến từ file kia vào script này
     source "$WPSILA_CONFIG_FILE"
     echo -e "${GREEN}Da tim thay file cau hinh: ${WPSILA_CONFIG_FILE}${NC}"
@@ -102,7 +102,7 @@ sleep 2
 DOMAIN_CHECK="$SCRIPT_WPSILA_DIR/domain_check.sh"
 
 # Nhúng file kiểm tra tên miền nhập vào
-if [ -f "$DOMAIN_CHECK" ]; then    
+if [[ -f "$DOMAIN_CHECK" ]]; then    
     # Lệnh source quan trọng để nhúng trực tiếp vào file chính
     source "$DOMAIN_CHECK"
 else 
@@ -123,7 +123,7 @@ echo "--------------------------------------------------------------------------
 DATABASE_USER_WP="$SCRIPT_WPSILA_DIR/database_user_wp.sh"
 
 # Nhúng cài đặt database & user vào
-if [ -f "$DATABASE_USER_WP" ]; then    
+if [[ -f "$DATABASE_USER_WP" ]]; then    
     # Lệnh source quan trọng để nhúng trực tiếp vào file chính
     source "$DATABASE_USER_WP"
 else 
@@ -143,7 +143,7 @@ echo "--------------------------------------------------------------------------
 WORDPRESS_FILE_TEMP="$SCRIPT_WPSILA_DIR/wordpress.sh"
 
 # Nhúng cài đặt WordPress vào, kiểm tra sự tồn tại để đảm bảo không lỗi
-if [ -f "$WORDPRESS_FILE_TEMP" ]; then    
+if [[ -f "$WORDPRESS_FILE_TEMP" ]]; then    
     # Lệnh source quan trọng để nhúng trực tiếp vào file chính
     source "$WORDPRESS_FILE_TEMP"
 else 
@@ -167,7 +167,7 @@ MARKER="#wpsila_kiencang"
 echo "Domain chinh: $DOMAIN"
 
 # Không phải subdomian mới cần thông báo
-if [ "$INSTALL_TYPE" != "subdomain" ]; then
+if [[ "$INSTALL_TYPE" != "subdomain" ]]; then
 	echo "Domain chuyen huong: $RED_DOMAIN"
 fi
 
@@ -177,12 +177,12 @@ fi
 CADDY_FILE_TEMP="$SCRIPT_WPSILA_DIR/caddyfile.sh"
 
 # Nếu là kiểu subdomain thì chọn file caddy tương ứng
-if [ "$INSTALL_TYPE" == "subdomain" ]; then
+if [[ "$INSTALL_TYPE" == "subdomain" ]]; then
 	CADDY_FILE_TEMP="$SCRIPT_WPSILA_DIR/caddyfile_subdomain.sh"
 fi
 
 # Nhúng caddyfile vào, kiểm tra sự tồn tại để đảm bảo không lỗi
-if [ -f "$CADDY_FILE_TEMP" ]; then    
+if [[ -f "$CADDY_FILE_TEMP" ]]; then    
     # Lệnh source quan trọng để nhúng trực tiếp vào file chính
     source "$CADDY_FILE_TEMP"
 else 
@@ -213,7 +213,7 @@ rotate_caddy_backup() {
 }
 
 # Kiểm tra nếu file tồn tại thì mới backup để tránh lỗi
-if [ -f "$CADDY_FILE" ]; then
+if [[ -f "$CADDY_FILE" ]]; then
     echo "Dang tao file backup: $BACKUP_FILE"
     cp "$CADDY_FILE" "$BACKUP_FILE"
 	
@@ -250,7 +250,7 @@ if ! caddy validate --config "$CADDY_FILE" --adapter caddyfile > /dev/null 2>&1;
     
     echo -e "${YELLOW}Dang khoi phuc lai file ban dau...${NC}"
     
-    if [ -f "$BACKUP_FILE" ]; then
+    if [[ -f "$BACKUP_FILE" ]]; then
         cp "$BACKUP_FILE" "$CADDY_FILE"
         echo "Da khoi phuc lai file goc an toan."
     else
