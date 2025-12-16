@@ -173,9 +173,9 @@ download_file "wpsila_menu.sh" "$INSTALL_DIR/wpsila_menu.sh"
 # -------------------------
 # Tải về các file phục vụ cho cài đặt LCMP
 download_file "install_lcmp.sh" "$INSTALL_DIR/install_lcmp.sh"
-download_file "caddy_web_server.sh" "$INSTALL_DIR/install_caddyserver.sh"
-download_file "php_mariadb.sh" "$INSTALL_DIR/install_php.sh"
-download_file "php_mariadb.sh" "$INSTALL_DIR/install_mariadb.sh"
+download_file "install_caddyserver.sh" "$INSTALL_DIR/install_caddyserver.sh"
+download_file "install_php.sh" "$INSTALL_DIR/install_php.sh"
+download_file "install_mariadb.sh" "$INSTALL_DIR/install_mariadb.sh"
 # -------------------------
 
 # -------------------------
