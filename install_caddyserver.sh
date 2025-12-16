@@ -1,6 +1,6 @@
 # -----------------------------------------------------------
 # MODULE: Cài đặt Caddy Web Server
-# File: caddy_web_server.sh
+# File: install_caddyserver.sh
 # File này được nhúng vào script install_lcmp.sh
 # Tuân thủ hướng dẫn: https://caddyserver.com/docs/install
 # -----------------------------------------------------------

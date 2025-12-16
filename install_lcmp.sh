@@ -190,7 +190,7 @@ EOF
 echo "Don dep rac he thong..."
 apt-get autoremove -y
 apt-get clean
-rm -rf /var/lib/apt/lists/*
+# rm -rf /var/lib/apt/lists/*
 
 echo "--------------------------------------------------------"
 echo -e "${GREEN}Cài đặt LCMP hoàn tất!${NC}"

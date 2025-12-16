@@ -1,6 +1,6 @@
 # -----------------------------------------------------------
 # MODULE: Cài đặt PHP Repo ondrej
-# File: php.sh
+# File: install_php.sh
 # File này được nhúng vào script install_lcmp.sh
 # -----------------------------------------------------------
 
