@@ -23,6 +23,16 @@ VERSION="v0.1.3"
 # +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
+# A. Màu sắc cho thông báo
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
+NC='\033[0m' # No Color (ngắt màu)
+# -------------------------------------------------------------------------------------------------------------------------------
+
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
 # --- Cấu hình ---
 # Thư mục lưu các file cài đặt
 # Thêm tiền tố kiencang để giảm tối đa xác suất trùng tên
@@ -132,7 +142,7 @@ download_file() {
 
     # 1. Tien hang tai file
     if ! wget -q --no-cache "$url" -O "$dest"; then
-        echo -e "\033[0;31m[DOWNLOAD FAIL]\033[0m Khong the tai: $url"
+        echo -e "${RED}[DOWNLOAD FAIL]${NC} Khong the tai: $url"
         rm -f "$dest"
         error_exit "Loi ket noi hoac duong dan khong chinh xac."
     fi
@@ -149,11 +159,11 @@ download_file() {
         actual_checksum=$(sha256sum "$dest" | awk '{print $1}')
 
         if [[ "$actual_checksum" != "$expected_checksum" ]]; then
-            echo -e "\033[0;31m[CHECKSUM FAIL]\033[0m Tap tin $filename bi thay doi hoac bi hong!"
+            echo -e "${RED}[CHECKSUM FAIL]${NC} Tap tin $filename bi thay doi hoac bi hong!"
             rm -f "$dest"
             error_exit "Checksum khong khop. Viec cai dat bi huy bo."
         fi
-        echo -e "\033[0;32m[CHECKSUM OK]\033[0m $filename"
+        echo -e "${GREEN}[CHECKSUM OK]${NC} $filename"
     fi
 }
 # -------------------------------------------------------------------------------------------------------------------------------
@@ -241,8 +251,8 @@ ln -sf "$INSTALL_DIR/wpsila_menu.sh" "$BIN_LINK"
 # -------------------------------------------------------------------------------------------------------------------------------
 # 8. Hoàn tất
 if [[ -x "$BIN_LINK" ]]; then
-    echo -e "\033[0;32m=== CAI DAT THANH CONG! ===\033[0m"
-    echo "Xin chuc mung ban! Hay go lenh: wpsila de bat dau su dung."
+    echo -e "${GREEN}=== CAI DAT THANH CONG! ===${NC}"
+    echo "Xin chuc mung ban! Hay go lenh: ${YELLOW}wpsila${NC} de bat dau su dung."
 else
     error_exit "Loi khi tao lenh shortcut wpsila."
 fi
