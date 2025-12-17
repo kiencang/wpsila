@@ -25,7 +25,8 @@ VERSION="v0.1.3"
 # -------------------------------------------------------------------------------------------------------------------------------
 # --- Cấu hình ---
 # Thư mục lưu các file cài đặt
-INSTALL_DIR="/opt/wpsila"
+# Thêm tiền tố kiencang để giảm tối đa xác suất trùng tên
+INSTALL_DIR="/opt/kiencang-wpsila"
 
 # Chú ý link Repo, cần cập nhật cả vps.wpsila.com nếu nó có thay đổi
 # vps.wpsila.com là nơi chứa mã nguồn này, làm khó thêm một bước trong trường hợp GitHub bị tấn công.
@@ -81,9 +82,11 @@ fi
 # -------------------------------------------------------------------------------------------------------------------------------
 # 4. Làm sạch file cũ (Clean Install)
 echo "Dang lam sach thu muc cai dat..."
-# Xóa cả file .sh và file .conf
+# Xóa toàn bộ file .sh cũ nếu có
 rm -f "$INSTALL_DIR/"*.sh
-rm -f "$INSTALL_DIR/"*.conf
+
+# Giữ lại file conf, vì thường là file cấu hình cũ
+# rm -f "$INSTALL_DIR/"*.conf
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
