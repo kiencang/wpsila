@@ -21,10 +21,19 @@ while [[ $COUNT -lt $MAX_RETRIES ]]; do
     COUNT=$((COUNT + 1)) 
     
     if [[ $COUNT -eq 1 ]]; then
-        read -p "Nhap Domain: " INPUT_DOMAIN < /dev/tty
+		if [[ "$INSTALL_TYPE" != "subdomain" ]]; then
+			read -p "Nhap ten mien: " INPUT_DOMAIN < /dev/tty
+		else 
+			read -p "Nhap SubDomain: " INPUT_DOMAIN < /dev/tty
+		fi	
     else
         echo -e "${RED}Ban vua nhap sai! Hay chu y nhap lai dung nhe.${NC}"
-        read -p "Nhap Domain: " INPUT_DOMAIN < /dev/tty
+		
+		if [[ "$INSTALL_TYPE" != "subdomain" ]]; then
+			read -p "Nhap ten mien: " INPUT_DOMAIN < /dev/tty
+		else 
+			read -p "Nhap SubDomain: " INPUT_DOMAIN < /dev/tty
+		fi	
     fi
     
     # Xử lý chuỗi
