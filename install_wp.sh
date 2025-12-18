@@ -66,12 +66,12 @@ DEFAULT_PHP_VER="8.3"
 # D2. Định nghĩa đường dẫn file config 
 # (Ví dụ: file config nằm cùng thư mục với script đang chạy)
 # Dòng lệnh này đảm bảo biến SCRIPT_WPSILA_DIR luôn là đường dẫn tuyệt đối tới thư mục chứa file này
-# Xác định thư mục, sử dụng cách đơn giản
-SCRIPT_WPSILA_DIR="$(dirname "$(realpath "$0")")"
+# Cách chuẩn mực
+SCRIPT_WPSILA_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
 # ---
-# Hoặc có thể dùng cách này:
-# SCRIPT_WPSILA_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+# Hoặc có thể dùng cách đơn giản này:
+# SCRIPT_WPSILA_DIR="$(dirname "$(realpath "$0")")"
 # ----
 
 # Trỏ vào file config nằm cùng thư mục đó
@@ -88,7 +88,9 @@ fi
 
 # D4. Chốt phiên bản cuối cùng
 # Cú pháp ${BIEN_1:-$BIEN_2} nghĩa là: Nếu BIEN_1 rỗng (chưa set trong config), thì lấy BIEN_2
-PHP_VER="${PHP_VER:-$DEFAULT_PHP_VER}"
+# Export ngay lập tức để toàn bộ quy trình bên dưới nhận diện được
+export PHP_VER="${PHP_VER:-$DEFAULT_PHP_VER}"
+export SCRIPT_WPSILA_DIR
 
 echo "Phien ban PHP: $PHP_VER"
 sleep 2

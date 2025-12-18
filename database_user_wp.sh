@@ -1,5 +1,6 @@
 # -----------------------------------------------------------
 # MODULE: Cài đặt database và user cho WordPress
+# File: database_user_wp.sh
 # File này được nhúng vào script install_wp.sh
 # -----------------------------------------------------------
 echo -e "${GREEN}Dang tao Database va User cho WordPress...${NC}"
@@ -57,7 +58,7 @@ mariadb -e "FLUSH PRIVILEGES;"
 # -------------------------------------------------------------------------------------------------------------------------------
 # F5. Xuất thông tin
 # Lưu thông tin vào file để tra cứu sau này (Quan trọng vì mật khẩu là ngẫu nhiên)
-CRED_FILE="$HOME/wpp.txt"
+CRED_FILE="$SCRIPT_WPSILA_DIR/wpp.txt"
 
 # Kiểm tra nếu file tồn tại thì mới xóa
 rm -f "$CRED_FILE"
@@ -77,7 +78,7 @@ chmod 600 "$CRED_FILE" # Chỉ user hiện tại mới đọc được file này
 
 # Để xem lại nội dung dùng lệnh sau trên terminal: cat ~/wpp.txt (đã bổ sung vào menu để người dùng cuối xem)
 # Copy bằng cách bôi đen ở terminal, sau đó paste (ctrl + V) như bình thường ở giao diện cài đặt
-# Sau khi cài xong WordPress cần xóa file này đi bằng lệnh: rm ~/wpp.txt
+# Sau khi cài xong WordPress cần xóa file này đi bằng lệnh: rm ~/wpp.txt (cần bổ sung vào menu)
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
