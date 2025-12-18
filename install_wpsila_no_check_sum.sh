@@ -153,6 +153,10 @@ download_file "$REPO_URL/setup_adminer.sh" "$INSTALL_DIR/setup_adminer.sh"
 # -------------------------
 # File để hiển thị mật khẩu WordPress
 download_file "$REPO_URL/wpp.sh" "$INSTALL_DIR/wpp.sh"
+
+# -------------------------
+# File kiểm tra cập nhật
+download_file "$REPO_URL/check_for_update.sh" "$INSTALL_DIR/check_for_update.sh"
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++

@@ -41,6 +41,7 @@ FILE_LIST=(
     "setup_sftp.sh"
     "setup_adminer.sh"
     "wpp.sh"
+	"check_for_update.sh"
 )
 
 # Kiểm tra dependency
