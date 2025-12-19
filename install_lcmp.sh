@@ -197,5 +197,5 @@ apt-get clean
 # rm -rf /var/lib/apt/lists/*
 
 echo "--------------------------------------------------------"
-echo -e "${GREEN}Cài đặt LCMP hoàn tất!${NC}"
+echo -e "${GREEN}Cai dat LCMP hoan tat!${NC}"
 echo "--------------------------------------------------------"
