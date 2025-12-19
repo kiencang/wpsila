@@ -77,7 +77,8 @@ UPDATE_WPSILA="${1:-noupdate}"
 if ! command -v wget &> /dev/null || ! command -v sha256sum &> /dev/null; then
     echo "Dang cai dat wget va coreutils..."
     # Cài đặt wget (cho tải file) và coreutils (cho sha256sum để dùng kiểm tra checksum)
-    apt-get update -qq && apt-get install -y -qq wget ca-certificates coreutils || error_exit "Khong the cai dat cac phu thuoc co ban (wget/coreutils)."
+	# Cài thêm python3 nếu chưa có (mặc dù thường có sẵn), dùng để check kiểm tra phiên bản mới tốt hơn.
+    apt-get update -qq && apt-get install -y -qq wget ca-certificates coreutils python3 || error_exit "Khong the cai dat cac phu thuoc co ban (wget/coreutils)."
 fi
 # -------------------------------------------------------------------------------------------------------------------------------
 
