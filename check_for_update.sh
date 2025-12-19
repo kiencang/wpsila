@@ -2,7 +2,7 @@
 
 # -------------------------------------------------------------------------
 # wpsila - Update Manager
-# Version 0.1.5 - Optimized for Ubuntu 22.04 & 24.04
+# Version 0.1.6 - Optimized for Ubuntu 22.04 & 24.04
 # -------------------------------------------------------------------------
 
 set -euo pipefail
@@ -15,7 +15,7 @@ if [[ $EUID -ne 0 ]]; then
    exit $?
 fi
 
-SCRIPT_VERSION="v0.1.4"
+SCRIPT_VERSION="v0.1.6"
 GITHUB_USER="kiencang"
 GITHUB_REPO="wpsila"
 
@@ -115,10 +115,10 @@ if [[ "$do_you_update" == "true" ]]; then
     
     # Lưu ý: Thêm cờ -- update để script mới biết nó đang được chạy ở chế độ update (nếu cần)
 	# Bản online
-    # exec sudo bash -c "curl -sL https://vps.wpsila.com | bash -s -- update"
+    exec sudo bash -c "curl -sL https://vps.wpsila.com | bash -s -- update"
 	
 	#Bản test
-	exec sudo bash -c "curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/install_wpsila.sh | bash -s -- update"
+	# exec sudo bash -c "curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/install_wpsila.sh | bash -s -- update"
 else
     echo -e "Tiep tuc khoi chay phien ban hien tai $SCRIPT_VERSION..."
     # [Code logic chính của script]
