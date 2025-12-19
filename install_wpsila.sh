@@ -141,7 +141,7 @@ declare -A CHECKSUMS=(
     ["setup_sftp.sh"]="bd6a11fd7f529acffb6ad1de139b3ce918552c25f5a9bf1bae042913e86a9989"
     ["setup_adminer.sh"]="d0f1bc7ba22fa5e895aaa762da7e215e773c86833ca149cdff1f5cd8d33ee594"
     ["wpp.sh"]="c8e548e9c551c2bb2661cb5d24b26c2aca752e17bcf77c1aad66192ed11e010a"
-    ["check_for_update.sh"]="e53423bdb1b28f80d9e15fdce1e0a00a357108ee5a0961d6fbdaa3060882b594"
+    ["check_for_update.sh"]="af5ed91e9d2d946345686e250afc6723b710e7caba7f9a4fc28245e018a9204a"
 )
 # -------------------------------------------------------------------------------------------------------------------------------
 
