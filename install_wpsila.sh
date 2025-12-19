@@ -120,8 +120,8 @@ rm -f "$INSTALL_DIR/"*.sh
 # Dev bắt buộc phải dùng trước khi công bố phiên bản mới
 declare -A CHECKSUMS=(
     ["wpsila.conf"]="37949dce87686d946195ae65dcd0e1e95a763c1bfa40ee7c2583f20040680ac2"
-    ["wpsila_menu.sh"]="2f56a09be9912ded8d4e05e24ca047fcb409251be5321633d128ae11358f9103"
-    ["install_lcmp.sh"]="b4c0a512bd074025e29ec44f3c07e64ee5031d85f0a8785b664f7ada47d373c5"
+    ["wpsila_menu.sh"]="890c97fd226ae67bffa938b1017de8c5826af1619577da95d252cb55ea063c0c"
+    ["install_lcmp.sh"]="2d4dcbeee5ad993a90de5a33a901c68d0804bad388ebe0da433df4d0e332607f"
     ["install_caddyserver.sh"]="7f0e5ebc2120651880ecd284ed3d9ff7c258cfb4f5e773f163d533263bbc3f84"
     ["install_php.sh"]="7ad031e6022bb2a102a78584f494947d167aecfe7aa90cbf263c2e2e0c0000fa"
     ["install_mariadb.sh"]="acdb10751d3fdf5ea9ac0a0077f4e2c57b4c015630a5165133466c2dd984750e"
@@ -138,7 +138,7 @@ declare -A CHECKSUMS=(
     ["setup_sftp.sh"]="bd6a11fd7f529acffb6ad1de139b3ce918552c25f5a9bf1bae042913e86a9989"
     ["setup_adminer.sh"]="d0f1bc7ba22fa5e895aaa762da7e215e773c86833ca149cdff1f5cd8d33ee594"
     ["wpp.sh"]="c8e548e9c551c2bb2661cb5d24b26c2aca752e17bcf77c1aad66192ed11e010a"
-    ["check_for_update.sh"]="af5ed91e9d2d946345686e250afc6723b710e7caba7f9a4fc28245e018a9204a"
+    ["check_for_update.sh"]="c7a10fbbdf376ab9a892084759f839cabd31e80575aacaaab63509800b714cd2"
 )
 # -------------------------------------------------------------------------------------------------------------------------------
 
