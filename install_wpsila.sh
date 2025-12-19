@@ -284,7 +284,7 @@ ln -sf "$INSTALL_DIR/wpsila_menu.sh" "$BIN_LINK"
 # 8. Hoàn tất
 if [[ -x "$BIN_LINK" ]]; then
     echo -e "${GREEN}=== CAI DAT THANH CONG! ===${NC}"
-    echo "Xin chuc mung ban! Hay go lenh: ${YELLOW}wpsila${NC} de bat dau su dung."
+    echo -e "Xin chuc mung ban! Hay go lenh: ${YELLOW}wpsila${NC} de bat dau su dung."
 else
     error_exit "Loi khi tao lenh shortcut wpsila."
 fi
