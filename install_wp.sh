@@ -25,7 +25,8 @@ NC='\033[0m' # No Color
 # 1. Kiểm tra xem đang chạy với quyền gì
 if [[ $EUID -ne 0 ]]; then
    # 2. Nếu không phải root, tự động chạy lại script này bằng sudo
-   sudo "$0" "$@"
+   # -E để giữ lại biến môi trường
+   sudo -E "$0" "$@"
    # 3. Thoát tiến trình cũ (không phải root) để tiến trình mới (có root) chạy
    exit $?
 fi
