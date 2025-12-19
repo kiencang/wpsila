@@ -12,6 +12,9 @@
 # -------------------------------------------------------------------------
 # Version 0.1.3 - 16/12/2025
 # -------------------------------------------------------------------------
+# Chạy lệnh test phiên bản mới
+# curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/install_wpsila.sh | sudo bash
+# -------------------------------------------------------------------------
 
 # Dừng script ngay lập tức nếu có biến chưa khai báo hoặc pipeline bị lỗi
 # Lưu ý: set -e sẽ được xử lý khéo léo trong hàm download để không ngắt script đột ngột
@@ -22,7 +25,7 @@ export LC_ALL=C.UTF-8
 export DEBIAN_FRONTEND=noninteractive
 
 # Phiên bản của bash script / rất quan trọng để tải đúng phiên bản các file cài tương ứng
-VERSION="v0.1.3"
+VERSION="v0.1.4"
 
 # +++
 
@@ -119,25 +122,26 @@ rm -f "$INSTALL_DIR/"*.sh
 # Sử dụng mã generate_checksum chạy để lấy mã này về
 # Dev bắt buộc phải dùng trước khi công bố phiên bản mới
 declare -A CHECKSUMS=(
-    ["wpsila.conf"]="5eb2ca775745af452d4c66bca812c212061803204acae32f8470d3e0a51debcb"
-    ["wpsila_menu.sh"]="c1627dbfb5ea4e212e6d846407dc44d41e6cbcd2aed8fa6bcd8c964717e76b6e"
-    ["install_lcmp.sh"]="5b8c5a3001a12018175546652b5f5316b07b653cba190e4cf4691acc5d1652c9"
+    ["wpsila.conf"]="37949dce87686d946195ae65dcd0e1e95a763c1bfa40ee7c2583f20040680ac2"
+    ["wpsila_menu.sh"]="2f56a09be9912ded8d4e05e24ca047fcb409251be5321633d128ae11358f9103"
+    ["install_lcmp.sh"]="b4c0a512bd074025e29ec44f3c07e64ee5031d85f0a8785b664f7ada47d373c5"
     ["install_caddyserver.sh"]="7f0e5ebc2120651880ecd284ed3d9ff7c258cfb4f5e773f163d533263bbc3f84"
     ["install_php.sh"]="7ad031e6022bb2a102a78584f494947d167aecfe7aa90cbf263c2e2e0c0000fa"
-    ["install_mariadb.sh"]="993e3e13af9243a9b1fb5de240d26ec2a82abd7904e25540cc29edf2a6ed8b97"
-    ["install_wp.sh"]="c03a688c6de9170500dfd458c3d0112ef3d5a1dfe16e4433a7a49a0ec076aa52"
-    ["domain_check.sh"]="09bd3a0408ea4ce56081c36c834371b40417dfb1075168c822ae3cc8b5c40ee5"
-    ["database_user_wp.sh"]="e9a585e0cb291fbb6711e933a2a1a589b2d19bf1c5bc0b282af9fd6510558e34"
+    ["install_mariadb.sh"]="acdb10751d3fdf5ea9ac0a0077f4e2c57b4c015630a5165133466c2dd984750e"
+    ["install_wp.sh"]="5b3e5445767026c9eb311c7380f948440ef7f9cb956fe53e1fb703bfef3c4a63"
+    ["domain_check.sh"]="364f649ff9e634f75e825e4bf8f8a74fcc3ddb2c85c926959d8daf1880b22551"
+    ["database_user_wp.sh"]="b8f828f59972c5d2bcb874ead560022f6fc62d2ba6bcb949c4162e863e11b792"
     ["wordpress.sh"]="eca92f6175bcd62ee0bd3f237b6891c545f004f16309b4d8d39a5c7a0dea2776"
     ["caddyfile.sh"]="94ab76338c51ec8d0691ef036424b212fff48062452aadacdec2aa150e93ff9a"
     ["caddyfile_subdomain.sh"]="7d38e3bba7afa65560919a7ac6bb77b062c7e2749e663757276c6b8987231975"
     ["mariadb_tune.sh"]="c0d6d37705ac870429150ad8a05a2fc9628a0c1a0b5fe0588588f9686187eb28"
     ["php_ini_tune.sh"]="745a110a84afee44b0318302b1edb5a4d2a5bf598a8aa1b905dff455eec37e3d"
     ["pool_tune.sh"]="a8c07af10b5a5c5291119cce2bfe749edf3528ccf4dad254e8132b563a12ed83"
-    ["remove_web.sh"]="100f7623fafa055d8ee16236427dba8a37b9d7e9898dc9a81b51e3cc7697c45e"
+    ["remove_web.sh"]="0b8309f393c2099c836a243e601359686a09c1ea2453ea07dc3b9909bee00701"
     ["setup_sftp.sh"]="bd6a11fd7f529acffb6ad1de139b3ce918552c25f5a9bf1bae042913e86a9989"
     ["setup_adminer.sh"]="d0f1bc7ba22fa5e895aaa762da7e215e773c86833ca149cdff1f5cd8d33ee594"
-    ["wpp.sh"]="38fa3bf2382f26b8a8a2d10c62d6d7407dea8021ecb9c5e9cf6ba92f920c4194"
+    ["wpp.sh"]="c8e548e9c551c2bb2661cb5d24b26c2aca752e17bcf77c1aad66192ed11e010a"
+    ["check_for_update.sh"]="e53423bdb1b28f80d9e15fdce1e0a00a357108ee5a0961d6fbdaa3060882b594"
 )
 # -------------------------------------------------------------------------------------------------------------------------------
 

@@ -15,7 +15,7 @@ if [[ $EUID -ne 0 ]]; then
    exit $?
 fi
 
-SCRIPT_VERSION="v0.1.3"
+SCRIPT_VERSION="v0.1.4"
 GITHUB_USER="kiencang"
 GITHUB_REPO="wpsila"
 
