@@ -72,13 +72,24 @@ UPDATE_WPSILA="${1:-noupdate}"
 # +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
-# 2. Cài đặt wget và ca-certificates (QUAN TRỌNG: thêm ca-certificates để tránh lỗi SSL)
-# Cài đặt wget và ca-certificates
-if ! command -v wget &> /dev/null || ! command -v sha256sum &> /dev/null; then
-    echo "Dang cai dat wget va coreutils..."
-    # Cài đặt wget (cho tải file) và coreutils (cho sha256sum để dùng kiểm tra checksum)
-	# Cài thêm python3 nếu chưa có (mặc dù thường có sẵn), dùng để check kiểm tra phiên bản mới tốt hơn.
-    apt-get update -qq && apt-get install -y -qq wget ca-certificates coreutils python3 || error_exit "Khong the cai dat cac phu thuoc co ban (wget/coreutils)."
+# 2. Cài đặt wget, ca-certificates, coreutils và python3
+# -------------------------------------------------------------------------------------------------------------------------------
+
+# Hàm kiểm tra xem một gói đã được cài đặt chưa (dùng dpkg để check chính xác hơn command -v)
+is_pkg_installed() {
+    dpkg -s "$1" &> /dev/null
+}
+
+# Kiểm tra: Nếu thiếu wget HOẶC thiếu python3 HOẶC thiếu ca-certificates thì mới chạy cài đặt
+if ! command -v wget &> /dev/null || ! command -v python3 &> /dev/null || ! is_pkg_installed ca-certificates; then
+    echo "Dang cai dat/cap nhat wget, ca-certificates va python3..."
+ 
+    # Cập nhật và cài đặt
+    apt-get update -qq && \
+    apt-get install -y -qq wget ca-certificates coreutils python3 || \
+    error_exit "Khong the cai dat cac phu thuoc co ban (wget/coreutils/python3)."
+else
+    echo "Cac goi phu thuoc co ban da duoc cai dat."
 fi
 # -------------------------------------------------------------------------------------------------------------------------------
 
