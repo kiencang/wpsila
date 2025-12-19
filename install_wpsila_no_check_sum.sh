@@ -163,7 +163,7 @@ download_file "$REPO_URL/wpp.sh" "$INSTALL_DIR/wpp.sh"
 
 # -------------------------
 # Kiểm tra cập nhật cho wpsila
-download_file "check_for_update.sh" "$INSTALL_DIR/check_for_update.sh"
+download_file "$REPO_URL/check_for_update.sh" "$INSTALL_DIR/check_for_update.sh"
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
