@@ -88,7 +88,7 @@ check_for_update() {
     # 5. Xác nhận cập nhật từ người dùng
     if [[ "$should_update" == "true" ]]; then
         echo -e "${YELLOW}Co phien ban moi: $latest_tag${NC} (Phien ban hien tai: $SCRIPT_VERSION)"
-        echo -ne "Ban co muon cap nhat tu dong ngay bay gio khong? [y/N]: "
+        echo -ne "Ban co muon ${YELLOW}cap nhat tu dong${NC} ngay bay gio khong? [y/N]: "
         read -r reply
         if [[ "$reply" =~ ^[Yy]$ ]]; then
             do_you_update="true"
