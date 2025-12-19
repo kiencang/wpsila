@@ -114,7 +114,11 @@ if [[ "$do_you_update" == "true" ]]; then
     export DEBIAN_FRONTEND=noninteractive
     
     # Lưu ý: Thêm cờ -- update để script mới biết nó đang được chạy ở chế độ update (nếu cần)
-    exec sudo bash -c "curl -sL https://vps.wpsila.com | bash -s -- update"
+	# Bản online
+    # exec sudo bash -c "curl -sL https://vps.wpsila.com | bash -s -- update"
+	
+	#Bản test
+	exec sudo bash -c "curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/install_wpsila.sh | bash -s -- update"
 else
     echo -e "Tiep tuc khoi chay phien ban hien tai $SCRIPT_VERSION..."
     # [Code logic chính của script]
