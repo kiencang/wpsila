@@ -54,10 +54,32 @@ fi
 # +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
-# 2. Cài đặt wget và ca-certificates (QUAN TRỌNG: thêm ca-certificates để tránh lỗi SSL)
-if ! command -v wget &> /dev/null; then
-    echo "Dang cai dat wget..."
-    apt-get update -qq && apt-get install -y wget ca-certificates -qq || error_exit "Khong the cai dat wget"
+# 2. Cài đặt wget, ca-certificates, coreutils và python3
+# -------------------------------------------------------------------------------------------------------------------------------
+
+# Hàm kiểm tra gói (Dùng dpkg để chính xác cho cả lệnh và thư viện)
+is_pkg_installed() {
+    dpkg -s "$1" &> /dev/null
+}
+
+# Danh sách các gói cần thiết
+REQUIRED_PKGS="wget ca-certificates coreutils python3"
+NEED_INSTALL=false
+
+for pkg in $REQUIRED_PKGS; do
+    if ! is_pkg_installed "$pkg"; then
+        NEED_INSTALL=true
+        break
+    fi
+done
+
+if [ "$NEED_INSTALL" = true ]; then
+    echo "Dang cai dat/cap nhat cac goi phu thuoc: $REQUIRED_PKGS..."
+    apt-get update -qq && \
+    apt-get install -y -qq $REQUIRED_PKGS || \
+    error_exit "Khong the cai dat cac phu thuoc co ban."
+else
+    echo "Tat ca cac goi phu thuoc da duoc cai dat day du."
 fi
 # -------------------------------------------------------------------------------------------------------------------------------
 
