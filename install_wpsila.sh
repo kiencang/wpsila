@@ -75,21 +75,29 @@ UPDATE_WPSILA="${1:-noupdate}"
 # 2. Cài đặt wget, ca-certificates, coreutils và python3
 # -------------------------------------------------------------------------------------------------------------------------------
 
-# Hàm kiểm tra xem một gói đã được cài đặt chưa (dùng dpkg để check chính xác hơn command -v)
+# Hàm kiểm tra gói (Dùng dpkg để chính xác cho cả lệnh và thư viện)
 is_pkg_installed() {
     dpkg -s "$1" &> /dev/null
 }
 
-# Kiểm tra: Nếu thiếu wget HOẶC thiếu python3 HOẶC thiếu ca-certificates thì mới chạy cài đặt
-if ! command -v wget &> /dev/null || ! command -v python3 &> /dev/null || ! is_pkg_installed ca-certificates; then
-    echo "Dang cai dat/cap nhat wget, ca-certificates va python3..."
- 
-    # Cập nhật và cài đặt
+# Danh sách các gói cần thiết
+REQUIRED_PKGS="wget ca-certificates coreutils python3"
+NEED_INSTALL=false
+
+for pkg in $REQUIRED_PKGS; do
+    if ! is_pkg_installed "$pkg"; then
+        NEED_INSTALL=true
+        break
+    fi
+done
+
+if [ "$NEED_INSTALL" = true ]; then
+    echo "Dang cai dat/cap nhat cac goi phu thuoc: $REQUIRED_PKGS..."
     apt-get update -qq && \
-    apt-get install -y -qq wget ca-certificates coreutils python3 || \
-    error_exit "Khong the cai dat cac phu thuoc co ban (wget/coreutils/python3)."
+    apt-get install -y -qq $REQUIRED_PKGS || \
+    error_exit "Khong the cai dat cac phu thuoc co ban."
 else
-    echo "Cac goi phu thuoc co ban da duoc cai dat."
+    echo "Tat ca cac goi phu thuoc da duoc cai dat day du."
 fi
 # -------------------------------------------------------------------------------------------------------------------------------
 
