@@ -155,7 +155,8 @@ download_file() {
     local expected_checksum="${CHECKSUMS[$filename]}"
 
     # 1. Tien hang tai file
-    if ! wget -q --no-cache "$url" -O "$dest"; then
+	# Thêm --tries=3 --timeout=15 để hạn chế vấn đề mạng lag
+    if ! wget -q --no-cache --tries=3 --timeout=15 "$url" -O "$dest"; then
         echo -e "${RED}[DOWNLOAD FAIL]${NC} Khong the tai: $url"
         rm -f "$dest"
         error_exit "Loi ket noi hoac duong dan khong chinh xac."
