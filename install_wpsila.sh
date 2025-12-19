@@ -17,6 +17,10 @@
 # Lưu ý: set -e sẽ được xử lý khéo léo trong hàm download để không ngắt script đột ngột
 set -euo pipefail
 
+# Thiet lap moi truong chuan cho Automation
+export LC_ALL=C.UTF-8
+export DEBIAN_FRONTEND=noninteractive
+
 # Phiên bản của bash script / rất quan trọng để tải đúng phiên bản các file cài tương ứng
 VERSION="v0.1.3"
 
@@ -39,7 +43,7 @@ NC='\033[0m' # No Color (ngắt màu)
 INSTALL_DIR="/opt/kiencang-wpsila"
 
 # Chú ý link Repo, cần cập nhật cả vps.wpsila.com nếu nó có thay đổi
-# vps.wpsila.com là nơi chứa mã nguồn này, làm khó thêm một bước trong trường hợp GitHub bị tấn công.
+# vps.wpsila.com là nơi chứa mã nguồn này, có thể để chuyển hướng hoặc chứa trực tiếp.
 REPO_URL="https://raw.githubusercontent.com/kiencang/wpsila/${VERSION}"
 BIN_LINK="/usr/local/bin/wpsila"
 
@@ -52,18 +56,17 @@ error_exit() {
 
 #+++
 
-echo "=== DANG CAI DAT WPSILA ==="
-
 # -------------------------------------------------------------------------------------------------------------------------------
-# 1. Kiểm tra quyền
-# NÂNG QUYỀN NẾU KHÔNG PHẢI LÀ ROOT
+echo "=== DANG CAI DAT WPSILA ==="
 # 1. Kiểm tra xem đang chạy với quyền gì
 if [[ $EUID -ne 0 ]]; then
-   # 2. Nếu không phải root, tự động chạy lại script này bằng sudo
-   sudo "$0" "$@"
-   # 3. Thoát tiến trình cũ (không phải root) để tiến trình mới (có root) chạy
-   exit $?
+	# Yêu cầu chạy quyền ROOT
+	echo -e "${RED}Ban phai chay script voi quyen root.${NC}"
+	exit 1
 fi
+
+# Kiểm tra xem có phải là yêu cầu update không
+UPDATE_WPSILA="${1:-noupdate}"
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
@@ -74,7 +77,7 @@ fi
 if ! command -v wget &> /dev/null || ! command -v sha256sum &> /dev/null; then
     echo "Dang cai dat wget va coreutils..."
     # Cài đặt wget (cho tải file) và coreutils (cho sha256sum để dùng kiểm tra checksum)
-    apt-get update -qq && apt-get install -y wget ca-certificates coreutils -qq || error_exit "Khong the cai dat cac phu thuoc co ban (wget/coreutils)."
+    apt-get update -qq && apt-get install -y -qq wget ca-certificates coreutils || error_exit "Khong the cai dat cac phu thuoc co ban (wget/coreutils)."
 fi
 # -------------------------------------------------------------------------------------------------------------------------------
 
@@ -85,6 +88,19 @@ fi
 if [[ ! -d "$INSTALL_DIR" ]]; then
     mkdir -p "$INSTALL_DIR"
 fi
+
+# Chặn ghi đè
+if [[ "$UPDATE_WPSILA" != "update" ]]; then
+    # Kiểm tra sự tồn tại của file cấu hình
+    if [[ -f "${INSTALL_DIR}/wpsila.conf" ]]; then
+        echo -e "${RED}[!] Tim thay file cau hinh: ${INSTALL_DIR}/wpsila.conf${NC}"
+        echo -e "${RED}[!] Ban da cai dat wpsila truoc day!${NC}"
+        echo -e "----------------------------------------------------------------"
+        echo -e "Chung toi dung chay de tranh ghi de co the gay loi website."
+        echo -e "----------------------------------------------------------------"
+        exit 0
+    fi
+fi
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
@@ -94,9 +110,6 @@ fi
 echo "Dang lam sach thu muc cai dat..."
 # Xóa toàn bộ file .sh cũ nếu có
 rm -f "$INSTALL_DIR/"*.sh
-
-# Giữ lại file conf, vì thường là file cấu hình cũ
-# rm -f "$INSTALL_DIR/"*.conf
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
@@ -176,7 +189,15 @@ download_file() {
 # Nếu thiếu mã checksum sẽ không thể tải về được, dev cần lưu ý.
 
 # File cấu hình (chứa định nghĩa phiên bản PHP)
-download_file "wpsila.conf" "$INSTALL_DIR/wpsila.conf"
+# Nếu là cài mới thì sẽ xóa (nếu có) và tải file mới về
+# wpsila.conf cũng sẽ được tải về nếu kiểm tra cho thấy nó chưa tồn tại
+if [[ "$UPDATE_WPSILA" != "update" || ! -f "$INSTALL_DIR/wpsila.conf" ]]; then
+    # Nếu là cài mới, xóa file cũ cho chắc chắn
+    [[ "$UPDATE_WPSILA" != "update" ]] && rm -f "$INSTALL_DIR/wpsila.conf"
+    download_file "wpsila.conf" "$INSTALL_DIR/wpsila.conf"
+else
+    echo -e "${YELLOW}[KEEP]${NC} Dang su dung file cau hinh hien tai."
+fi
 # -------------------------
 
 # -------------------------
@@ -227,15 +248,22 @@ download_file "setup_adminer.sh" "$INSTALL_DIR/setup_adminer.sh"
 # -------------------------
 # File để hiển thị mật khẩu WordPress
 download_file "wpp.sh" "$INSTALL_DIR/wpp.sh"
+
+# -------------------------
+# Kiểm tra cập nhật cho wpsila
+download_file "check_for_update.sh" "$INSTALL_DIR/check_for_update.sh"
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
 # 6. Phân quyền
+chmod 700 "$INSTALL_DIR"
 chmod 700 "$INSTALL_DIR/"*.sh
 chmod 700 "$INSTALL_DIR/"*.conf
-chmod 700 "$INSTALL_DIR"
+
+# Hơi thừa nhưng bổ sung cho chắc!
+chmod +x "$INSTALL_DIR/wpsila_menu.sh"
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
