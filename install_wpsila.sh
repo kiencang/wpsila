@@ -213,67 +213,84 @@ download_file() {
 # File cấu hình (chứa định nghĩa phiên bản PHP)
 # Nếu là cài mới thì sẽ xóa (nếu có) và tải file mới về
 # wpsila.conf cũng sẽ được tải về nếu kiểm tra cho thấy nó chưa tồn tại
-if [[ "$UPDATE_WPSILA" != "update" || ! -f "$INSTALL_DIR/wpsila.conf" ]]; then
-    # Nếu là cài mới, xóa file cũ cho chắc chắn
-    [[ "$UPDATE_WPSILA" != "update" ]] && rm -f "$INSTALL_DIR/wpsila.conf"
-    download_file "wpsila.conf" "$INSTALL_DIR/wpsila.conf"
-else
-    echo -e "${YELLOW}[KEEP]${NC} Dang su dung file cau hinh hien tai."
-fi
-# -------------------------
 
-# -------------------------
+# 5.1 VÒNG LẶP TỰ ĐỘNG TẢI FILE
+# Lấy danh sách key (tên file) từ mảng CHECKSUMS
+# Điều này giúp tránh sơ suất không tải file khi có cập nhật thêm file, đỡ phải thêm download_file thủ công
+for filename in "${!CHECKSUMS[@]}"; do
+    dest="$INSTALL_DIR/$filename"
+
+    # XỬ LÝ NGOẠI LỆ: wpsila.conf
+    # File cấu hình cần logic riêng để tránh ghi đè khi Update
+    if [[ "$filename" == "wpsila.conf" ]]; then
+        # Nếu là Update VÀ file đã tồn tại -> Bỏ qua (Giữ cấu hình cũ)
+        if [[ "$UPDATE_WPSILA" == "update" && -f "$dest" ]]; then
+            echo -e "${YELLOW}[KEEP]${NC} Dang su dung file cau hinh hien tai: $filename"
+            continue # Chuyển sang file tiếp theo trong vòng lặp
+        fi
+        # Nếu không phải update, hoặc file thiếu -> Code sẽ chạy xuống dưới để tải mới (Ghi đè)
+    fi
+
+    # Thực hiện tải file
+    download_file "$filename" "$dest"
+done
+# -------------------------------------------------------------------------------------------------------------------------------
+
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
+# Giải thích ý nghĩa
 # Tải về menu cho chương trình quản trị wpsila
-download_file "wpsila_menu.sh" "$INSTALL_DIR/wpsila_menu.sh"
+# "wpsila_menu.sh" 
 # -------------------------
 
 # -------------------------
 # Tải về các file phục vụ cho cài đặt LCMP
-download_file "install_lcmp.sh" "$INSTALL_DIR/install_lcmp.sh"
-download_file "install_caddyserver.sh" "$INSTALL_DIR/install_caddyserver.sh"
-download_file "install_php.sh" "$INSTALL_DIR/install_php.sh"
-download_file "install_mariadb.sh" "$INSTALL_DIR/install_mariadb.sh"
+# "install_lcmp.sh" 
+# "install_caddyserver.sh" 
+# "install_php.sh" 
+# "install_mariadb.sh" 
 # -------------------------
 
 # -------------------------
 # Tải về các file phục vụ cho việc cài đặt WordPress
-download_file "install_wp.sh" "$INSTALL_DIR/install_wp.sh"
-download_file "domain_check.sh" "$INSTALL_DIR/domain_check.sh"
-download_file "database_user_wp.sh" "$INSTALL_DIR/database_user_wp.sh"
-download_file "wordpress.sh" "$INSTALL_DIR/wordpress.sh"
-download_file "caddyfile.sh" "$INSTALL_DIR/caddyfile.sh"
-download_file "caddyfile_subdomain.sh" "$INSTALL_DIR/caddyfile_subdomain.sh"
+# "install_wp.sh"
+# "domain_check.sh"
+# "database_user_wp.sh"
+# "wordpress.sh" 
+# "caddyfile.sh"
+# "caddyfile_subdomain.sh"
 # -------------------------
 
 # -------------------------
 # Tải về các file để thiết lập cấu hình cho MariaDB và PHP INI cũng như Poll Tune
-download_file "mariadb_tune.sh" "$INSTALL_DIR/mariadb_tune.sh"
-download_file "php_ini_tune.sh" "$INSTALL_DIR/php_ini_tune.sh"
-download_file "pool_tune.sh" "$INSTALL_DIR/pool_tune.sh"
+# "mariadb_tune.sh" 
+# "php_ini_tune.sh" 
+# "pool_tune.sh" 
 # -------------------------
 
 # -------------------------
 # Tải về file phục vụ chức năng xóa website
-download_file "remove_web.sh" "$INSTALL_DIR/remove_web.sh"
+# "remove_web.sh"
 # -------------------------
 
 # -------------------------
 # Tải về file tạo tài khoản sFTP
-download_file "setup_sftp.sh" "$INSTALL_DIR/setup_sftp.sh"
+# "setup_sftp.sh"
 # -------------------------
 
 # -------------------------
 # Tải về file cài adminer để tạo trang quản trị database (không cài nếu không cần)
-download_file "setup_adminer.sh" "$INSTALL_DIR/setup_adminer.sh"
+# "setup_adminer.sh" 
 # -------------------------
 
 # -------------------------
 # File để hiển thị mật khẩu WordPress
-download_file "wpp.sh" "$INSTALL_DIR/wpp.sh"
+# "wpp.sh" "$INSTALL_DIR/wpp.sh"
 
 # -------------------------
 # Kiểm tra cập nhật cho wpsila
-download_file "check_for_update.sh" "$INSTALL_DIR/check_for_update.sh"
+# "check_for_update.sh"
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
