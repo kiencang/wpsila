@@ -34,6 +34,8 @@ fi
 # C. ĐẢM BẢO LOG FOLDER TỒN TẠI
 # Tạo thư mục nếu chưa có (-p giúp không báo lỗi nếu đã có)
 mkdir -p /var/log/caddy
+chown -R caddy:caddy /var/log/caddy
+chmod 755 /var/log/caddy	
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
@@ -179,6 +181,15 @@ TIMESTAMP=$(date +%s)
 echo "Dang tao file backup cho Caddyfile"
 BACKUP_FILE="${CADDY_FILE}.bak_${TIMESTAMP}"
 
+if [[ -f "$CADDY_FILE" ]]; then
+    cp "$CADDY_FILE" "$BACKUP_FILE"
+else
+    echo -e "${RED}Khong tim thay Caddyfile de backup!${NC}"
+    exit 1
+fi
+
+echo "-> Backup cho Caddyfile da duoc tao: $BACKUP_FILE"
+
 # Kiểm tra tồn tại của thư mục adminer
 if grep -q "$INSTALL_DIR" "$CADDY_FILE"; then
     echo "CANH BAO: Duong dan '$INSTALL_DIR' da co trong Caddyfile."
@@ -245,7 +256,7 @@ EOF
 
 	# Đến phần này nghĩa là file caddyfile không lỗi, có thể khởi động lại Caddy được.
 	# Nếu không làm bước này, Caddy không thể ghi file vào đây được.
-	# Gán quyền liên quan đến thư mục log.
+	# Gán quyền liên quan đến thư mục log, gán lại, phòng root chiếm quyền gây lỗi khởi động lại.
 	chown -R caddy:caddy /var/log/caddy
 	chmod 755 /var/log/caddy	
 	
