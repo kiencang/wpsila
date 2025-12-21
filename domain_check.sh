@@ -43,7 +43,7 @@ while [[ $COUNT -lt $MAX_RETRIES ]]; do
     # [a-z]{2,}$       : TLD phải từ 2 ký tự trở lên (vd: .vn, .com)
     if [[ -z "$DOMAIN" ]]; then
          echo -e "${RED}Loi: Khong duoc de trong!${NC}"
-    elif [[ ! "$DOMAIN" =~ ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)+$ ]]; then
+    elif [[ ! "$DOMAIN" =~ ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\.[a-z]{2,}$ ]]; then
          echo -e "${RED}Loi: Ten mien '$DOMAIN' chua ky tu khong hop le hoac sai dinh dang.${NC}"
     else
         # Input hợp lệ
