@@ -54,38 +54,42 @@ fi
 # -------------------------------------------------------------------------------------------------------------------------------
 # 2. Cài đặt wget, ca-certificates, coreutils và python3
 # -------------------------------------------------------------------------------------------------------------------------------
-# -------------------------------------------------------------------------
-# BUOC XU LY APT NANG CAO (FAST & CLEAN)
-# -------------------------------------------------------------------------
-echo "1. Chiem quyen APT va dung tien trinh chay ngam..."
-# Tat update tu dong
-systemctl stop unattended-upgrades.service >/dev/null 2>&1 || true
-systemctl disable unattended-upgrades.service >/dev/null 2>&1 || true
+	# -------------------------------------------------------------------------
+	# Tắt tiến trình chạy cập nhật ngầm của Ubuntu
+	# -------------------------------------------------------------------------
+	# Chỉ cần dùng nếu cần sử dụng apt
+	echo "1. Lay quyen APT va dung tien trinh chay ngam..."
+	systemctl stop unattended-upgrades.service >/dev/null 2>&1 || true
 
-# Kill tat ca tien trinh lien quan den apt/dpkg
-pkill -f apt >/dev/null 2>&1 || true
-pkill -f dpkg >/dev/null 2>&1 || true
-pkill -f unattended-upgr >/dev/null 2>&1 || true
+	echo "Dang cho APT giai phong lock (toi da 120s)..."
 
-# Xoa file lock (de phong bi ket)
-rm -f /var/lib/dpkg/lock*
-rm -f /var/lib/apt/lists/lock
-rm -f /var/cache/apt/archives/lock
+	timeout 120s bash -c '
+	LOCKS=(
+	  /var/lib/dpkg/lock
+	  /var/lib/apt/lists/lock
+	  /var/cache/apt/archives/lock
+	)
 
-# Sua chua database (neu viec kill gay loi do dang)
-dpkg --configure -a
+	while :; do
+	  BUSY=0
+	  for lock in "${LOCKS[@]}"; do
+		if fuser "$lock" >/dev/null 2>&1; then
+		  BUSY=1
+		  break
+		fi
+	  done
 
-echo "2. Chu dong cap nhat he thong (Upgrade)..."
-# BI QUYET:
-# -o Dpkg::Options::="--force-confdef": Tu dong chon mac dinh
-# -o Dpkg::Options::="--force-confold": Giu lai config cu neu co xung dot
-# apt-get upgrade -y: Chu dong nang cap
-apt-get update -qq
-apt-get upgrade -y -qq \
-    -o Dpkg::Options::="--force-confdef" \
-    -o Dpkg::Options::="--force-confold"
+	  if [[ "$BUSY" -eq 0 ]]; then
+		exit 0
+	  fi
 
-echo "=> He thong da san sang cai dat WPSILA!"
+	  sleep 3
+	done
+	' || true
+
+	dpkg --configure -a || true
+	
+	# -------------------------------------------------------------------------
 
 # Hàm kiểm tra gói (Dùng dpkg để chính xác cho cả lệnh và thư viện)
 is_pkg_installed() {
@@ -239,6 +243,13 @@ ln -sf "$INSTALL_DIR/wpsila_menu.sh" "$BIN_LINK"
 
 # -------------------------------------------------------------------------------------------------------------------------------
 # 8. Hoàn tất
+if [ "$NEED_INSTALL" = true ]; then
+	# Kích hoạt lại dịch vụ cập nhật tự động của Ubuntu
+	# Chỉ cần bật lại nếu trước đó tắt do dùng apt
+	echo "Khoi phuc lai che do cap nhat tu dong cua Ubuntu..."
+	systemctl start unattended-upgrades.service >/dev/null 2>&1 || true
+fi
+
 if [[ -x "$BIN_LINK" ]]; then
     echo -e "\033[0;32m=== CAI DAT THANH CONG! ===\033[0m"
     echo "Xin chuc mung ban! Hay go lenh: wpsila de bat dau su dung."
