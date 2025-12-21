@@ -5,11 +5,13 @@
 # -----------------------------------------------------------
 
 echo -e "${GREEN}[1/3] Dang nap PHP Repo ondrej ${PHP_VER} va cac module can thiet...${NC}"
-# Setup Repository (Them -y cho apt update dau tien de tranh hoi)
-# Repo ondrej/php
+
+# Setup Repository
+# Repo ondrej/php là chuẩn vàng cho Ubuntu
+# Lưu ý: Lệnh này sẽ tự động trigger apt update sau khi add xong
 add-apt-repository ppa:ondrej/php -y
 
-# Thêm repo thì cập nhật lại
+# Thêm repo thì cập nhật lại (nhưng cứ thêm cho chắc!)
 apt-get update
 
 # ==============================================================
@@ -18,7 +20,6 @@ apt-get update
 
 echo -e "${GREEN}[2/3] Dang chuan bi cai dat PHP phien ban: ${PHP_VER} ${NC}"
 
-# Da loai bo soap vi it dung cho Blog
 PHP_PACKAGES=(
     "php${PHP_VER}-fpm"       # Process Manager
     "php${PHP_VER}-cli"       # Command Line Interface & Cron
@@ -31,7 +32,9 @@ PHP_PACKAGES=(
     "php${PHP_VER}-gd"        # Fallback Image Lib
     "php${PHP_VER}-imagick"   # Primary Image Lib (Best for Blog)
     "php${PHP_VER}-intl"      # Date/Time Format
-    "php${PHP_VER}-bcmath"    # Math Precision (Plugin support)
+    "php${PHP_VER}-bcmath"    # Math Precision (WooCommerce/Plugins support)
+    "php${PHP_VER}-redis"     # Redis Object Cache (For High Performance)
+    "php${PHP_VER}-exif"      # Read metadata (Image Rotation fix)
 )
 
 # Cai dat PHP va cac module
@@ -43,6 +46,7 @@ systemctl enable --now "php${PHP_VER}-fpm"
 # E4. Kiểm tra trạng thái cuối cùng
 if	systemctl is-active --quiet "php${PHP_VER}-fpm"; then
     echo -e "${GREEN}[3/3] PHP ${PHP_VER} da cai dat THANH CONG!${NC}"
+    # Hiển thị phiên bản để double check
     php -v | head -n 1
 else
     echo -e "${RED}Co loi xay ra trong qua trinh cai dat!${NC}"

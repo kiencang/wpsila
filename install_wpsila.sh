@@ -78,6 +78,30 @@ UPDATE_WPSILA="${1:-noupdate}"
 # 2. Cài đặt wget, ca-certificates, coreutils và python3
 # -------------------------------------------------------------------------------------------------------------------------------
 
+# Hàm chờ APT nhả khóa (Có giới hạn thời gian - Timeout)
+wait_for_apt_lock() {
+    local counter=0
+    local max_retries=120 # Giới hạn 120 lần thử (120 x 5s = 600s = 10 phút)
+
+    # Vòng lặp kiểm tra: Nếu thấy apt/dpkg đang chạy HOẶC file lock đang bị giữ
+    while pgrep -a "apt|apt-get|dpkg|unattended-upgr" > /dev/null 2>&1 || \
+          lsof /var/lib/dpkg/lock-frontend > /dev/null 2>&1; do
+        
+        # Nếu đợi quá số lần quy định
+        if [[ $counter -ge $max_retries ]]; then
+            echo -e "${RED}[!] Loi: Tien trinh cap nhat he thong bi treo qua 10 phut.${NC}"
+            echo -e "${YELLOW}Giai phap: Hay thu reboot lai VPS va chay lai script.${NC}"
+            # Hoặc bạn có thể chọn: killall apt apt-get (nhưng khá mạo hiểm)
+            exit 1
+        fi
+        
+        # Thông báo đếm ngược
+        echo -e "${YELLOW}He thong dang ban (Update). Dang doi 5s... (Thu $((counter+1))/${max_retries})${NC}"
+        sleep 5
+        ((counter++))
+    done
+}
+
 # Hàm kiểm tra gói (Dùng dpkg để chính xác cho cả lệnh và thư viện)
 is_pkg_installed() {
     dpkg -s "$1" &> /dev/null
@@ -95,6 +119,8 @@ for pkg in $REQUIRED_PKGS; do
 done
 
 if [ "$NEED_INSTALL" = true ]; then
+	# Gọi hàm chờ, kiểm tra lock apt
+	wait_for_apt_lock
     echo "Dang cai dat/cap nhat cac goi phu thuoc: $REQUIRED_PKGS..."
     apt-get update -qq && \
     apt-get install -y -qq $REQUIRED_PKGS || \
