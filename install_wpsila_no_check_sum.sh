@@ -54,6 +54,38 @@ fi
 # -------------------------------------------------------------------------------------------------------------------------------
 # 2. Cài đặt wget, ca-certificates, coreutils và python3
 # -------------------------------------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------
+# BUOC XU LY APT NANG CAO (FAST & CLEAN)
+# -------------------------------------------------------------------------
+echo "1. Chiem quyen APT va dung tien trinh chay ngam..."
+# Tat update tu dong
+systemctl stop unattended-upgrades.service >/dev/null 2>&1 || true
+systemctl disable unattended-upgrades.service >/dev/null 2>&1 || true
+
+# Kill tat ca tien trinh lien quan den apt/dpkg
+pkill -f apt >/dev/null 2>&1 || true
+pkill -f dpkg >/dev/null 2>&1 || true
+pkill -f unattended-upgr >/dev/null 2>&1 || true
+
+# Xoa file lock (de phong bi ket)
+rm -f /var/lib/dpkg/lock*
+rm -f /var/lib/apt/lists/lock
+rm -f /var/cache/apt/archives/lock
+
+# Sua chua database (neu viec kill gay loi do dang)
+dpkg --configure -a
+
+echo "2. Chu dong cap nhat he thong (Upgrade)..."
+# BI QUYET:
+# -o Dpkg::Options::="--force-confdef": Tu dong chon mac dinh
+# -o Dpkg::Options::="--force-confold": Giu lai config cu neu co xung dot
+# apt-get upgrade -y: Chu dong nang cap
+apt-get update -qq
+apt-get upgrade -y -qq \
+    -o Dpkg::Options::="--force-confdef" \
+    -o Dpkg::Options::="--force-confold"
+
+echo "=> He thong da san sang cai dat WPSILA!"
 
 # Hàm kiểm tra gói (Dùng dpkg để chính xác cho cả lệnh và thư viện)
 is_pkg_installed() {
