@@ -50,8 +50,9 @@ show_menu() {
     echo -e "  ${YELLOW}7.${NC} >> Xoa cai dat (delete) website WordPress"
     echo -e "${BLUE}-----------------------------------------------------------${NC}"
     echo -e "  ${YELLOW}8.${NC} >> Cai dat quan ly database (can thi moi cai)"
+	echo -e "  ${YELLOW}9.${NC} >> Xem thong tin pass cua quan ly database"
     echo -e "${BLUE}-----------------------------------------------------------${NC}"
-    echo -e "  ${YELLOW}9.${NC} >> Kiem tra cap nhat cho wpsila"	
+    echo -e "  ${YELLOW}10.${NC} >> Kiem tra cap nhat cho wpsila"	
     echo -e "${BLUE}-----------------------------------------------------------${NC}"	
     echo -e "  ${YELLOW}0.${NC} >> Exit (thoat) >>"
     echo -e "${BLUE}===========================================================${NC}"
@@ -131,6 +132,13 @@ while true; do
             fi
             echo -e "\n${BLUE}An Enter de quay lai...${NC}"; read -r ;; # Them -r		
         9)
+            if [[ -f "$BASE_DIR/adminer.sh" ]]; then
+                bash "$BASE_DIR/adminer.sh"
+            else
+                echo -e "${RED}Loi: Khong tim thay file adminer.sh${NC}"
+            fi
+            echo -e "\n${BLUE}An Enter de quay lai...${NC}"; read -r ;; # Them -r				
+        10)
             if [[ -f "$BASE_DIR/check_for_update.sh" ]]; then
                 bash "$BASE_DIR/check_for_update.sh"
             else

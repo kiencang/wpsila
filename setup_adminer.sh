@@ -53,16 +53,26 @@ read -p "Nhap ten mien cho Adminer (VD: db.domain.com): " INPUT_DOMAIN
     
     # Validation cơ bản
     if [[ -z "$DOMAIN" ]]; then
-        echo -e "${RED}Loi: Ten mien khong duoc de trong!${NC}"
+        echo -e "${RED}Loi: Dia chi khong duoc de trong!${NC}"
 		exit 1
     elif [[ "$DOMAIN" != *"."* ]]; then
-        echo -e "${RED}Loi: Ten mien '$DOMAIN' khong hop le (thieu dau cham).${NC}"
+        echo -e "${RED}Loi: Dia chi '$DOMAIN' khong hop le (thieu dau cham).${NC}"
 		exit 1
     else
         if [[ "$INPUT_DOMAIN" != "$DOMAIN" ]]; then
              echo -e "${GREEN}Script da tu dong chuan hoa input '${INPUT_DOMAIN}' thanh '${DOMAIN}'${NC}"
         fi
     fi
+
+# Caddyfile	
+CADDY_FILE="/etc/caddy/Caddyfile"	
+
+# Kiểm tra sớm để tránh rác cài đặt
+if grep -Eq "^[^#]*([[:space:]]|^)$DOMAIN([[:space:]]|:|\{|$)" "$CADDY_FILE"; then
+    echo "CANH BAO: $DOMAIN da co trong Caddyfile."
+    echo "-> Da BO QUA viec chen de tranh trung lap."
+	exit 1	
+fi	
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
@@ -108,7 +118,6 @@ PHP_SOCKET="/run/php/php${PHP_VER}-fpm.sock"
 
 # Thư mục cài adminer
 INSTALL_DIR="/var/www/adminer"
-CADDY_FILE="/etc/caddy/Caddyfile"
 
 # Cố định cho cả 2 phần để đỡ rắc rối
 USER_NAME="adminer_db"
@@ -124,6 +133,14 @@ if [[ ! -S "$PHP_SOCKET" ]]; then
     exit 1
 fi
 echo "-> OK."
+
+# Kiểm tra trước sự tồn tại của thư mục adminer trong caddyfile để chặn sớm ngay từ đầu
+# Tránh việc cài đặt
+if grep -q "$INSTALL_DIR" "$CADDY_FILE"; then
+    echo "CANH BAO: Duong dan '$INSTALL_DIR' da co trong Caddyfile."
+    echo "-> Da BO QUA viec chen de tranh trung lap."
+	exit 1
+fi	
 
 # --- 2. CÀI ĐẶT ADMINER ---
 echo "[2/4] Dang tai Adminer..."
@@ -144,6 +161,7 @@ chown -R www-data:www-data "$INSTALL_DIR"
 
 # Phân quyền
 chmod 755 "$INSTALL_DIR"
+chmod 644 "$INSTALL_DIR/index.php"
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
@@ -155,10 +173,12 @@ if ! systemctl is-active --quiet mariadb; then
     systemctl start mariadb
 fi
 
-mysql -e "CREATE USER IF NOT EXISTS '${USER_NAME}'@'localhost' IDENTIFIED BY '${DB_PASS}';"
-mysql -e "ALTER USER '${USER_NAME}'@'localhost' IDENTIFIED BY '${DB_PASS}';"
-mysql -e "GRANT ALL PRIVILEGES ON *.* TO '${USER_NAME}'@'localhost' WITH GRANT OPTION;"
-mysql -e "FLUSH PRIVILEGES;"
+mysql <<EOF
+CREATE USER IF NOT EXISTS '${USER_NAME}'@'localhost' IDENTIFIED BY '${DB_PASS}';
+ALTER USER '${USER_NAME}'@'localhost' IDENTIFIED BY '${DB_PASS}';
+GRANT ALL PRIVILEGES ON *.* TO '${USER_NAME}'@'localhost' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
+EOF
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
@@ -190,10 +210,13 @@ fi
 
 echo "-> Backup cho Caddyfile da duoc tao: $BACKUP_FILE"
 
-# Kiểm tra tồn tại của thư mục adminer
-if grep -q "$INSTALL_DIR" "$CADDY_FILE"; then
-    echo "CANH BAO: Duong dan '$INSTALL_DIR' da co trong Caddyfile."
+# Kiểm tra tồn tại của tên miền trong file caddyfile
+# ^[^#]* : Bắt đầu dòng KHÔNG phải dấu # (bỏ qua comment)
+# [[:space:]] : Domain thường đứng sau khoảng trắng hoặc đầu dòng
+if grep -Eq "^[^#]*([[:space:]]|^)$DOMAIN([[:space:]]|:|\{|$)" "$CADDY_FILE"; then
+    echo "CANH BAO: $DOMAIN da co trong Caddyfile."
     echo "-> Da BO QUA viec chen de tranh trung lap."
+	exit 1
 else
     # Hash password
     HASHED_PASS=$(caddy hash-password --plaintext "$WEB_PASS")
@@ -268,7 +291,30 @@ fi
 # +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
-# G. XUẤT KẾT QUẢ
+# G. Ghi thêm thông tin đăng nhập adminer vào file adminer.txt
+CRED_FILE="$SCRIPT_WPSILA_DIR/adminer.txt"
+
+# Kiểm tra nếu file tồn tại thì mới xóa
+rm -f "$CRED_FILE"
+
+# Tạo mới
+cat > "$CRED_FILE" <<EOF
+----------------------------------------
+ADMINER CREDENTIALS
+Date: $(date)
+----------------------------------------
+URL: https://${DOMAIN}
+[LOP 1] WEB LOGIN (Basic Auth):
+User: ${USER_NAME}
+Pass: ${WEB_PASS}
+----------------------------------------
+[LOP 2] DATABASE LOGIN:
+User: ${USER_NAME}
+Pass: ${DB_PASS}
+EOF
+chmod 600 "$CRED_FILE" # Chỉ user hiện tại mới đọc được file này
+
+# Xuất ra màn hình
 echo ""
 echo "======================================="
 echo "   CAI DAT THANH CONG!"
@@ -282,5 +328,6 @@ echo ""
 echo "[LOP 2] DATABASE LOGIN:"
 echo "   User: $USER_NAME"
 echo "   Pass: $DB_PASS"
+echo "	Xem lai pass o mục <9>"
 echo "======================================="
 # -------------------------------------------------------------------------------------------------------------------------------
