@@ -63,17 +63,18 @@ error_exit() {
 echo "=== DANG CAI DAT WPSILA ==="
 # 1. Kiểm tra xem đang chạy với quyền gì
 if [[ $EUID -ne 0 ]]; then
-	# Yêu cầu chạy quyền ROOT
-	echo -e "${RED}Ban phai chay script voi quyen root.${NC}"
-	exit 1
+# Yêu cầu chạy quyền ROOT
+    echo -e "${RED}Ban phai chay script voi quyen root.${NC}"
+    exit 1
 fi
 
 # Kiểm tra hệ điều hành có phù hợp hay không?
 # Yêu cầu Ubuntu 22.04 hoặc 24.04
 if [ -f /etc/os-release ]; then
+    # shellcheck source=/dev/null
     . /etc/os-release
     # Xóa dấu ngoặc kép nếu có (ví dụ "24.04" -> 24.04)
-    CURRENT_VER=$(echo $VERSION_ID | tr -d '"')
+    CURRENT_VER=$(echo "$VERSION_ID" | tr -d '"')
     
     if [[ "$ID" != "ubuntu" ]] || [[ ! "$CURRENT_VER" =~ ^(22.04|24.04)$ ]]; then
         echo -e "${RED}[!] Loi: WPSILA chi ho tro Ubuntu 22.04 va 24.04.${NC}"
@@ -93,7 +94,29 @@ UPDATE_WPSILA="${1:-noupdate}"
 # +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
-# 2. Cài đặt wget, ca-certificates, coreutils và python3
+# 2. Tạo thư mục cho mã nguồn của wpsila
+if [[ ! -d "$INSTALL_DIR" ]]; then
+    mkdir -p "$INSTALL_DIR"
+fi
+
+# Chặn ghi đè
+if [[ "$UPDATE_WPSILA" != "update" ]]; then
+    # Kiểm tra sự tồn tại của file cấu hình
+    if [[ -f "${INSTALL_DIR}/wpsila.conf" ]]; then
+        echo -e "${RED}[!] Tim thay file cau hinh: ${INSTALL_DIR}/wpsila.conf${NC}"
+        echo -e "${RED}[!] Ban da cai dat wpsila truoc day!${NC}"
+        echo -e "----------------------------------------------------------------"
+        echo -e "Chung toi dung chay de tranh ghi de co the gay loi website."
+        echo -e "----------------------------------------------------------------"
+        exit 0
+    fi
+fi
+# -------------------------------------------------------------------------------------------------------------------------------
+
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
+# 3. Cài đặt wget, ca-certificates, coreutils và python3
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # -------------------------------------------------------------------------
@@ -148,33 +171,14 @@ done
 
 if [ "$NEED_INSTALL" = true ]; then
     echo "Dang cai dat/cap nhat cac goi phu thuoc: $REQUIRED_PKGS..."
-    apt-get update -qq && \
-    apt-get install -y -qq $REQUIRED_PKGS || \
-    error_exit "Khong the cai dat cac phu thuoc co ban."
+	# shellcheck disable=SC2086
+    if apt-get update -qq && apt-get install -y -qq $REQUIRED_PKGS; then
+       echo "Cai dat thanh cong"
+    else
+       error_exit "Khong the cai dat cac phu thuoc co ban."
+    fi
 else
     echo "Tat ca cac goi phu thuoc da duoc cai dat day du."
-fi
-# -------------------------------------------------------------------------------------------------------------------------------
-
-# +++
-
-# -------------------------------------------------------------------------------------------------------------------------------
-# 3. Tạo thư mục cho mã nguồn của wpsila
-if [[ ! -d "$INSTALL_DIR" ]]; then
-    mkdir -p "$INSTALL_DIR"
-fi
-
-# Chặn ghi đè
-if [[ "$UPDATE_WPSILA" != "update" ]]; then
-    # Kiểm tra sự tồn tại của file cấu hình
-    if [[ -f "${INSTALL_DIR}/wpsila.conf" ]]; then
-        echo -e "${RED}[!] Tim thay file cau hinh: ${INSTALL_DIR}/wpsila.conf${NC}"
-        echo -e "${RED}[!] Ban da cai dat wpsila truoc day!${NC}"
-        echo -e "----------------------------------------------------------------"
-        echo -e "Chung toi dung chay de tranh ghi de co the gay loi website."
-        echo -e "----------------------------------------------------------------"
-        exit 0
-    fi
 fi
 # -------------------------------------------------------------------------------------------------------------------------------
 
@@ -233,7 +237,7 @@ download_file() {
     local expected_checksum="${CHECKSUMS[$filename]}"
 
     # 1. Tien hang tai file
-	# Thêm --tries=3 --timeout=15 để hạn chế vấn đề mạng lag
+    # Thêm --tries=3 --timeout=15 để hạn chế vấn đề mạng lag
     if ! wget -q --no-cache --tries=3 --timeout=15 "$url" -O "$dest"; then
         echo -e "${RED}[DOWNLOAD FAIL]${NC} Khong the tai: $url"
         rm -f "$dest"
@@ -367,7 +371,7 @@ chmod +x "$INSTALL_DIR/wpsila_menu.sh"
 
 # -------------------------------------------------------------------------------------------------------------------------------
 # 7. Tạo Symlink an toàn
-rm -f "$BIN_LINK" 
+rm -f "$BIN_LINK"
 ln -sf "$INSTALL_DIR/wpsila_menu.sh" "$BIN_LINK"
 # -------------------------------------------------------------------------------------------------------------------------------
 
