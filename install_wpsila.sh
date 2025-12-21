@@ -142,8 +142,8 @@ rm -f "$INSTALL_DIR/"*.sh
 # Sử dụng mã generate_checksum chạy để lấy mã này về
 # Dev bắt buộc phải dùng trước khi công bố phiên bản mới
 # ----------------------------------------------------------------------------
-# Generated at: Sun Dec 21 11:40:57 +07 2025
-# Version: v0.1.7
+# Generated at: Sun Dec 21 12:00:32 +07 2025
+# Version: v0.1.8
 declare -A CHECKSUMS=(
     ["wpsila.conf"]="37949dce87686d946195ae65dcd0e1e95a763c1bfa40ee7c2583f20040680ac2"
     ["wpsila_menu.sh"]="b0d5a8dd7622e55dfd03783ac1757574478a1382ffa210875cd002b594cea016"
@@ -164,7 +164,7 @@ declare -A CHECKSUMS=(
     ["setup_sftp.sh"]="bd6a11fd7f529acffb6ad1de139b3ce918552c25f5a9bf1bae042913e86a9989"
     ["setup_adminer.sh"]="a8324f0678ee6d00afe9eb35c2400898dc7bb304add4265714accb8eadd11741"
     ["wpp.sh"]="c8e548e9c551c2bb2661cb5d24b26c2aca752e17bcf77c1aad66192ed11e010a"
-    ["check_for_update.sh"]="c7a10fbbdf376ab9a892084759f839cabd31e80575aacaaab63509800b714cd2"
+    ["check_for_update.sh"]="7af3e4a6ea6dcf5b0121f48a51276d7f6e0baa5c7ae3e00ef69bbc0141f17092"
 )
 # -------------------------------------------------------------------------------------------------------------------------------
 
