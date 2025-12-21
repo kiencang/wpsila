@@ -3,49 +3,50 @@
 # File này được nhúng vào script install_wp.sh
 # -----------------------------------------------------------
 
-if [[ "$INSTALL_TYPE" != "subdomain" ]]; then
-	echo -e "${GREEN}>>> Vui long nhap ten mien cua ban (vi du: example.com):${NC}"
-fi
-
-if [[ "$INSTALL_TYPE" == "subdomain" ]]; then
-	echo -e "${GREEN}>>> Vui long nhap SubDomain cua ban (vi du: hello.example.com):${NC}"
-fi
-
-# E1. Cấu hình số lần thử tối đa
+# E1. Cấu hình
 MAX_RETRIES=3
 COUNT=0
 DOMAIN=""
 
-# E2. Bắt đầu vòng lặp nhập liệu
+# Thiết lập prompt dựa trên loại cài đặt
+if [[ "$INSTALL_TYPE" == "subdomain" ]]; then
+    PROMPT_TEXT="Nhap SubDomain (vi du: hello.example.com): "
+    TYPE_TEXT="SubDomain"
+else
+    PROMPT_TEXT="Nhap ten mien (vi du: example.com): "
+    TYPE_TEXT="Ten mien"
+fi
+
+echo -e "${GREEN}>>> Vui long nhap ${TYPE_TEXT} cua ban.${NC}"
+
+# E2. Vòng lặp nhập liệu
 while [[ $COUNT -lt $MAX_RETRIES ]]; do
-    COUNT=$((COUNT + 1)) 
+    COUNT=$((COUNT + 1))
     
-    if [[ $COUNT -eq 1 ]]; then
-		if [[ "$INSTALL_TYPE" != "subdomain" ]]; then
-			read -p "Nhap ten mien: " INPUT_DOMAIN < /dev/tty
-		else 
-			read -p "Nhap SubDomain: " INPUT_DOMAIN < /dev/tty
-		fi	
-    else
-        echo -e "${RED}Ban vua nhap sai! Hay chu y nhap lai dung nhe.${NC}"
-		
-		if [[ "$INSTALL_TYPE" != "subdomain" ]]; then
-			read -p "Nhap ten mien: " INPUT_DOMAIN < /dev/tty
-		else 
-			read -p "Nhap SubDomain: " INPUT_DOMAIN < /dev/tty
-		fi	
+    # Chỉ hiển thị cảnh báo từ lần 2 trở đi
+    if [[ $COUNT -gt 1 ]]; then
+        echo -e "${RED}Loi: Dinh dang khong hop le. Vui long thu lai (${COUNT}/${MAX_RETRIES}).${NC}"
     fi
-    
-    # Xử lý chuỗi
-    TEMP_DOMAIN=$(echo "$INPUT_DOMAIN" | tr -d ' ' | tr '[:upper:]' '[:lower:]')
-    DOMAIN=$(echo "$TEMP_DOMAIN" | sed -e 's|^https\?://||' -e 's|/.*$||')
-    
-    # Validation cơ bản
+
+    read -p "$PROMPT_TEXT" INPUT_DOMAIN < /dev/tty
+
+    # 1. Chuẩn hóa: Lowercase -> Xóa khoảng trắng -> Xóa protocol/path
+    # Sửa regex sed để bắt chính xác hơn các trường hợp có port hoặc user:pass
+    TEMP_DOMAIN=$(echo "$INPUT_DOMAIN" | tr '[:upper:]' '[:lower:]' | tr -d ' ')
+    DOMAIN=$(echo "$TEMP_DOMAIN" | sed -E 's|^https?://||' | sed -E 's|/.*$||' | sed -E 's|:[0-9]+$||')
+
+    # 2. Validation chuyên sâu (Regex chuẩn RFC 1035/1123)
+    # Giải thích Regex:
+    # ^[a-z0-9]        : Bắt đầu bằng chữ hoặc số
+    # ([-a-z0-9]*...   : Phần giữa có thể chứa gạch ngang
+    # \.               : Phải có dấu chấm
+    # [a-z]{2,}$       : TLD phải từ 2 ký tự trở lên (vd: .vn, .com)
     if [[ -z "$DOMAIN" ]]; then
-        echo -e "${RED}Loi: Ten mien khong duoc de trong!${NC}"
-    elif [[ "$DOMAIN" != *"."* ]]; then
-        echo -e "${RED}Loi: Ten mien '$DOMAIN' khong hop le (thieu dau cham).${NC}"
+         echo -e "${RED}Loi: Khong duoc de trong!${NC}"
+    elif [[ ! "$DOMAIN" =~ ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)+$ ]]; then
+         echo -e "${RED}Loi: Ten mien '$DOMAIN' chua ky tu khong hop le hoac sai dinh dang.${NC}"
     else
+        # Input hợp lệ
         if [[ "$INPUT_DOMAIN" != "$DOMAIN" ]]; then
              echo -e "${GREEN}Script da tu dong chuan hoa input '${INPUT_DOMAIN}' thanh '${DOMAIN}'${NC}"
         fi
@@ -55,49 +56,34 @@ while [[ $COUNT -lt $MAX_RETRIES ]]; do
     if [[ $COUNT -eq $MAX_RETRIES ]]; then
         echo -e "${RED}Ban da nhap sai qua 3 lan. Dung script.${NC}"
         exit 1
-    else
-        echo "Vui long thu lai..."
-        echo "-------------------------"
     fi
 done
 
-# --- BƯỚC MỚI: KIỂM TRA TỒN TẠI (QUAN TRỌNG) ---
+# --- BƯỚC MỚI: KIỂM TRA TỒN TẠI & AN TOÀN ---
 echo "Dang kiem tra an toan he thong..."
 
-# Không phải subdomain mới cần xác định chuyển hướng
-if [[ "$INSTALL_TYPE" != "subdomain" ]]; then
-	# Xác định luôn dạng chuyển hướng của tên miền để tiện kiểm tra thư mục web gốc
-	if [[ "$DOMAIN" == www.* ]]; then
-		RED_DOMAIN="${DOMAIN#www.}"
-	else
-		RED_DOMAIN="www.$DOMAIN"
-	fi
-fi
-
-# Định nghĩa đường dẫn
-# Thư mục tên miền người dùng nhập vào
 WEB_ROOT_DIR_CHECK="/var/www/$DOMAIN"
+CADDY_CONF_CHECK="/etc/caddy/Caddyfile"
 
+# Xử lý logic www/non-www
+WEB_ROOT_DIR_CHECK_RED=""
 if [[ "$INSTALL_TYPE" != "subdomain" ]]; then
-	# Dự phòng thư mục tên miền chuyển hướng
-	# Chỉ phải check khi kiểu cài đặt không phải là dạng subdomain
-	WEB_ROOT_DIR_CHECK_RED="/var/www/$RED_DOMAIN"
+    if [[ "$DOMAIN" == www.* ]]; then
+        RED_DOMAIN="${DOMAIN#www.}"
+    else
+        RED_DOMAIN="www.$DOMAIN"
+    fi
+    WEB_ROOT_DIR_CHECK_RED="/var/www/$RED_DOMAIN"
 fi
 
-# Đường dẫn tới file Caddyfile của Webserver, phải ghi đè vào đường dẫn này
-CADDY_CONF_CHECK="/etc/caddy/Caddyfile" 
-
-# 1. Kiểm tra trong Caddyfile (Deep Scan Check)
+# 1. Kiểm tra Caddyfile (Deep Scan & Ignore Comments)
 if [[ -f "$CADDY_CONF_CHECK" ]]; then
-    # Regex Explained:
-    # (^|[[:space:]/])      : Bắt đầu dòng, khoảng trắng hoặc dấu /
-    # $DOMAIN               : Tên miền
-    # ([[:space:],:]|\{|$)  : Kết thúc bằng khoảng trắng, dấu phẩy (,), dấu hai chấm (:) hoặc dấu {
-    
-    if grep -Eq "(^|[[:space:]/])$DOMAIN([[:space:],:]|\{|$)" "$CADDY_CONF_CHECK"; then
+    # Grep logic cải tiến:
+    # ^[^#]* : Bắt đầu dòng KHÔNG phải dấu # (bỏ qua comment)
+    # [[:space:]] : Domain thường đứng sau khoảng trắng hoặc đầu dòng
+    if grep -Eq "^[^#]*([[:space:]]|^)$DOMAIN([[:space:]]|:|\{|$)" "$CADDY_CONF_CHECK"; then
         echo -e "${RED}NGUY HIEM: Ten mien [$DOMAIN] da duoc cau hinh trong Caddyfile!${NC}"
-        echo -e "Script phat hien ten mien nay da ton tai (co the kem theo port hoac trong danh sach)."
-        echo -e "Vui long kiem tra file $CADDY_CONF_CHECK va xoa cau hinh cu truoc khi chay lai."
+        echo -e "Script phat hien domain nay dang hoat dong (khong tinh dong comment)."
         exit 1
     fi
 fi
@@ -105,36 +91,17 @@ fi
 # 2. Kiểm tra thư mục Web
 if [[ -d "$WEB_ROOT_DIR_CHECK" ]]; then
     echo -e "${RED}NGUY HIEM: Thu muc web [$WEB_ROOT_DIR_CHECK] da ton tai!${NC}"
-    echo -e "Viec tiep tuc co the ghi de du lieu cu."
-    echo -e "Vui long xoa thu muc thu cong hoac chon ten mien khac."
     exit 1
 fi
 
-# Không phải dạng subdomain mới cần kiểm tra
-if [[ "$INSTALL_TYPE" != "subdomain" ]]; then
-
-	if [[ -d "$WEB_ROOT_DIR_CHECK_RED" ]]; then
-		echo -e "${RED}NGUY HIEM: Thu muc web [$WEB_ROOT_DIR_CHECK_RED] da ton tai!${NC}"
-		echo -e "Viec tiep tuc co the gay nham lan."
-		echo -e "Vui long xoa thu muc thu cong hoac chon ten mien khac."
-		exit 1
-	fi
-	
+if [[ -n "$WEB_ROOT_DIR_CHECK_RED" && -d "$WEB_ROOT_DIR_CHECK_RED" ]]; then
+    echo -e "${RED}NGUY HIEM: Thu muc web redirection [$WEB_ROOT_DIR_CHECK_RED] da ton tai!${NC}"
+    exit 1
 fi
 
 echo -e "${GREEN}Kiem tra an toan hoan tat.${NC}"
-# -----------------------------------------------
 
-# --- Script tiếp tục chạy từ đây khi dữ liệu đã đúng ---
-if [[ "$INSTALL_TYPE" != "subdomain" ]]; then
-	echo -e "Thanh cong! Ten mien duoc chap nhan: $DOMAIN"
-	echo -e "${GREEN}>>> Dang tien hanh cai dat cho domain: ${YELLOW}$DOMAIN${NC}"
-fi
-
-# Thông báo cho trường hợp là subdomain
-if [[ "$INSTALL_TYPE" == "subdomain" ]]; then
-	echo -e "Thanh cong! SubDomain duoc chap nhan: $DOMAIN"
-	echo -e "${GREEN}>>> Dang tien hanh cai dat cho subdomain: ${YELLOW}$DOMAIN${NC}"
-fi
-
+# --- KẾT THÚC MODULE ---
+echo -e "Thanh cong! ${TYPE_TEXT} duoc chap nhan: $DOMAIN"
+echo -e "${GREEN}>>> Dang tien hanh cai dat cho: ${YELLOW}$DOMAIN${NC}"
 sleep 2
