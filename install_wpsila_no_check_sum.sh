@@ -54,6 +54,23 @@ fi
 # -------------------------------------------------------------------------------------------------------------------------------
 # 2. Cài đặt wget, ca-certificates, coreutils và python3
 # -------------------------------------------------------------------------------------------------------------------------------
+# Hàm kiểm tra gói (Dùng dpkg để chính xác cho cả lệnh và thư viện)
+is_pkg_installed() {
+    dpkg -s "$1" &> /dev/null
+}
+
+# Danh sách các gói cần thiết
+REQUIRED_PKGS="wget ca-certificates coreutils python3"
+NEED_INSTALL=false
+
+for pkg in $REQUIRED_PKGS; do
+    if ! is_pkg_installed "$pkg"; then
+        NEED_INSTALL=true
+        break
+    fi
+done
+
+if [ "$NEED_INSTALL" = true ]; then
 	# -------------------------------------------------------------------------
 	# Tắt tiến trình chạy cập nhật ngầm của Ubuntu
 	# -------------------------------------------------------------------------
@@ -90,24 +107,6 @@ fi
 	dpkg --configure -a || true
 	
 	# -------------------------------------------------------------------------
-
-# Hàm kiểm tra gói (Dùng dpkg để chính xác cho cả lệnh và thư viện)
-is_pkg_installed() {
-    dpkg -s "$1" &> /dev/null
-}
-
-# Danh sách các gói cần thiết
-REQUIRED_PKGS="wget ca-certificates coreutils python3"
-NEED_INSTALL=false
-
-for pkg in $REQUIRED_PKGS; do
-    if ! is_pkg_installed "$pkg"; then
-        NEED_INSTALL=true
-        break
-    fi
-done
-
-if [ "$NEED_INSTALL" = true ]; then
     echo "Dang cai dat/cap nhat cac goi phu thuoc: $REQUIRED_PKGS..."
     apt-get update -qq && \
     apt-get install -y -qq $REQUIRED_PKGS || \
