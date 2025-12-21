@@ -98,40 +98,14 @@ sleep 1
 
 # -------------------------------------------------------------------------------------------------------------------------------
 # C4. UPDATE SYSTEM & DEPENDENCIES
-#C4.1 Hàm chờ tránh lock
-wait_for_apt_lock() {
-    local counter=0
-    local max_retries=30 # Giới hạn 30 lần thử (30 x 30s = 900s = 15 phút)
-
-    # Vòng lặp kiểm tra: Nếu thấy apt/dpkg đang chạy HOẶC file lock đang bị giữ
-    while pgrep -a "apt|apt-get|dpkg|unattended-upgr" > /dev/null 2>&1 || \
-          lsof /var/lib/dpkg/lock-frontend > /dev/null 2>&1; do
-        
-        # Nếu đợi quá số lần quy định
-        if [[ $counter -ge $max_retries ]]; then
-            echo -e "${RED}[!] Loi: Tien trinh cap nhat he thong bi treo qua 15 phut.${NC}"
-            echo -e "${YELLOW}Giai phap: Hay thu reboot lai VPS va chay lai script.${NC}"
-            # Hoặc bạn có thể chọn: killall apt apt-get (nhưng khá mạo hiểm)
-            exit 1
-        fi
-        
-        # Thông báo đếm ngược
-        echo -e "${YELLOW}He thong dang cap nhat (Update). Dang doi 30s... (Thu $((counter+1))/${max_retries})${NC}"
-        sleep 30
-        counter=$((counter+1))
-    done
-}
-
-# C4.2. Gọi hàm chờ, tránh lock
-wait_for_apt_lock
 echo "--------------------------------------------------------"
 echo "Cap nhat he thong va cai dat cac goi co ban..."
 
-# C4.3. Gỡ bỏ các webserver mặc định (Apache/Nginx) nếu có để tránh xung đột tiềm ẩn
+# C4.1. Gỡ bỏ các webserver mặc định (Apache/Nginx) nếu có để tránh xung đột tiềm ẩn
 # Dùng || true để không báo lỗi nếu không tìm thấy gói
 apt-get remove --purge -y apache2 apache2-* nginx nginx-* &>/dev/null || true
 
-# C4.4 Cập nhật và cài đặt gói bổ trợ
+# C4.2 Cập nhật và cài đặt gói bổ trợ
 # Đã xóa dấu '&& \' bị thừa ở cuối lệnh để tránh lỗi cú pháp
 apt-get update
 apt-get install -y --no-install-recommends \

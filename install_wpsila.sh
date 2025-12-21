@@ -78,29 +78,39 @@ UPDATE_WPSILA="${1:-noupdate}"
 # 2. Cài đặt wget, ca-certificates, coreutils và python3
 # -------------------------------------------------------------------------------------------------------------------------------
 
-# Hàm chờ APT nhả khóa (Có giới hạn thời gian - Timeout)
-wait_for_apt_lock() {
-    local counter=0
-    local max_retries=30 # Giới hạn 30 lần thử (30 x 30s = 900s = 15 phút)
+# -------------------------------------------------------------------------
+# BUOC XU LY APT NANG CAO (FAST & CLEAN)
+# -------------------------------------------------------------------------
 
-    # Vòng lặp kiểm tra: Nếu thấy apt/dpkg đang chạy HOẶC file lock đang bị giữ
-    while pgrep -a "apt|apt-get|dpkg|unattended-upgr" > /dev/null 2>&1 || \
-          lsof /var/lib/dpkg/lock-frontend > /dev/null 2>&1; do
-        
-        # Nếu đợi quá số lần quy định
-        if [[ $counter -ge $max_retries ]]; then
-            echo -e "${RED}[!] Loi: Tien trinh cap nhat he thong bi treo qua 15 phut.${NC}"
-            echo -e "${YELLOW}Giai phap: Hay thu reboot lai VPS va chay lai script.${NC}"
-            # Hoặc bạn có thể chọn: killall apt apt-get (nhưng khá mạo hiểm)
-            exit 1
-        fi
-        
-        # Thông báo đếm ngược
-        echo -e "${YELLOW}He thong dang cap nhat (Update). Dang doi 30s... (Thu $((counter+1))/${max_retries})${NC}"
-        sleep 30
-        counter=$((counter+1))
-    done
-}
+echo "1. Chiem quyen APT va dung tien trinh chay ngam..."
+# Tat update tu dong
+systemctl stop unattended-upgrades.service >/dev/null 2>&1 || true
+systemctl disable unattended-upgrades.service >/dev/null 2>&1 || true
+
+# Kill tat ca tien trinh lien quan den apt/dpkg
+pkill -f apt >/dev/null 2>&1 || true
+pkill -f dpkg >/dev/null 2>&1 || true
+pkill -f unattended-upgr >/dev/null 2>&1 || true
+
+# Xoa file lock (de phong bi ket)
+rm -f /var/lib/dpkg/lock*
+rm -f /var/lib/apt/lists/lock
+rm -f /var/cache/apt/archives/lock
+
+# Sua chua database (neu viec kill gay loi do dang)
+dpkg --configure -a
+
+echo "2. Chu dong cap nhat he thong (Upgrade)..."
+# BI QUYET:
+# -o Dpkg::Options::="--force-confdef": Tu dong chon mac dinh
+# -o Dpkg::Options::="--force-confold": Giu lai config cu neu co xung dot
+# apt-get upgrade -y: Chu dong nang cap
+apt-get update -qq
+apt-get upgrade -y -qq \
+    -o Dpkg::Options::="--force-confdef" \
+    -o Dpkg::Options::="--force-confold"
+
+echo "=> He thong da san sang cai dat WPSILA!"
 
 # Hàm kiểm tra gói (Dùng dpkg để chính xác cho cả lệnh và thư viện)
 is_pkg_installed() {
@@ -119,8 +129,6 @@ for pkg in $REQUIRED_PKGS; do
 done
 
 if [ "$NEED_INSTALL" = true ]; then
-	# Gọi hàm chờ, kiểm tra lock apt
-	wait_for_apt_lock
     echo "Dang cai dat/cap nhat cac goi phu thuoc: $REQUIRED_PKGS..."
     apt-get update -qq && \
     apt-get install -y -qq $REQUIRED_PKGS || \
