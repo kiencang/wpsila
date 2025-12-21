@@ -6,7 +6,7 @@
 # Website: https://wpsila.com
 # GitHub: https://github.com/kiencang/wpsila
 # Copyright (c) 2025 - Nguyen Duc Anh
-# This script is licensed under M.I.T
+# This script is licensed under GPL-3.0
 # -------------------------------------------------------------------------
 # curl -sL https://vps.wpsila.com | sudo bash
 # -------------------------------------------------------------------------
@@ -123,6 +123,7 @@ fi
 # BUOC XU LY APT NANG CAO (FAST & CLEAN)
 # -------------------------------------------------------------------------
 
+# Tắt tiến trình chạy cập nhật ngầm của Ubuntu
 echo "1. Lay quyen APT va dung tien trinh chay ngam..."
 # Tat update tu dong
 systemctl stop unattended-upgrades.service >/dev/null 2>&1 || true
@@ -141,17 +142,9 @@ rm -f /var/cache/apt/archives/lock
 # Sua chua database (neu viec kill gay loi do dang)
 dpkg --configure -a
 
-echo "2. Chu dong cap nhat he thong (Upgrade)..."
-# BI QUYET:
-# -o Dpkg::Options::="--force-confdef": Tu dong chon mac dinh
-# -o Dpkg::Options::="--force-confold": Giu lai config cu neu co xung dot
-# apt-get upgrade -y: Chu dong nang cap
-apt-get update -qq
-apt-get upgrade -y -qq \
-    -o Dpkg::Options::="--force-confdef" \
-    -o Dpkg::Options::="--force-confold"
-
 echo "=> He thong da san sang cai dat WPSILA!"
+
+# -------------------------------------------------------------------------
 
 # Hàm kiểm tra gói (Dùng dpkg để chính xác cho cả lệnh và thư viện)
 is_pkg_installed() {
@@ -173,12 +166,12 @@ if [ "$NEED_INSTALL" = true ]; then
     echo "Dang cai dat/cap nhat cac goi phu thuoc: $REQUIRED_PKGS..."
 	# shellcheck disable=SC2086
     if apt-get update -qq && apt-get install -y -qq $REQUIRED_PKGS; then
-       echo "Cai dat thanh cong"
+       echo "Cai dat thanh cong cac goi co ban."
     else
        error_exit "Khong the cai dat cac phu thuoc co ban."
     fi
 else
-    echo "Tat ca cac goi phu thuoc da duoc cai dat day du."
+    echo "Tat ca cac goi phu thuoc da co san."
 fi
 # -------------------------------------------------------------------------------------------------------------------------------
 
