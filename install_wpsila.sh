@@ -68,6 +68,24 @@ if [[ $EUID -ne 0 ]]; then
 	exit 1
 fi
 
+# Kiểm tra hệ điều hành có phù hợp hay không?
+# Yêu cầu Ubuntu 22.04 hoặc 24.04
+if [ -f /etc/os-release ]; then
+    . /etc/os-release
+    # Xóa dấu ngoặc kép nếu có (ví dụ "24.04" -> 24.04)
+    CURRENT_VER=$(echo $VERSION_ID | tr -d '"')
+    
+    if [[ "$ID" != "ubuntu" ]] || [[ ! "$CURRENT_VER" =~ ^(22.04|24.04)$ ]]; then
+        echo -e "${RED}[!] Loi: WPSILA chi ho tro Ubuntu 22.04 va 24.04.${NC}"
+        echo -e "[!] He dieu hanh cua ban: $PRETTY_NAME"
+        exit 1
+    fi
+    echo -e "${GREEN}[OK]${NC} He dieu hanh hop le: $PRETTY_NAME"
+else
+    echo -e "${RED}[!] Khong tim thay thong tin he dieu hanh!${NC}"
+    exit 1
+fi
+
 # Kiểm tra xem có phải là yêu cầu update không
 UPDATE_WPSILA="${1:-noupdate}"
 # -------------------------------------------------------------------------------------------------------------------------------
@@ -82,7 +100,7 @@ UPDATE_WPSILA="${1:-noupdate}"
 # BUOC XU LY APT NANG CAO (FAST & CLEAN)
 # -------------------------------------------------------------------------
 
-echo "1. Chiem quyen APT va dung tien trinh chay ngam..."
+echo "1. Lay quyen APT va dung tien trinh chay ngam..."
 # Tat update tu dong
 systemctl stop unattended-upgrades.service >/dev/null 2>&1 || true
 systemctl disable unattended-upgrades.service >/dev/null 2>&1 || true
@@ -303,7 +321,7 @@ done
 # -------------------------
 
 # -------------------------
-# Tải về các file để thiết lập cấu hình cho MariaDB và PHP INI cũng như Poll Tune
+# Tải về các file để thiết lập cấu hình cho MariaDB và PHP INI cũng như Pool Tune
 # "mariadb_tune.sh" 
 # "php_ini_tune.sh" 
 # "pool_tune.sh" 
