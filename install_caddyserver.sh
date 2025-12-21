@@ -89,5 +89,3 @@ else
 fi
 
 echo -e "${GREEN}>>> Module Caddy hoan tat.${NC}"
-echo "--------------------------------------------------------"
-sleep 2
