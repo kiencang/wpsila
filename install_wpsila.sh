@@ -142,6 +142,8 @@ rm -f "$INSTALL_DIR/"*.sh
 # Sử dụng mã generate_checksum chạy để lấy mã này về
 # Dev bắt buộc phải dùng trước khi công bố phiên bản mới
 # ----------------------------------------------------------------------------
+# Generated at: Sun Dec 21 11:40:57 +07 2025
+# Version: v0.1.7
 declare -A CHECKSUMS=(
     ["wpsila.conf"]="37949dce87686d946195ae65dcd0e1e95a763c1bfa40ee7c2583f20040680ac2"
     ["wpsila_menu.sh"]="b0d5a8dd7622e55dfd03783ac1757574478a1382ffa210875cd002b594cea016"
