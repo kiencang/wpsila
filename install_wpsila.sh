@@ -12,6 +12,9 @@
 # -------------------------------------------------------------------------
 # Version 0.1.6 - 19/12/2025
 # -------------------------------------------------------------------------
+# Test
+# curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/install_wpsila.sh | sudo bash
+# -------------------------------------------------------------------------
 
 # Dừng script ngay lập tức nếu có biến chưa khai báo hoặc pipeline bị lỗi
 # Lưu ý: set -e sẽ được xử lý khéo léo trong hàm download để không ngắt script đột ngột
