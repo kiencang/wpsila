@@ -81,7 +81,7 @@ UPDATE_WPSILA="${1:-noupdate}"
 # Hàm chờ APT nhả khóa (Có giới hạn thời gian - Timeout)
 wait_for_apt_lock() {
     local counter=0
-    local max_retries=120 # Giới hạn 120 lần thử (120 x 5s = 600s = 10 phút)
+    local max_retries=30 # Giới hạn 30 lần thử (30 x 30s = 900s = 15 phút)
 
     # Vòng lặp kiểm tra: Nếu thấy apt/dpkg đang chạy HOẶC file lock đang bị giữ
     while pgrep -a "apt|apt-get|dpkg|unattended-upgr" > /dev/null 2>&1 || \
@@ -89,15 +89,15 @@ wait_for_apt_lock() {
         
         # Nếu đợi quá số lần quy định
         if [[ $counter -ge $max_retries ]]; then
-            echo -e "${RED}[!] Loi: Tien trinh cap nhat he thong bi treo qua 10 phut.${NC}"
+            echo -e "${RED}[!] Loi: Tien trinh cap nhat he thong bi treo qua 15 phut.${NC}"
             echo -e "${YELLOW}Giai phap: Hay thu reboot lai VPS va chay lai script.${NC}"
             # Hoặc bạn có thể chọn: killall apt apt-get (nhưng khá mạo hiểm)
             exit 1
         fi
         
         # Thông báo đếm ngược
-        echo -e "${YELLOW}He thong dang ban (Update). Dang doi 5s... (Thu $((counter+1))/${max_retries})${NC}"
-        sleep 5
+        echo -e "${YELLOW}He thong dang cap nhat (Update). Dang doi 30s... (Thu $((counter+1))/${max_retries})${NC}"
+        sleep 30
         counter=$((counter+1))
     done
 }
