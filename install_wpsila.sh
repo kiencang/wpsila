@@ -119,33 +119,6 @@ fi
 # 3. Cài đặt wget, ca-certificates, coreutils và python3
 # -------------------------------------------------------------------------------------------------------------------------------
 
-# -------------------------------------------------------------------------
-# BUOC XU LY APT NANG CAO (FAST & CLEAN)
-# -------------------------------------------------------------------------
-
-# Tắt tiến trình chạy cập nhật ngầm của Ubuntu
-echo "1. Lay quyen APT va dung tien trinh chay ngam..."
-# Tat update tu dong
-systemctl stop unattended-upgrades.service >/dev/null 2>&1 || true
-systemctl disable unattended-upgrades.service >/dev/null 2>&1 || true
-
-# Kill tat ca tien trinh lien quan den apt/dpkg
-pkill -f apt >/dev/null 2>&1 || true
-pkill -f dpkg >/dev/null 2>&1 || true
-pkill -f unattended-upgr >/dev/null 2>&1 || true
-
-# Xoa file lock (de phong bi ket)
-rm -f /var/lib/dpkg/lock*
-rm -f /var/lib/apt/lists/lock
-rm -f /var/cache/apt/archives/lock
-
-# Sua chua database (neu viec kill gay loi do dang)
-dpkg --configure -a
-
-echo "=> He thong da san sang cai dat WPSILA!"
-
-# -------------------------------------------------------------------------
-
 # Hàm kiểm tra gói (Dùng dpkg để chính xác cho cả lệnh và thư viện)
 is_pkg_installed() {
     dpkg -s "$1" &> /dev/null
@@ -163,6 +136,43 @@ for pkg in $REQUIRED_PKGS; do
 done
 
 if [ "$NEED_INSTALL" = true ]; then
+	# -------------------------------------------------------------------------
+	# Tắt tiến trình chạy cập nhật ngầm của Ubuntu
+	# -------------------------------------------------------------------------
+	# Chỉ cần dùng nếu cần sử dụng apt
+	echo "1. Lay quyen APT va dung tien trinh chay ngam..."
+	systemctl stop unattended-upgrades.service >/dev/null 2>&1 || true
+
+	echo "Dang cho APT giai phong lock (toi da 120s)..."
+
+	timeout 120s bash -c '
+	LOCKS=(
+	  /var/lib/dpkg/lock
+	  /var/lib/apt/lists/lock
+	  /var/cache/apt/archives/lock
+	)
+
+	while :; do
+	  BUSY=0
+	  for lock in "${LOCKS[@]}"; do
+		if fuser "$lock" >/dev/null 2>&1; then
+		  BUSY=1
+		  break
+		fi
+	  done
+
+	  if [[ "$BUSY" -eq 0 ]]; then
+		exit 0
+	  fi
+
+	  sleep 3
+	done
+	' || true
+
+	dpkg --configure -a || true
+	
+	# -------------------------------------------------------------------------
+
     echo "Dang cai dat/cap nhat cac goi phu thuoc: $REQUIRED_PKGS..."
 	# shellcheck disable=SC2086
     if apt-get update -qq && apt-get install -y -qq $REQUIRED_PKGS; then
@@ -372,6 +382,13 @@ ln -sf "$INSTALL_DIR/wpsila_menu.sh" "$BIN_LINK"
 
 # -------------------------------------------------------------------------------------------------------------------------------
 # 8. Hoàn tất
+if [ "$NEED_INSTALL" = true ]; then
+	# Kích hoạt lại dịch vụ cập nhật tự động của Ubuntu
+	# Chỉ cần bật lại nếu trước đó tắt do dùng apt
+	echo "Khoi phuc lai che do cap nhat tu dong cua Ubuntu..."
+	systemctl start unattended-upgrades.service >/dev/null 2>&1 || true
+fi
+
 if [[ -x "$BIN_LINK" ]]; then
     echo -e "${GREEN}=== CAI DAT THANH CONG! ===${NC}"
     echo -e "Xin chuc mung ban! Hay go lenh: ${YELLOW}wpsila${NC} de bat dau su dung."

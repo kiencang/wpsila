@@ -16,6 +16,8 @@ set -euo pipefail
 export LC_ALL=C.UTF-8
 export DEBIAN_FRONTEND=noninteractive
 
+# +++
+
 # -------------------------------------------------------------------------------------------------------------------------------
 # A. Màu sắc cho thông báo
 GREEN='\033[0;32m'
@@ -70,12 +72,56 @@ if [[ $EUID -ne 0 ]]; then
    exit $?
 fi
 
-# C2 pre. Kiểm tra file lock (đã cài rồi)
+# -------------------------------------------------------------------------
+
+# C1 pre. Kiểm tra file lock (đã cài rồi)
 ALREADY_WPSILA="$SCRIPT_WPSILA_DIR/wpsila_success.txt"
 if [[ -f "$ALREADY_WPSILA" ]]; then
-	echo -e "${YELLOW}Ban da cai wpsila tren VPS nay roi.${NC}"
-	exit 0
-fi	
+    echo -e "${YELLOW}Ban da cai wpsila tren VPS nay roi.${NC}"
+    exit 0
+fi
+
+# -------------------------------------------------------------------------
+
+# Đặt trap âm thầm để bảo vệ hệ thống nếu script văng lỗi giữa chừng
+# Tức là khởi động lại cập nhật tự động sau khi install_lcmp chạy xong
+# Kể cả việc nó bị văng ra do lỗi tải file về, cái này là dự phòng
+trap 'systemctl start unattended-upgrades.service >/dev/null 2>&1 || true' EXIT
+
+# -------------------------------------------------------------------------
+# Tắt tiến trình chạy cập nhật ngầm của Ubuntu
+# -------------------------------------------------------------------------
+echo "1. Lay quyen APT va dung tien trinh chay ngam..."
+systemctl stop unattended-upgrades.service >/dev/null 2>&1 || true
+
+echo "Dang cho APT giai phong lock (toi da 120s)..."
+
+timeout 120s bash -c '
+LOCKS=(
+  /var/lib/dpkg/lock
+  /var/lib/apt/lists/lock
+  /var/cache/apt/archives/lock
+)
+
+while :; do
+  BUSY=0
+  for lock in "${LOCKS[@]}"; do
+    if fuser "$lock" >/dev/null 2>&1; then
+      BUSY=1
+      break
+    fi
+  done
+
+  if [[ "$BUSY" -eq 0 ]]; then
+    exit 0
+  fi
+
+  sleep 3
+done
+' || true
+
+dpkg --configure -a || true
+# -------------------------------------------------------------------------
 
 # C2. Kiểm tra Port 80 & 443
 # Dùng grep -E để gộp lệnh, code gọn hơn
@@ -198,7 +244,10 @@ EOF
 echo "Don dep rac he thong..."
 apt-get autoremove -y
 apt-get clean
-# rm -rf /var/lib/apt/lists/*
+
+# Kích hoạt lại dịch vụ cập nhật tự động của Ubuntu
+echo "Khoi phuc lai che do cap nhat tu dong cua Ubuntu..."
+systemctl start unattended-upgrades.service >/dev/null 2>&1 || true
 
 echo "--------------------------------------------------------"
 echo -e "${GREEN}Cai dat LCMP hoan tat!${NC}"
