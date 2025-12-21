@@ -138,15 +138,18 @@ rm -f "$INSTALL_DIR/"*.sh
 # 4.1 MA BASH DE DAN VAO install_wpsila.sh
 # Sử dụng mã generate_checksum chạy để lấy mã này về
 # Dev bắt buộc phải dùng trước khi công bố phiên bản mới
+# ----------------------------------------------------------------------------
+# Generated at: Sun Dec 21 11:29:33 +07 2025
+# Version: v0.1.7
 declare -A CHECKSUMS=(
     ["wpsila.conf"]="37949dce87686d946195ae65dcd0e1e95a763c1bfa40ee7c2583f20040680ac2"
-    ["wpsila_menu.sh"]="890c97fd226ae67bffa938b1017de8c5826af1619577da95d252cb55ea063c0c"
+    ["wpsila_menu.sh"]="b0d5a8dd7622e55dfd03783ac1757574478a1382ffa210875cd002b594cea016"
     ["install_lcmp.sh"]="2d4dcbeee5ad993a90de5a33a901c68d0804bad388ebe0da433df4d0e332607f"
     ["install_caddyserver.sh"]="7f0e5ebc2120651880ecd284ed3d9ff7c258cfb4f5e773f163d533263bbc3f84"
     ["install_php.sh"]="7ad031e6022bb2a102a78584f494947d167aecfe7aa90cbf263c2e2e0c0000fa"
     ["install_mariadb.sh"]="acdb10751d3fdf5ea9ac0a0077f4e2c57b4c015630a5165133466c2dd984750e"
-    ["install_wp.sh"]="5b3e5445767026c9eb311c7380f948440ef7f9cb956fe53e1fb703bfef3c4a63"
-    ["domain_check.sh"]="364f649ff9e634f75e825e4bf8f8a74fcc3ddb2c85c926959d8daf1880b22551"
+    ["install_wp.sh"]="8af3f10183131540ca5c582b6f24f6711a6b64a33e2fc44d5939f85558849940"
+    ["domain_check.sh"]="41c28c62413f2b9c81a922b36692d8e1132e5883bb61fbde0951504fbf4cf437"
     ["database_user_wp.sh"]="b8f828f59972c5d2bcb874ead560022f6fc62d2ba6bcb949c4162e863e11b792"
     ["wordpress.sh"]="eca92f6175bcd62ee0bd3f237b6891c545f004f16309b4d8d39a5c7a0dea2776"
     ["caddyfile.sh"]="94ab76338c51ec8d0691ef036424b212fff48062452aadacdec2aa150e93ff9a"
@@ -156,7 +159,7 @@ declare -A CHECKSUMS=(
     ["pool_tune.sh"]="a8c07af10b5a5c5291119cce2bfe749edf3528ccf4dad254e8132b563a12ed83"
     ["remove_web.sh"]="0b8309f393c2099c836a243e601359686a09c1ea2453ea07dc3b9909bee00701"
     ["setup_sftp.sh"]="bd6a11fd7f529acffb6ad1de139b3ce918552c25f5a9bf1bae042913e86a9989"
-    ["setup_adminer.sh"]="d0f1bc7ba22fa5e895aaa762da7e215e773c86833ca149cdff1f5cd8d33ee594"
+    ["setup_adminer.sh"]="a8324f0678ee6d00afe9eb35c2400898dc7bb304add4265714accb8eadd11741"
     ["wpp.sh"]="c8e548e9c551c2bb2661cb5d24b26c2aca752e17bcf77c1aad66192ed11e010a"
     ["check_for_update.sh"]="c7a10fbbdf376ab9a892084759f839cabd31e80575aacaaab63509800b714cd2"
 )
