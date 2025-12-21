@@ -81,7 +81,7 @@ UPDATE_WPSILA="${1:-noupdate}"
 # Hàm chờ APT nhả khóa (Có giới hạn thời gian - Timeout)
 wait_for_apt_lock() {
     local counter=0
-    local max_retries=120 # Giới hạn 60 lần thử (60 x 5s = 600s = 10 phút)
+    local max_retries=120 # Giới hạn 120 lần thử (120 x 5s = 600s = 10 phút)
 
     # Vòng lặp kiểm tra: Nếu thấy apt/dpkg đang chạy HOẶC file lock đang bị giữ
     while pgrep -a "apt|apt-get|dpkg|unattended-upgr" > /dev/null 2>&1 || \
