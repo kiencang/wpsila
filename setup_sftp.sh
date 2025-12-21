@@ -51,6 +51,11 @@ if [[ ! -d "$JAIL_DIR" ]]; then
     exit 1
 fi
 
+if [[ -z "$SFTP_USER" ]]; then
+    echo "Loi: User '$SFTP_USER' khong duoc de trong!"
+    exit 1
+fi
+
 if id "$SFTP_USER" &>/dev/null; then
     echo "Loi: User '$SFTP_USER' da ton tai tren he thong!"
     exit 1
