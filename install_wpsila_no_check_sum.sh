@@ -211,6 +211,9 @@ download_file "$REPO_URL/setup_sftp.sh" "$INSTALL_DIR/setup_sftp.sh"
 # Tải về file cài adminer để tạo trang quản trị database (không cài nếu không cần)
 download_file "$REPO_URL/setup_adminer.sh" "$INSTALL_DIR/setup_adminer.sh"
 # -------------------------
+# File để hiển thị mật khẩu adminer
+download_file "$REPO_URL/adminer.sh" "$INSTALL_DIR/adminer.sh"
+# -------------------------
 
 # -------------------------
 # File để hiển thị mật khẩu WordPress
