@@ -4,7 +4,7 @@
 set -euo pipefail
 
 # Phiên bản của bash script
-VERSION="v0.1.6"
+VERSION="v0.1.10"
 
 # +++
 
@@ -40,6 +40,7 @@ FILE_LIST=(
     "remove_web.sh"
     "setup_sftp.sh"
     "setup_adminer.sh"
+	"adminer.sh"
     "wpp.sh"
 	"check_for_update.sh"
 )
