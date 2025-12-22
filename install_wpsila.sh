@@ -347,7 +347,8 @@ done
 
 # -------------------------
 # Tải về file cài adminer để tạo trang quản trị database (không cài nếu không cần)
-# "setup_adminer.sh" 
+# "setup_adminer.sh"
+# "padminer.sh"
 # -------------------------
 
 # -------------------------

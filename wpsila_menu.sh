@@ -132,10 +132,10 @@ while true; do
             fi
             echo -e "\n${BLUE}An Enter de quay lai...${NC}"; read -r ;; # Them -r		
         9)
-            if [[ -f "$BASE_DIR/adminer.sh" ]]; then
-                bash "$BASE_DIR/adminer.sh"
+            if [[ -f "$BASE_DIR/padminer.sh" ]]; then
+                bash "$BASE_DIR/padminer.sh"
             else
-                echo -e "${RED}Loi: Khong tim thay file adminer.sh${NC}"
+                echo -e "${RED}Loi: Khong tim thay file padminer.sh${NC}"
             fi
             echo -e "\n${BLUE}An Enter de quay lai...${NC}"; read -r ;; # Them -r				
         10)

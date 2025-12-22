@@ -292,7 +292,7 @@ fi
 
 # -------------------------------------------------------------------------------------------------------------------------------
 # G. Ghi thêm thông tin đăng nhập adminer vào file adminer.txt
-CRED_FILE="$SCRIPT_WPSILA_DIR/adminer.txt"
+CRED_FILE="$SCRIPT_WPSILA_DIR/padminer.txt"
 
 # Kiểm tra nếu file tồn tại thì mới xóa
 rm -f "$CRED_FILE"
