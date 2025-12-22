@@ -84,7 +84,7 @@ cp $SSHD_CONFIG "${SSHD_CONFIG}.bak"
 
 # Thêm block Match Group vào cuối file nếu chưa có
 if ! grep -q "^Match Group sftp_only" $SSHD_CONFIG; then
-    cat <<EOT >> $SSHD_CONFIG
+cat <<EOT >> $SSHD_CONFIG
 
 # --- Added by SFTP Script ---
 Match Group sftp_only
@@ -136,22 +136,9 @@ useradd -d "$JAIL_DIR" -s /usr/sbin/nologin -g www-data -G sftp_only -M -N "$SFT
 
 # --- [SUA LOI NHAP PASSWD] ---
 # Thay vì dùng lệnh 'passwd' dễ lỗi, ta dùng 'read' để nhập vào biến trước
-echo "Thiet lap mat khau cho user '$SFTP_USER':"
+echo "Thiet lap mat khau tu dong cho user '$SFTP_USER':"
 
-# Thêm cờ -s: Silent (ẩn ký tự khi gõ mật khẩu để bảo mật) nếu cần, nhưng để hiện cho chắc chắn
-# < /dev/tty: Đảm bảo script luôn đọc từ bàn phím kể cả khi chạy qua pipe
-read -p " -> Nhap mat khau moi: " SFTP_PASS < /dev/tty
-echo "" # Xuống dòng vì -s không tự xuống dòng
-read -p " -> Nhap lai mat khau: " SFTP_PASS_CONFIRM < /dev/tty
-echo ""
-
-# Kiểm tra khớp mật khẩu
-if [[ "$SFTP_PASS" != "$SFTP_PASS_CONFIRM" ]]; then
-    echo "Loi: Mat khau nhap lai khong khop!"
-    # Xóa user vừa tạo để tránh rác
-    userdel "$SFTP_USER"
-    exit 1
-fi
+SFTP_PASS=sftp_$(openssl rand -hex 12)
 
 # Mã hóa mật khẩu và gán trực tiếp (Bypass PAM check)
 ENCRYPTED_PASS=$(openssl passwd -6 "$SFTP_PASS")
@@ -195,6 +182,29 @@ SSH_PORT=${DETECTED_PORT:-22}
 
 # -------------------------------------------------------------------------------------------------------------------------------
 # 8. HOÀN TẤT
+# Ghi thêm thông tin đăng nhập vào file psftp.txt
+# Xác định thư mục
+SCRIPT_WPSILA_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+CRED_FILE="$SCRIPT_WPSILA_DIR/psftp.txt"
+
+# Kiểm tra nếu file tồn tại thì mới xóa
+rm -f "$CRED_FILE"
+
+# Tạo mới
+cat > "$CRED_FILE" <<EOF
+----------------------------------------
+SFTP CREDENTIALS
+Date: $(date)
+DOMAIN: $DOMAIN
+----------------------------------------
+Host:       (IP VPS cua ban)
+Port:       $SSH_PORT
+Protocol:   SFTP (SSH File Transfer Protocol)
+User:       $SFTP_USER
+Password:   $SFTP_PASS
+EOF
+chmod 600 "$CRED_FILE" # Chỉ user hiện tại mới đọc được file này
+
 echo ""
 echo "========================================================"
 echo "✅ TAO TAI KHOAN SFTP THANH CONG!"
@@ -204,7 +214,7 @@ echo "   - Host:       (IP VPS cua ban)"
 echo "   - Port:       $SSH_PORT"
 echo "   - Protocol:   SFTP (SSH File Transfer Protocol)"
 echo "   - User:       $SFTP_USER"
-echo "   - Password:   (Mat khau ban vua nhap)"
+echo "   - Password:   $SFTP_PASS"
 echo "--------------------------------------------------------"
 echo "📝 Luu y:"
 echo "   - Khi dang nhap, user se thay minh o thu muc goc (/)."
