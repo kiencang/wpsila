@@ -40,7 +40,7 @@ FILE_LIST=(
     "remove_web.sh"
     "setup_sftp.sh"
     "setup_adminer.sh"
-	"adminer.sh"
+	"padminer.sh"
     "wpp.sh"
 	"check_for_update.sh"
 )
