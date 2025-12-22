@@ -80,13 +80,13 @@ while true; do
         2)
             if [[ -f "$BASE_DIR/mariadb_tune.sh" && -f "$BASE_DIR/php_ini_tune.sh" && -f "$BASE_DIR/pool_tune.sh" ]]; then
                 echo -e "${GREEN}>> Dang chay toi uu MariaDB...${NC}"
-                bash "$BASE_DIR/mariadb_tune.sh" && \
+                bash "$BASE_DIR/tune_mariadb.sh" && \
                 
                 echo -e "${GREEN}>> Dang chay toi uu PHP INI...${NC}"
-                bash "$BASE_DIR/php_ini_tune.sh" && \
+                bash "$BASE_DIR/tune_php.sh" && \
                 
                 echo -e "${GREEN}>> Dang chay toi uu PHP Pool...${NC}"
-                bash "$BASE_DIR/pool_tune.sh"
+                bash "$BASE_DIR/tune_pool.sh"
             else
                 echo -e "${RED}Loi: Khong tim thay file cai dat toi uu.${NC}"
             fi
