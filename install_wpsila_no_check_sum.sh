@@ -212,7 +212,7 @@ download_file "$REPO_URL/setup_sftp.sh" "$INSTALL_DIR/setup_sftp.sh"
 download_file "$REPO_URL/setup_adminer.sh" "$INSTALL_DIR/setup_adminer.sh"
 # -------------------------
 # File để hiển thị mật khẩu adminer
-download_file "$REPO_URL/adminer.sh" "$INSTALL_DIR/adminer.sh"
+download_file "$REPO_URL/padminer.sh" "$INSTALL_DIR/padminer.sh"
 # -------------------------
 
 # -------------------------
