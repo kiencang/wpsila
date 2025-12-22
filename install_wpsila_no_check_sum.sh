@@ -192,9 +192,9 @@ download_file "$REPO_URL/caddyfile_subdomain.sh" "$INSTALL_DIR/caddyfile_subdoma
 
 # -------------------------
 # Tải về các file để thiết lập cấu hình cho MariaDB và PHP INI cũng như Poll Tune
-download_file "$REPO_URL/mariadb_tune.sh" "$INSTALL_DIR/mariadb_tune.sh"
-download_file "$REPO_URL/php_ini_tune.sh" "$INSTALL_DIR/php_ini_tune.sh"
-download_file "$REPO_URL/pool_tune.sh" "$INSTALL_DIR/pool_tune.sh"
+download_file "$REPO_URL/tune_mariadb.sh" "$INSTALL_DIR/tune_mariadb.sh"
+download_file "$REPO_URL/tune_php.sh" "$INSTALL_DIR/tune_php.sh"
+download_file "$REPO_URL/tune_pool.sh" "$INSTALL_DIR/tune_pool.sh"
 # -------------------------
 
 # -------------------------
