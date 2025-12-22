@@ -17,7 +17,7 @@ $DOMAIN {
 	
     # Tang gioi han upload, can chinh them /etc/php/PHP_VER/fpm/php.ini cho dong bo
     request_body {
-        max_size 50MB
+        max_size 100MB
     }	
 
     # Log: Tu dong xoay vong
