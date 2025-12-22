@@ -70,7 +70,7 @@ fi
 
 # Kiểm tra hệ điều hành có phù hợp hay không?
 # Yêu cầu Ubuntu 22.04 hoặc 24.04
-if [ -f /etc/os-release ]; then
+if [[ -f /etc/os-release ]]; then
     # shellcheck source=/dev/null
     . /etc/os-release
     # Xóa dấu ngoặc kép nếu có (ví dụ "24.04" -> 24.04)
