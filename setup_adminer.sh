@@ -291,7 +291,7 @@ fi
 # +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
-# G. Ghi thêm thông tin đăng nhập adminer vào file adminer.txt
+# G. Ghi thêm thông tin đăng nhập adminer vào file padminer.txt
 CRED_FILE="$SCRIPT_WPSILA_DIR/padminer.txt"
 
 # Kiểm tra nếu file tồn tại thì mới xóa
