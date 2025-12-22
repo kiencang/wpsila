@@ -28,7 +28,7 @@ while [[ $COUNT -lt $MAX_RETRIES ]]; do
         echo -e "${RED}Loi: Dinh dang khong hop le. Vui long thu lai (${COUNT}/${MAX_RETRIES}).${NC}"
     fi
 
-    read -p "$PROMPT_TEXT" INPUT_DOMAIN < /dev/tty
+    read -r -p "$PROMPT_TEXT" INPUT_DOMAIN < /dev/tty
 
     # 1. Chuẩn hóa: Lowercase -> Xóa khoảng trắng -> Xóa protocol/path
     # Sửa regex sed để bắt chính xác hơn các trường hợp có port hoặc user:pass

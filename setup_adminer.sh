@@ -45,7 +45,7 @@ chmod 755 /var/log/caddy
 echo "========================================================"
 echo "   SETUP ADMINER (PHP 8.3) & AUTO CADDY CONFIG"
 echo "========================================================"
-read -p "Nhap ten mien cho Adminer (VD: db.domain.com): " INPUT_DOMAIN
+read -r -p "Nhap ten mien cho Adminer (VD: db.domain.com): " INPUT_DOMAIN
 
     # Xử lý chuỗi
     TEMP_DOMAIN=$(echo "$INPUT_DOMAIN" | tr -d ' ' | tr '[:upper:]' '[:lower:]')

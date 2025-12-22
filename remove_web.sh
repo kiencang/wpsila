@@ -38,7 +38,7 @@ fi
 # C1. Thông báo trước sự nguy hiểm của yêu cầu này
 echo -e "${YELLOW}=== CONG CU XOA WEBSITE WORDPRESS (CADDY) ===${NC}"
 echo -e "${RED}LUY Y: HANH DONG NAY KHONG THE HOAN TAC, HAY BACKUP TRUOC!${NC}"
-read -p "Nhap ten mien muon xoa (VD: example.com): " INPUT_DOMAIN < /dev/tty
+read -r -p "Nhap ten mien muon xoa (VD: example.com): " INPUT_DOMAIN < /dev/tty
 
 # Sanitize input: Xóa khoảng trắng, chuyển chữ hoa thành chữ thường
 DOMAIN=$(echo "$INPUT_DOMAIN" | tr -d ' ' | tr '[:upper:]' '[:lower:]')
@@ -123,7 +123,7 @@ fi
 # -------------------------------------------------------------------------------------------------------------------------------
 # F. Xác nhận lại người dùng có chắc chắn muốn xóa không, luôn phải làm
 echo -e ""
-read -p "Ban co chac muon XOA VINH VIEN du lieu cua website? (y/n): " confirm < /dev/tty
+read -r -p "Ban co chac muon XOA VINH VIEN du lieu cua website? (y/n): " confirm < /dev/tty
 
 if [[ ! "$confirm" =~ ^[yY](es)?$ ]]; then
     echo "Da HUY thao tac theo yeu cau. Website CHUA bi xoa."
@@ -195,7 +195,7 @@ fi
 # G3.2. Kiểm tra xem thư mục cert của tên miền đó có tồn tại không rồi mới xóa
 if [[ -d "$CERT_PATH/$DOMAIN" ]]; then
     echo "Dang xoa chung chi cu cua $DOMAIN..."
-    rm -rf "$CERT_PATH/$DOMAIN"
+	rm -rf "${CERT_PATH:?}/$DOMAIN"
 else
     echo "Khong tim thay chung chi cu cua $DOMAIN (Co the chua duoc tao bao gio)."
 fi
@@ -219,7 +219,7 @@ fi
 # Xóa https của cả tên miền chuyển hướng nếu nó có
 if [[ -d "$CERT_PATH/$RED_DOMAIN" ]]; then
     echo "Dang xoa chung chi cu cua $RED_DOMAIN..."
-    rm -rf "$CERT_PATH/$RED_DOMAIN"
+	rm -rf "${CERT_PATH:?}/$RED_DOMAIN"
 fi
 # -------------------------------------------------------------------------------------------------------------------------------
 
@@ -255,6 +255,8 @@ echo "Dang tien hanh xoa cau hinh cho: $DOMAIN..."
 # Dấu chấm (.) trong domain (ví dụ abc.com) là ký tự đặc biệt trong Regex
 # Cần chuyển đổi dấu . thành \. để sed hiểu đó là dấu chấm thực sự.
 DOMAIN_ESCAPED=$(echo "$DOMAIN" | sed 's/\./\\./g')
+# Hoặc có thể sử dụng lệnh này
+# DOMAIN_ESCAPED="${DOMAIN//./\\.}"
 
 # Update lại biến Marker dùng cho Regex (có escaped domain)
 REGEX_START="^###start_wpsila_kiencang_${DOMAIN_ESCAPED}###$"

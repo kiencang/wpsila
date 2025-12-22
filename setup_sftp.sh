@@ -34,7 +34,7 @@ fi
 echo "--------------------------------------------------------"
 echo "CONG CU TAO USER SFTP CHO WORDPRESS (SECURE MODE)"
 echo "--------------------------------------------------------"
-read -p "Nhap ten mien (VD: example.com): " DOMAIN < /dev/tty
+read -r -p "Nhap ten mien (VD: example.com): " DOMAIN < /dev/tty
 
 # Kiểm tra nhẹ nhập tên miền đầu vào
 if [[ ! "$DOMAIN" =~ ^[a-zA-Z0-9.-]+$ ]]; then
@@ -42,7 +42,7 @@ if [[ ! "$DOMAIN" =~ ^[a-zA-Z0-9.-]+$ ]]; then
     exit 1
 fi
 
-read -p "Nhap user sFTP moi: " SFTP_USER < /dev/tty
+read -r -p "Nhap user sFTP moi: " SFTP_USER < /dev/tty
 
 # Định nghĩa thư mục Vỏ (Jail)
 JAIL_DIR="/var/www/$DOMAIN"
