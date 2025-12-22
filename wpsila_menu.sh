@@ -43,16 +43,18 @@ show_menu() {
 	echo -e "${BLUE}-----------------------------------------------------------${NC}"
     echo -e "  ${YELLOW}3.${NC} >> Cai dat (install) website WordPress moi"
 	echo -e "  ${YELLOW}4.${NC} >> Xem thong tin pass cua trang WordPress vua tao"
-	echo -e "  ${YELLOW}5.${NC} >> Them tai khoan sFTP cho website"
 	echo -e "${BLUE}-----------------------------------------------------------${NC}"
-	echo -e "  ${YELLOW}6.${NC} >> Cai dat (install) subdomain WordPress moi"	
+	echo -e "  ${YELLOW}5.${NC} >> Them tai khoan sFTP cho website"
+	echo -e "  ${YELLOW}6.${NC} >> Xem pass sFTP ban vua tao"
+	echo -e "${BLUE}-----------------------------------------------------------${NC}"
+	echo -e "  ${YELLOW}7.${NC} >> Cai dat (install) subdomain WordPress moi"	
 	echo -e "${BLUE}-----------------------------------------------------------${NC}"	
-    echo -e "  ${YELLOW}7.${NC} >> Xoa cai dat (delete) website WordPress"
+    echo -e "  ${YELLOW}8.${NC} >> Xoa cai dat (delete) website WordPress"
     echo -e "${BLUE}-----------------------------------------------------------${NC}"
-    echo -e "  ${YELLOW}8.${NC} >> Cai dat quan ly database (can thi moi cai)"
-	echo -e "  ${YELLOW}9.${NC} >> Xem thong tin pass cua quan ly database"
+    echo -e "  ${YELLOW}9.${NC} >> Cai dat quan ly database (can thi moi cai)"
+	echo -e "  ${YELLOW}10.${NC} >> Xem thong tin pass cua quan ly database"
     echo -e "${BLUE}-----------------------------------------------------------${NC}"
-    echo -e "  ${YELLOW}10.${NC} >> Kiem tra cap nhat cho wpsila"	
+    echo -e "  ${YELLOW}11.${NC} >> Kiem tra cap nhat cho wpsila"	
     echo -e "${BLUE}-----------------------------------------------------------${NC}"	
     echo -e "  ${YELLOW}0.${NC} >> Exit (thoat) >>"
     echo -e "${BLUE}===========================================================${NC}"
@@ -111,34 +113,41 @@ while true; do
             fi
             echo -e "\n${BLUE}An Enter de quay lai...${NC}"; read -r ;; # Them -r
         6)
+            if [[ -f "$BASE_DIR/psftp.sh" ]]; then
+                bash "$BASE_DIR/psftp.sh"
+            else
+                echo -e "${RED}Loi: Khong tim thay file psftp.sh${NC}"
+            fi
+            echo -e "\n${BLUE}An Enter de quay lai...${NC}"; read -r ;; # Them -r			
+        7)
             if [[ -f "$BASE_DIR/install_wp.sh" ]]; then
                 bash "$BASE_DIR/install_wp.sh" subdomain
             else
                 echo -e "${RED}Loi: Khong tim thay file install_wp.sh${NC}"
             fi
             echo -e "\n${BLUE}An Enter de quay lai...${NC}"; read -r ;; # Them -r				
-        7)
+        8)
             if [[ -f "$BASE_DIR/remove_web.sh" ]]; then
                 bash "$BASE_DIR/remove_web.sh"
             else
                 echo -e "${RED}Loi: Khong tim thay file remove_web.sh${NC}"
             fi
             echo -e "\n${BLUE}An Enter de quay lai...${NC}"; read -r ;; # Them -r
-        8)
+        9)
             if [[ -f "$BASE_DIR/setup_adminer.sh" ]]; then
                 bash "$BASE_DIR/setup_adminer.sh"
             else
                 echo -e "${RED}Loi: Khong tim thay file setup_adminer.sh${NC}"
             fi
             echo -e "\n${BLUE}An Enter de quay lai...${NC}"; read -r ;; # Them -r		
-        9)
+        10)
             if [[ -f "$BASE_DIR/padminer.sh" ]]; then
                 bash "$BASE_DIR/padminer.sh"
             else
                 echo -e "${RED}Loi: Khong tim thay file padminer.sh${NC}"
             fi
             echo -e "\n${BLUE}An Enter de quay lai...${NC}"; read -r ;; # Them -r				
-        10)
+        11)
             if [[ -f "$BASE_DIR/check_for_update.sh" ]]; then
                 bash "$BASE_DIR/check_for_update.sh"
             else
