@@ -35,6 +35,13 @@ echo "--------------------------------------------------------"
 echo "CONG CU TAO USER SFTP CHO WORDPRESS (SECURE MODE)"
 echo "--------------------------------------------------------"
 read -p "Nhap ten mien (VD: example.com): " DOMAIN < /dev/tty
+
+# Kiểm tra nhẹ nhập tên miền đầu vào
+if [[ ! "$DOMAIN" =~ ^[a-zA-Z0-9.-]+$ ]]; then
+    echo "Ten mien khong hop le"
+    exit 1
+fi
+
 read -p "Nhap user sFTP moi: " SFTP_USER < /dev/tty
 
 # Định nghĩa thư mục Vỏ (Jail)
@@ -150,7 +157,7 @@ if [[ $NEED_RESTART -eq 1 ]]; then
 		
         # Khôi phục lại file backup nếu cần thiết (tuỳ chọn)
 		cp "${SSHD_CONFIG_MAIN}.bak" "$SSHD_CONFIG_MAIN"
-        echo "-> Da khoi phuc lai file config cu."		
+        echo "-> Da khoi phuc lai file config cu."
         exit 1
     fi
 fi
@@ -189,8 +196,8 @@ echo "Da thiet lap mat khau thanh cong."
 # -------------------------------------------------------------------------------------------------------------------------------
 # 6. KIỂM TRA LẠI QUYỀN THƯ MỤC VỎ (SAFETY CHECK)
 # Yêu cầu bắt buộc của SSH Chroot: Thư mục Home phải là root:root và quyền 755
-CURRENT_OWNER=$(stat -c '%U:%G' $JAIL_DIR)
-CURRENT_PERM=$(stat -c '%a' $JAIL_DIR)
+CURRENT_OWNER=$(stat -c '%U:%G' "$JAIL_DIR")
+CURRENT_PERM=$(stat -c '%a' "$JAIL_DIR")
 
 if [[ "$CURRENT_OWNER" != "root:root" ]] || [[ "$CURRENT_PERM" != "755" ]]; then
     echo "Phat hien sai quyen thu muc vo. Dang sua lai cho dung chuan Chroot..."
