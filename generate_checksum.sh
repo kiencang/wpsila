@@ -39,6 +39,7 @@ FILE_LIST=(
     "pool_tune.sh"
     "remove_web.sh"
     "setup_sftp.sh"
+    "psftp.sh"
     "setup_adminer.sh"
 	"padminer.sh"
     "wpp.sh"

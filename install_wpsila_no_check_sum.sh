@@ -205,6 +205,7 @@ download_file "$REPO_URL/remove_web.sh" "$INSTALL_DIR/remove_web.sh"
 # -------------------------
 # Tải về file tạo tài khoản sFTP
 download_file "$REPO_URL/setup_sftp.sh" "$INSTALL_DIR/setup_sftp.sh"
+download_file "$REPO_URL/psftp.sh" "$INSTALL_DIR/psftp.sh"
 # -------------------------
 
 # -------------------------
