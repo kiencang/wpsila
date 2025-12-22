@@ -35,6 +35,8 @@ PHP_PACKAGES=(
     "php${PHP_VER}-bcmath"    # Math Precision (WooCommerce/Plugins support)
     "php${PHP_VER}-redis"     # Redis Object Cache (For High Performance)
     "php${PHP_VER}-exif"      # Read metadata (Image Rotation fix)
+    "php${PHP_VER}-iconv"  # Bổ sung cho xử lý ký tự
+    "php${PHP_VER}-soap"   # Bổ sung cho khả năng tương thích API	
 )
 
 # Cai dat PHP va cac module
