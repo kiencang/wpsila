@@ -98,7 +98,7 @@ fi
 # Bước 2: Đảm bảo file config gốc có lệnh "Include"
 # Hầu hết Ubuntu mặc định đã có dòng này ở đầu file.
 # Nếu chưa có, ta phải thêm vào đầu file (hoặc cuối file cũng được, nhưng đầu file tốt hơn).
-if ! grep -q "^Include $SSHD_CONFIG_DIR/\*.conf" "$SSHD_CONFIG_MAIN"; then
+if ! grep -Fq "Include $SSHD_CONFIG_DIR/*.conf" "$SSHD_CONFIG_MAIN"; then
     echo "Canh bao: File config chinh chua co lenh Include. Dang them vao..."
     # Backup trước
     cp "$SSHD_CONFIG_MAIN" "${SSHD_CONFIG_MAIN}.bak"
@@ -114,7 +114,7 @@ fi
 # Kiểm tra nếu nội dung file chưa đúng hoặc file chưa tồn tại thì ghi đè lại cho chắc.
 
 # Nội dung cấu hình mong muốn
-read -r -d '' SFTP_CONFIG_CONTENT << EOT
+read -r -d '' SFTP_CONFIG_CONTENT << EOT || true
 # --- SFTP JAIL CONFIGURATION ---
 # Created by Auto Script
 Match Group sftp_only
