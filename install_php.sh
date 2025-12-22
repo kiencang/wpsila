@@ -21,22 +21,21 @@ apt-get update
 echo -e "${GREEN}[2/3] Dang chuan bi cai dat PHP phien ban: ${PHP_VER} ${NC}"
 
 PHP_PACKAGES=(
-    "php${PHP_VER}-fpm"       # Process Manager
-    "php${PHP_VER}-cli"       # Command Line Interface & Cron
-    "php${PHP_VER}-mysql"     # Database Driver
-    "php${PHP_VER}-opcache"   # Speed Optimization
-    "php${PHP_VER}-curl"      # Remote Request
-    "php${PHP_VER}-mbstring"  # String Handling (Tiếng Việt)
-    "php${PHP_VER}-xml"       # SEO & Sitemap
-    "php${PHP_VER}-zip"       # Unzip Plugins/Themes
-    "php${PHP_VER}-gd"        # Fallback Image Lib
-    "php${PHP_VER}-imagick"   # Primary Image Lib (Best for Blog)
-    "php${PHP_VER}-intl"      # Date/Time Format
-    "php${PHP_VER}-bcmath"    # Math Precision (WooCommerce/Plugins support)
-    "php${PHP_VER}-redis"     # Redis Object Cache (For High Performance)
-    "php${PHP_VER}-exif"      # Read metadata (Image Rotation fix)
-    "php${PHP_VER}-iconv"  # Bổ sung cho xử lý ký tự
-    "php${PHP_VER}-soap"   # Bổ sung cho khả năng tương thích API	
+    "php${PHP_VER}-fpm"       # Core PHP process manager (Kéo theo Common, Ctype, Fileinfo, Tokenizer, Iconv...)
+    "php${PHP_VER}-cli"       # WP-CLI, System maintenance
+    "php${PHP_VER}-mysql"     # Kết nối Database (mysqli & pdo_mysql)
+    "php${PHP_VER}-opcache"   # Tăng tốc độ PHP (Bắt buộc)
+    "php${PHP_VER}-curl"      # HTTP Requests (Update, API)
+    "php${PHP_VER}-mbstring"  # Xử lý tiếng Việt (Bắt buộc)
+    "php${PHP_VER}-xml"       # Sitemap, SEO, RSS Feeds
+    "php${PHP_VER}-zip"       # Cài/Update Plugin & Theme
+    "php${PHP_VER}-gd"        # Xử lý ảnh (Cơ bản)
+    "php${PHP_VER}-imagick"   # Xử lý ảnh nâng cao (Chất lượng cao cho Blog/News)
+    "php${PHP_VER}-intl"      # Định dạng ngày giờ chuẩn tiếng Việt
+    "php${PHP_VER}-bcmath"    # Tính toán chính xác (Cần cho một số plugin thống kê/quảng cáo)
+    "php${PHP_VER}-redis"     # Object Cache (Cực quan trọng cho web tin tức high-traffic)
+    "php${PHP_VER}-exif"      # Sửa lỗi xoay ảnh từ điện thoại
+    "php${PHP_VER}-soap"      # Hỗ trợ API (Một số cổng thanh toán hoặc tool lấy tin tự động cần)
 )
 
 # Cai dat PHP va cac module
