@@ -78,7 +78,7 @@ while true; do
             fi
             echo -e "\n${BLUE}An Enter de quay lai...${NC}"; read -r ;; # Them -r
         2)
-            if [[ -f "$BASE_DIR/mariadb_tune.sh" && -f "$BASE_DIR/php_ini_tune.sh" && -f "$BASE_DIR/pool_tune.sh" ]]; then
+            if [[ -f "$BASE_DIR/tune_mariadb.sh" && -f "$BASE_DIR/tune_php.sh.sh" && -f "$BASE_DIR/tune_pool.sh" ]]; then
                 echo -e "${GREEN}>> Dang chay toi uu MariaDB...${NC}"
                 bash "$BASE_DIR/tune_mariadb.sh" && \
                 
