@@ -270,7 +270,7 @@ else
 	# Nguyên nhân là vì mặc dù phân quyền đã làm, nhưng trong quá trình cài đặt có thể root ghi vào file log.
 	# Nó thành chủ sở hữu và không cho user caddy can thiệp vào nữa, cách phòng thủ tốt nhất là tái lập lại quyền.
 	# Rất dễ xảy ra với việc cài lần đầu tiên.
-	chown -R caddy:caddy /var/www/$DOMAIN/logs
+	chown -R caddy:caddy "/var/www/$DOMAIN/logs"
 	
     systemctl reload caddy
     echo "Da cap nhat cau hinh cho $DOMAIN trong Caddyfile."

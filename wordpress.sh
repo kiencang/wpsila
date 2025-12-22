@@ -5,13 +5,13 @@
 # G1. TẠO CẤU TRÚC THƯ MỤC
 echo -e "${GREEN}[1/5] Dang tao thu muc chua ma nguon...${NC}"
 # Tạo thư mục web root (-p giúp không báo lỗi nếu thư mục đã tồn tại)
-mkdir -p /var/www/$DOMAIN/public_html
+mkdir -p "/var/www/$DOMAIN/public_html"
 
 echo -e "${GREEN}[2/5] Dang tao thu muc logs va cap quyen...${NC}"
 # Tạo thư mục logs
-mkdir -p /var/www/$DOMAIN/logs
+mkdir -p "/var/www/$DOMAIN/logs"
 # Cấp quyền cho user caddy để ghi được log truy cập
-chown -R caddy:caddy /var/www/$DOMAIN/logs
+chown -R caddy:caddy "/var/www/$DOMAIN/logs"
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
@@ -21,7 +21,7 @@ chown -R caddy:caddy /var/www/$DOMAIN/logs
 echo -e "${GREEN}[3/5] Dang tai WordPress phien ban moi nhat...${NC}"
 
 # Di chuyển vào thư mục tên miền
-cd /var/www/$DOMAIN
+cd "/var/www/$DOMAIN" || { echo "Loi: Khong tim thay thu muc!"; exit 1; }
 
 # Tải file về (thêm cờ -f để báo lỗi nếu link hỏng/404)
 # Xóa file cũ nếu tồn tại để tránh lỗi permission
@@ -31,7 +31,7 @@ curl -fLO https://wordpress.org/latest.tar.gz
 
 echo -e "${GREEN}[4/5] Dang giai nen ma nguon...${NC}"
 # Giải nén thẳng vào thư mục đích, bỏ qua lớp vỏ 'wordpress' bên ngoài
-tar xzf latest.tar.gz -C /var/www/$DOMAIN/public_html --strip-components=1
+tar xzf latest.tar.gz -C "/var/www/$DOMAIN/public_html" --strip-components=1
 
 # Dọn dẹp file nén 
 rm -f latest.tar.gz
@@ -58,7 +58,7 @@ echo -e "${GREEN}>>> Dang tu dong cau hinh wp-config.php va database...${NC}"
     WP_ADMIN_EMAIL="admin@$DOMAIN"
 
     # Di chuyển vào thư mục code
-    cd "$WP_PATH" || exit
+    cd "$WP_PATH" || { echo "Loi: Khong tim thay thu muc!"; exit 1; }
 
 # G3.3. Tạo file wp-config.php từ thông tin DB ở Bước 2
     # Dùng --allow-root vì script đang chạy quyền sudo
@@ -107,46 +107,38 @@ PARENT_DIR="/var/www/$DOMAIN"
 # Gán chủ sở hữu thư mục cha, không đệ quy, không -R
 # Cái này dùng để nhốt user sFTP trong tương lai không leo ra ngoài thư mục web nó có quyền
 # Tức là nó chỉ có quyền trong phạm vi web nó được gán không leo toàn bộ các web trên VPS
-chown root:root $PARENT_DIR
-chmod 755 $PARENT_DIR
+chown root:root "$PARENT_DIR"
+chmod 755 "$PARENT_DIR"
 
 # Gán Group www-data là chủ sở hữu (để PHP có thể ghi file, cài plugin, upload ảnh)
 # User sở hữu là root
-chown -R root:www-data $WP_ROOT
+chown -R root:www-data "$WP_ROOT"
 
 # Chuẩn hóa quyền để không mâu thuẫn quyền của nhau sau này khi tạo tài khoản sFTP:
 # - Thư mục: 775 (rwxrwxr-x)
 # - File: 664 (rw-rw-r--)
 # số 2 trước 775 là để các file sau này do sFTP up lên mặc định thuộc quyền sở hữu của group www-data
 # Do vậy user www-data thuộc group www-data sẽ có quyền làm việc với file đó mà không bị lỗi không đủ quyền.
-find $WP_ROOT -type d -exec chmod 2775 {} \;
-find $WP_ROOT -type f -exec chmod 664 {} \;
+find "$WP_ROOT" -type d -exec chmod 2775 {} \;
+find "$WP_ROOT" -type f -exec chmod 664 {} \;
 
 # Định nghĩa đường dẫn file config 
 WP_CONFIG="$WP_ROOT/wp-config.php"
 
 # Bổ sung để vượt qua sự khó tính về quyền trong WordPress. Dù phân quyền trên đã ổn.
-# Kiểm tra: Nếu chưa có FS_METHOD thì mới thực hiện
-if ! grep -q "FS_METHOD" "$WP_CONFIG"; then
-    # Dùng lệnh sed để chèn ngay sau thẻ mở <?php
-    # Dấu ^ đảm bảo chỉ tìm <?php ở đầu dòng (tránh nhầm lẫn nếu có trong comment)
-    sed -i "0,/<?php/s/<?php/<?php\n\ndefine( 'FS_METHOD', 'direct' );/" "$WP_CONFIG"
-    
-    echo "Da them cau hinh FS_METHOD: direct"
-else
-    echo "Cau hinh FS_METHOD da ton tai."
-fi
+# Kiểm tra: Nếu chưa có FS_METHOD trong wp-config thì mới thực hiện
+wp config set FS_METHOD direct --type=constant --allow-root --path="$WP_ROOT"
 
 # Phân quyền để quản lý chặt file wp-config
 if [[ -f "$WP_CONFIG" ]]; then
-    chmod 660 $WP_CONFIG
+    chmod 660 "$WP_CONFIG"
 fi
 
 # Đảm bảo Caddy có thể "đi xuyên qua" thư mục /var/www để đọc file
 chmod +x /var/www
 
 # Khởi động lại để tránh phân quyền bị cache
-systemctl reload php${PHP_VER}-fpm
+systemctl reload "php${PHP_VER}-fpm"
 
 # --- HOÀN TẤT ---
 echo -e "${GREEN}=============================================${NC}"
