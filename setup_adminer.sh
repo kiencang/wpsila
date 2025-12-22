@@ -328,6 +328,6 @@ echo ""
 echo "[LOP 2] DATABASE LOGIN:"
 echo "   User: $USER_NAME"
 echo "   Pass: $DB_PASS"
-echo "	Xem lai pass o muc <9>"
+echo "   Xem lai thong tin pass o muc <10>"
 echo "======================================="
 # -------------------------------------------------------------------------------------------------------------------------------
