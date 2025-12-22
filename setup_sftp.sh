@@ -75,44 +75,82 @@ if ! getent group sftp_only > /dev/null; then
     echo "Da tao group: sftp_only"
 fi
 
-# 4.2. Cấu hình SSHD (Quan trọng)
-SSHD_CONFIG="/etc/ssh/sshd_config"
+# 4.2. Cấu hình SSHD (Phương pháp tách file config - Modern Way)
+SSHD_CONFIG_MAIN="/etc/ssh/sshd_config"
+SSHD_CONFIG_DIR="/etc/ssh/sshd_config.d"
+SFTP_CONFIG_FILE="$SSHD_CONFIG_DIR/99-sftp-jail.conf"
 NEED_RESTART=0
 
-# Backup file config
-cp $SSHD_CONFIG "${SSHD_CONFIG}.bak"
+echo "Dang cau hinh SSH theo chuan moi (config.d)..."
 
-# Thêm block Match Group vào cuối file nếu chưa có
-if ! grep -q "^Match Group sftp_only" $SSHD_CONFIG; then
-cat <<EOT >> $SSHD_CONFIG
+# Bước 1: Kiểm tra xem thư mục config.d có tồn tại không (Mặc định Ubuntu 22/24 đều có)
+if [[ ! -d "$SSHD_CONFIG_DIR" ]]; then
+    mkdir -p "$SSHD_CONFIG_DIR"
+fi
 
-# --- Added by SFTP Script ---
+# Bước 2: Đảm bảo file config gốc có lệnh "Include"
+# Hầu hết Ubuntu mặc định đã có dòng này ở đầu file.
+# Nếu chưa có, ta phải thêm vào đầu file (hoặc cuối file cũng được, nhưng đầu file tốt hơn).
+if ! grep -q "^Include $SSHD_CONFIG_DIR/\*.conf" "$SSHD_CONFIG_MAIN"; then
+    echo "Canh bao: File config chinh chua co lenh Include. Dang them vao..."
+    # Backup trước
+    cp "$SSHD_CONFIG_MAIN" "${SSHD_CONFIG_MAIN}.bak"
+    
+    # Thêm dòng Include vào đầu file (sử dụng sed)
+    # 1i nghĩa là insert vào dòng 1
+    sed -i "1i Include $SSHD_CONFIG_DIR/*.conf" "$SSHD_CONFIG_MAIN"
+    echo "Da them lenh Include vao $SSHD_CONFIG_MAIN"
+fi
+
+# Bước 3: Tạo file cấu hình riêng cho SFTP
+# Chúng ta dùng tên 99-sftp-jail.conf để đảm bảo nó được load.
+# Kiểm tra nếu nội dung file chưa đúng hoặc file chưa tồn tại thì ghi đè lại cho chắc.
+
+# Nội dung cấu hình mong muốn
+read -r -d '' SFTP_CONFIG_CONTENT << EOT
+# --- SFTP JAIL CONFIGURATION ---
+# Created by Auto Script
 Match Group sftp_only
     ChrootDirectory %h
     ForceCommand internal-sftp -u 002
     AllowTCPForwarding no
     X11Forwarding no
     PasswordAuthentication yes
-# ----------------------------
+# -------------------------------
 EOT
-    echo "Da them cau hinh Match Group sftp_only."
+
+# Kiểm tra xem file đã tồn tại chưa
+if [[ ! -f "$SFTP_CONFIG_FILE" ]]; then
+    echo "$SFTP_CONFIG_CONTENT" > "$SFTP_CONFIG_FILE"
+    echo "Da tao file cau hinh rieng: $SFTP_CONFIG_FILE"
     NEED_RESTART=1
 else
-    echo "Cau hinh SSH da chuan."
+    # Nếu file tồn tại, kiểm tra xem nội dung có khớp không (để tránh ghi đè không cần thiết)
+    # Nếu nội dung khác nhau, ta ghi đè lại
+    if [[ "$SFTP_CONFIG_CONTENT" != "$(cat "$SFTP_CONFIG_FILE")" ]]; then
+        echo "$SFTP_CONFIG_CONTENT" > "$SFTP_CONFIG_FILE"
+        echo "Da cap nhat noi dung file: $SFTP_CONFIG_FILE"
+        NEED_RESTART=1
+    else
+        echo "Cau hinh SFTP trong $SFTP_CONFIG_FILE da chuan."
+    fi
 fi
 
-# Áp dụng cấu hình SSH mới, sử dụng reload, đừng sử dụng restart vì nó có khả năng ngắt kết nối giữa chừng.
+# Bước 4: Kiểm tra và Reload SSH
 if [[ $NEED_RESTART -eq 1 ]]; then
-    # Kiểm tra cú pháp file config trước (Safety First)
     if sshd -t; then
         systemctl reload ssh
-        echo "Da reload dich vu SSH (Cau hinh an toan)."
+        echo "Da reload dich vu SSH (Config an toan)."
     else
-        echo "NGUY HIEM: File sshd_config bi loi cu phap!"
-        echo "Khong reload SSH de tranh mat ket noi server."
+        echo "NGUY HIEM: File sshd config bi loi cu phap!"
+        echo "Vui long kiem tra lai file $SFTP_CONFIG_FILE"
+        # Xóa file gây lỗi để hệ thống hoạt động bình thường
+        rm -f "$SFTP_CONFIG_FILE"
+        echo "Da xoa file config gay loi de bao dam an toan cho Server."
+		
         # Khôi phục lại file backup nếu cần thiết (tuỳ chọn)
-        cp "${SSHD_CONFIG}.bak" "$SSHD_CONFIG"
-        echo "   -> Da khoi phuc lai file config cu."
+		cp "${SSHD_CONFIG_MAIN}.bak" "$SSHD_CONFIG_MAIN"
+        echo "-> Da khoi phuc lai file config cu."		
         exit 1
     fi
 fi
