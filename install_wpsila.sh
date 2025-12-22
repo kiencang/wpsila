@@ -10,7 +10,7 @@
 # -------------------------------------------------------------------------
 # curl -sL https://vps.wpsila.com | sudo bash
 # -------------------------------------------------------------------------
-# Version 0.2.0 - 21/12/2025
+# Version 0.2.1 - 22/12/2025
 # -------------------------------------------------------------------------
 # Test
 # curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/install_wpsila.sh | sudo bash
@@ -25,7 +25,7 @@ export LC_ALL=C.UTF-8
 export DEBIAN_FRONTEND=noninteractive
 
 # Phiên bản của bash script / rất quan trọng để tải đúng phiên bản các file cài tương ứng
-VERSION="v0.2.0"
+VERSION="v0.2.1"
 
 # +++
 
@@ -201,30 +201,31 @@ rm -f "$INSTALL_DIR/"*.sh
 # Sử dụng mã generate_checksum chạy để lấy mã này về
 # Dev bắt buộc phải dùng trước khi công bố phiên bản mới
 # ----------------------------------------------------------------------------
-# Generated at: Sun Dec 21 22:40:04 +07 2025
-# Version: v0.2.0
+# Generated at: Mon Dec 22 23:48:28 +07 2025
+# Version: v0.2.1
 declare -A CHECKSUMS=(
     ["wpsila.conf"]="37949dce87686d946195ae65dcd0e1e95a763c1bfa40ee7c2583f20040680ac2"
-    ["wpsila_menu.sh"]="de74240512fede24735d5110b25e6fca175e9ec58b72e6694de8ec27d36c8ad8"
+    ["wpsila_menu.sh"]="28fd4c3f9e1b9bd07a1e1b06313924a7b3e809437ef3c2a8ef285a7c2ad29a59"
     ["install_lcmp.sh"]="1da7fda0f6c9a87939ab0e5f29df4cd7269d0538136859646d8a5ddb7f90343d"
     ["install_caddyserver.sh"]="c3475516a670bdaa5a3c1bffc29f7b23e175690221c1958c3eed0d99260c2aa4"
     ["install_php.sh"]="997658bf5bfe8801a573d238ae06010d50a858be0937492407efba420e679d1a"
     ["install_mariadb.sh"]="836c8e841fae50429f0e4b3941aa03745f9818f6b1c77bddc2f72bc2680f88cd"
-    ["install_wp.sh"]="8af3f10183131540ca5c582b6f24f6711a6b64a33e2fc44d5939f85558849940"
-    ["domain_check.sh"]="c29c6ec983f3df88def25a176a96e4abd20c4ef409f9685a060d0eadc8c28eca"
+    ["install_wp.sh"]="ea80584cdb23d309c7bb339aead4e52ef184ab90b2548130f73803df08da45d2"
+    ["domain_check.sh"]="8d3c4b17c7552e9b333920680ef92cd0c4b298313e612e21824086698e52b975"
     ["database_user_wp.sh"]="b8f828f59972c5d2bcb874ead560022f6fc62d2ba6bcb949c4162e863e11b792"
-    ["wordpress.sh"]="eca92f6175bcd62ee0bd3f237b6891c545f004f16309b4d8d39a5c7a0dea2776"
-    ["caddyfile.sh"]="94ab76338c51ec8d0691ef036424b212fff48062452aadacdec2aa150e93ff9a"
-    ["caddyfile_subdomain.sh"]="7d38e3bba7afa65560919a7ac6bb77b062c7e2749e663757276c6b8987231975"
-    ["mariadb_tune.sh"]="c0d6d37705ac870429150ad8a05a2fc9628a0c1a0b5fe0588588f9686187eb28"
-    ["php_ini_tune.sh"]="745a110a84afee44b0318302b1edb5a4d2a5bf598a8aa1b905dff455eec37e3d"
-    ["pool_tune.sh"]="a8c07af10b5a5c5291119cce2bfe749edf3528ccf4dad254e8132b563a12ed83"
-    ["remove_web.sh"]="0b8309f393c2099c836a243e601359686a09c1ea2453ea07dc3b9909bee00701"
-    ["setup_sftp.sh"]="6580f813c14600863ff41bf0fb0b86e080b54a6a2211378dd0bb57079c5a4c1d"
-    ["setup_adminer.sh"]="ec3595744bc9116924fefb0622d18e9d199cb1c10114420551f07a71a6783953"
-    ["adminer.sh"]="ce3489d9d83b6d2b62edbe8bf0c68d440ef7f74b176cca44e225166222c9b493"
+    ["wordpress.sh"]="ce41642e1c7fe06240559f2f6181c49c2d25e1425c7fb02d01b16de1ca602368"
+    ["caddyfile.sh"]="99e7a6d723819e9673be429bd78135138f6449b7c81c2f42e649fc49b882c89f"
+    ["caddyfile_subdomain.sh"]="c27d3be2fb569d4f8e2c85d273d62e3bf43f57b6f4fb932a70a3bdba210de35f"
+    ["tune_mariadb.sh"]="c0d6d37705ac870429150ad8a05a2fc9628a0c1a0b5fe0588588f9686187eb28"
+    ["tune_php.sh"]="745a110a84afee44b0318302b1edb5a4d2a5bf598a8aa1b905dff455eec37e3d"
+    ["tune_pool.sh"]="a8c07af10b5a5c5291119cce2bfe749edf3528ccf4dad254e8132b563a12ed83"
+    ["remove_web.sh"]="bdb7a7e8a3cef79b4641460c53386eb5731b4df89fe20ffd68f758a2bd7fa144"
+    ["setup_sftp.sh"]="3d61dc9e22e2bdcfbdb6c96ba5a836e7aa134e16dd96350444c4419940645581"
+    ["psftp.sh"]="704fef7ed8374bd313695e2ea2c8aebc0af36ea1c40b968772d2667a71b1b886"
+    ["setup_adminer.sh"]="e8ca0a224d478f177369dccc43247b0ca0039a54d8e3c4cafeb22f57f79f8b93"
+    ["padminer.sh"]="4db06f6743c2db72054d465e28b7fc84120ef7a1cef579a9d578687d945b5057"
     ["wpp.sh"]="c8e548e9c551c2bb2661cb5d24b26c2aca752e17bcf77c1aad66192ed11e010a"
-    ["check_for_update.sh"]="8a893edd42ed40c0ec7435c4abc14d080b1db365a1340e91aa1bd79c1d46e435"
+    ["check_for_update.sh"]="a7d97a8cb50294c6ac817b87418a309b7328251519b23740de466968498acb8b"
 )
 # -------------------------------------------------------------------------------------------------------------------------------
 
