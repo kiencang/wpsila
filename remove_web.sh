@@ -195,8 +195,13 @@ fi
 
 # G3.2. Kiểm tra xem thư mục cert của tên miền đó có tồn tại không rồi mới xóa
 if [[ -d "$CERT_PATH/$DOMAIN" ]]; then
-    echo "Dang xoa chung chi cu cua $DOMAIN..."
+    echo -e "${YELLOW}Dang xoa chung chi cu cua $DOMAIN...${NC}"
 	rm -rf "${CERT_PATH:?}/$DOMAIN"
+	
+	# Thông báo xóa chứng chỉ cũ thành công
+	if [[ ! -d "$CERT_PATH/$DOMAIN" ]]; then
+		echo -e "${GREEN}Xoa thanh cong chung chi cu cua $DOMAIN...${NC}"
+	fi
 else
     echo "Khong tim thay chung chi cu cua $DOMAIN (Co the chua duoc tao bao gio)."
 fi
@@ -219,8 +224,15 @@ fi
 
 # Xóa https của cả tên miền chuyển hướng nếu nó có
 if [[ -d "$CERT_PATH/$RED_DOMAIN" ]]; then
-    echo "Dang xoa chung chi cu cua $RED_DOMAIN..."
+    echo -e "${YELLOW}Dang xoa chung chi cu cua $RED_DOMAIN...${NC}"
 	rm -rf "${CERT_PATH:?}/$RED_DOMAIN"
+	
+	# Thông báo xóa chứng chỉ cũ thành công
+	if [[ ! -d "$CERT_PATH/$RED_DOMAIN" ]]; then
+		echo -e "${GREEN}Xoa thanh cong chung chi cu cua $RED_DOMAIN...${NC}"
+	fi
+else
+    echo "Khong tim thay chung chi cu cua $RED_DOMAIN (Co the chua duoc tao bao gio)."
 fi
 # -------------------------------------------------------------------------------------------------------------------------------
 
