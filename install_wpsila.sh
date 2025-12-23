@@ -227,14 +227,14 @@ rm -f "$INSTALL_DIR/"*.sh
 # Sử dụng mã generate_checksum chạy để lấy mã này về
 # Dev bắt buộc phải dùng trước khi công bố phiên bản mới
 # ----------------------------------------------------------------------------
-# Generated at: Mon Dec 22 23:48:28 +07 2025
-# Version: v0.2.1
+# Generated at: Tue Dec 23 13:23:08 +07 2025
+# Version: v0.2.2
 declare -A CHECKSUMS=(
     ["wpsila.conf"]="37949dce87686d946195ae65dcd0e1e95a763c1bfa40ee7c2583f20040680ac2"
     ["wpsila_menu.sh"]="28fd4c3f9e1b9bd07a1e1b06313924a7b3e809437ef3c2a8ef285a7c2ad29a59"
-    ["install_lcmp.sh"]="1da7fda0f6c9a87939ab0e5f29df4cd7269d0538136859646d8a5ddb7f90343d"
+    ["install_lcmp.sh"]="063980fde7ccb560e2a3ad77330f8468319d973f6ee5e02bcc944a0774185ab0"
     ["install_caddyserver.sh"]="c3475516a670bdaa5a3c1bffc29f7b23e175690221c1958c3eed0d99260c2aa4"
-    ["install_php.sh"]="997658bf5bfe8801a573d238ae06010d50a858be0937492407efba420e679d1a"
+    ["install_php.sh"]="d88717e1a8bfc21f6de225da608433e79f4c8c71e62da8690b4f6ab2008cfd88"
     ["install_mariadb.sh"]="836c8e841fae50429f0e4b3941aa03745f9818f6b1c77bddc2f72bc2680f88cd"
     ["install_wp.sh"]="ea80584cdb23d309c7bb339aead4e52ef184ab90b2548130f73803df08da45d2"
     ["domain_check.sh"]="8d3c4b17c7552e9b333920680ef92cd0c4b298313e612e21824086698e52b975"
@@ -251,7 +251,7 @@ declare -A CHECKSUMS=(
     ["setup_adminer.sh"]="e8ca0a224d478f177369dccc43247b0ca0039a54d8e3c4cafeb22f57f79f8b93"
     ["padminer.sh"]="4db06f6743c2db72054d465e28b7fc84120ef7a1cef579a9d578687d945b5057"
     ["wpp.sh"]="c8e548e9c551c2bb2661cb5d24b26c2aca752e17bcf77c1aad66192ed11e010a"
-    ["check_for_update.sh"]="a7d97a8cb50294c6ac817b87418a309b7328251519b23740de466968498acb8b"
+    ["check_for_update.sh"]="6c31a047fef096f77a3cce85f31ab90476ca2412a44a75cccc89e23f5b5ef742"
 )
 # -------------------------------------------------------------------------------------------------------------------------------
 
