@@ -1,3 +1,5 @@
+Phần này chỉ dành cho dev, không liên quan đến người dùng cuối.
+
 Mỗi khi ra phiên bản mới cần làm như sau:
 - Cập nhật version mới cho check_for_update.sh trong main (ví dụ v0.3.1)
 - Trên GitHub, tạo phiên bản mới tương ứng với version vừa nhập trong check_for_update.sh
