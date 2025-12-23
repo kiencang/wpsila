@@ -99,10 +99,10 @@ while true; do
             fi
             echo -e "\n${BLUE}An Enter de quay lai...${NC}"; read -r ;; # Them -r	
         4)
-            if [[ -f "$BASE_DIR/wpp.sh" ]]; then
-                bash "$BASE_DIR/wpp.sh"
+            if [[ -f "$BASE_DIR/show_pass.sh" ]]; then
+                bash "$BASE_DIR/show_pass.sh" wpp.txt
             else
-                echo -e "${RED}Loi: Khong tim thay file wpp.sh${NC}"
+                echo -e "${RED}Loi: Khong tim thay file show_pass.sh${NC}"
             fi
             echo -e "\n${BLUE}An Enter de quay lai...${NC}"; read -r ;; # Them -r				
         5)
@@ -113,10 +113,10 @@ while true; do
             fi
             echo -e "\n${BLUE}An Enter de quay lai...${NC}"; read -r ;; # Them -r
         6)
-            if [[ -f "$BASE_DIR/psftp.sh" ]]; then
-                bash "$BASE_DIR/psftp.sh"
+            if [[ -f "$BASE_DIR/show_pass.sh" ]]; then
+                bash "$BASE_DIR/show_pass.sh" sftpp.txt
             else
-                echo -e "${RED}Loi: Khong tim thay file psftp.sh${NC}"
+                echo -e "${RED}Loi: Khong tim thay file show_pass.sh${NC}"
             fi
             echo -e "\n${BLUE}An Enter de quay lai...${NC}"; read -r ;; # Them -r			
         7)
@@ -141,10 +141,10 @@ while true; do
             fi
             echo -e "\n${BLUE}An Enter de quay lai...${NC}"; read -r ;; # Them -r		
         10)
-            if [[ -f "$BASE_DIR/padminer.sh" ]]; then
-                bash "$BASE_DIR/padminer.sh"
+            if [[ -f "$BASE_DIR/show_pass.sh" ]]; then
+                bash "$BASE_DIR/show_pass.sh" adminerp.txt
             else
-                echo -e "${RED}Loi: Khong tim thay file padminer.sh${NC}"
+                echo -e "${RED}Loi: Khong tim thay file show_pass.sh${NC}"
             fi
             echo -e "\n${BLUE}An Enter de quay lai...${NC}"; read -r ;; # Them -r				
         11)

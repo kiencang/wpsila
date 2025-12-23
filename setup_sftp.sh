@@ -227,10 +227,11 @@ SSH_PORT=${DETECTED_PORT:-22}
 
 # -------------------------------------------------------------------------------------------------------------------------------
 # 8. HOÀN TẤT
-# Ghi thêm thông tin đăng nhập vào file psftp.txt
 # Xác định thư mục
 SCRIPT_WPSILA_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
-CRED_FILE="$SCRIPT_WPSILA_DIR/psftp.txt"
+
+# Ghi thêm thông tin đăng nhập vào file sftpp.txt
+CRED_FILE="$SCRIPT_WPSILA_DIR/sftpp.txt"
 
 # Kiểm tra nếu file tồn tại thì mới xóa
 rm -f "$CRED_FILE"

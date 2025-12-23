@@ -291,8 +291,8 @@ fi
 # +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
-# G. Ghi thêm thông tin đăng nhập adminer vào file padminer.txt
-CRED_FILE="$SCRIPT_WPSILA_DIR/padminer.txt"
+# G. Ghi thêm thông tin đăng nhập adminer vào file adminerp.txt
+CRED_FILE="$SCRIPT_WPSILA_DIR/adminerp.txt"
 
 # Kiểm tra nếu file tồn tại thì mới xóa
 rm -f "$CRED_FILE"
