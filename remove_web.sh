@@ -145,6 +145,7 @@ if [[ -n "$DB_NAME" ]]; then
         # 2>/dev/null ở lệnh mysql giúp ẩn các cảnh báo không cần thiết
         SQL_CMD="DROP DATABASE IF EXISTS \`$DB_NAME\`;"
         SQL_CMD+="DROP USER IF EXISTS \`$DB_USER\`@'localhost';"
+		SQL_CMD+="DROP USER IF EXISTS \`$DB_USER\`@'127.0.0.1';"
         SQL_CMD+="DROP USER IF EXISTS \`$DB_USER\`@'%';"
         SQL_CMD+="FLUSH PRIVILEGES;"
 
