@@ -74,7 +74,7 @@ show_menu() {
     echo -e "${BLUE}-----------------------------------------------------------${NC}"
     echo -e " ${GREEN}11.${NC} >> Kiem tra cap nhat wpsila"
     echo -e "${BLUE}-----------------------------------------------------------${NC}"
-    echo -e "  ${RED}0.${NC} >> Exit (Thoat)"
+    echo -e "  ${YELLOW}0.${NC} >> Exit (Thoat)"
     echo -e "${BLUE}===========================================================${NC}"
     echo -n "Nhap lua chon (0-11): "
 }
