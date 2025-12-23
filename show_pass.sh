@@ -20,7 +20,7 @@ fi
 
 # Tham số đầu vào mặc định ở vị trí đầu tiên (1)
 # Xác định kiểu pass cần hiển thị
-# Chung cho cả 3 file hiển thị pass WordPress, sFTP, Adminer
+# Chung cho cả 3 file hiển thị pass WordPress (wpp.txt), sFTP (sftpp.txt), Adminer (adminerp.txt)
 WHAT_PASS="${1:-nopa}"
 # -------------------------------------------------------------------------------------------------------------------------------
 
