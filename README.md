@@ -7,5 +7,6 @@ Mỗi khi ra phiên bản mới cần làm như sau:
 - Nhớ thay đổi version tương ứng trong generate_checksum để nó tạo chính xác các file theo version
 - Cập nhật các checksum này vào file install_wpsila.sh
 - Đẩy file install_wpsila.sh lên vps.wpsila.com
+- Cập nhật các thông báo vesion trên README của main và trên website chính wpsila.com
 
 Lúc này vps.wpsila.com sẽ chứa phiên bản mới nhất. Tải có kiểm tra checksum để đảm bảo dữ liệu tải về đầy đủ.
