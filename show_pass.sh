@@ -48,6 +48,6 @@ if [ -f "$TARGET_FILE" ]; then
 	# Hiển thị pass
     cat "$TARGET_FILE"
 else
-    echo "KHONG tim thay file tai $TARGET_FILE."
+    echo "KHONG tim thay file tai $TARGET_FILE"
 fi
 # -------------------------------------------------------------------------------------------------------------------------------
