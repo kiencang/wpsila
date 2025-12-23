@@ -227,29 +227,29 @@ rm -f "$INSTALL_DIR/"*.sh
 # Sử dụng mã generate_checksum chạy để lấy mã này về
 # Dev bắt buộc phải dùng trước khi công bố phiên bản mới
 # ----------------------------------------------------------------------------
-# Generated at: Tue Dec 23 16:19:52 +07 2025
-# Version: v0.2.3
+# Generated at: Tue Dec 23 21:44:41 +07 2025
+# Version: v0.3.0
 declare -A CHECKSUMS=(
     ["wpsila.conf"]="37949dce87686d946195ae65dcd0e1e95a763c1bfa40ee7c2583f20040680ac2"
     ["wpsila_menu.sh"]="a457874ea10c7f30ddae4aac9e9c33fbc07ff1f421cec449a8e881987b6c1292"
     ["install_lcmp.sh"]="063980fde7ccb560e2a3ad77330f8468319d973f6ee5e02bcc944a0774185ab0"
-    ["install_caddyserver.sh"]="c3475516a670bdaa5a3c1bffc29f7b23e175690221c1958c3eed0d99260c2aa4"
+    ["install_caddyserver.sh"]="96f9a5ed4e6b39ef696c30f5689d5a8b68b951f3d4cd43a5351df7433aafa601"
     ["install_php.sh"]="d88717e1a8bfc21f6de225da608433e79f4c8c71e62da8690b4f6ab2008cfd88"
     ["install_mariadb.sh"]="836c8e841fae50429f0e4b3941aa03745f9818f6b1c77bddc2f72bc2680f88cd"
-    ["install_wp.sh"]="ea80584cdb23d309c7bb339aead4e52ef184ab90b2548130f73803df08da45d2"
+    ["install_wp.sh"]="3841e2885a9768cbf151cc3d46edecd3aa581f3390f11f77d6d66dc76808a0d0"
     ["domain_check.sh"]="8d3c4b17c7552e9b333920680ef92cd0c4b298313e612e21824086698e52b975"
     ["database_user_wp.sh"]="b8f828f59972c5d2bcb874ead560022f6fc62d2ba6bcb949c4162e863e11b792"
     ["wordpress.sh"]="ce41642e1c7fe06240559f2f6181c49c2d25e1425c7fb02d01b16de1ca602368"
-    ["caddyfile.sh"]="99e7a6d723819e9673be429bd78135138f6449b7c81c2f42e649fc49b882c89f"
-    ["caddyfile_subdomain.sh"]="c27d3be2fb569d4f8e2c85d273d62e3bf43f57b6f4fb932a70a3bdba210de35f"
+    ["caddyfile.sh"]="6cf2a24585b0f6b8c367039f8ae520a9a21f6fe9571d32312104d0cf48a11460"
+    ["caddyfile_subdomain.sh"]="6aaac1fe52f407be8895531ac3a57fb56094f051e4dbab027a460c2b72a97d9b"
     ["tune_mariadb.sh"]="c0d6d37705ac870429150ad8a05a2fc9628a0c1a0b5fe0588588f9686187eb28"
     ["tune_php.sh"]="745a110a84afee44b0318302b1edb5a4d2a5bf598a8aa1b905dff455eec37e3d"
     ["tune_pool.sh"]="a8c07af10b5a5c5291119cce2bfe749edf3528ccf4dad254e8132b563a12ed83"
-    ["remove_web.sh"]="bdb7a7e8a3cef79b4641460c53386eb5731b4df89fe20ffd68f758a2bd7fa144"
+    ["remove_web.sh"]="e3fa30d6895e86c2005665932b4214bf895925dccfa31bf21f8ba2183b755d95"
     ["setup_sftp.sh"]="147be0ddafcfbd162ffd69ec0753aa81ea2b68bc10a0313da4359824df921ab0"
-    ["setup_adminer.sh"]="52987401bc30f0fcadeab3de9a2511b68ccf30e2f7d840201cc5f5a2161cf3cc"
-    ["show_pass.sh"]="bfcb22062e7619d56e90c49ba175a89b707ceec8313289a72ea90d46a112323c"
-    ["check_for_update.sh"]="9dc2a2761fa5d9a8557467c05851ab1ba688ab71d060ba04b7e9adc735876a19"
+    ["setup_adminer.sh"]="dc2422443b9609c03e8b7f4e3f249a8c7cd2be73d3f66930aa89b6f9dae751ad"
+    ["show_pass.sh"]="ea1877c03f225a3ca28693191b348cd5359e2cefaa9a7cae79f3478ca7c5e6c9"
+    ["check_for_update.sh"]="2d9b5d90af2b7f3759115bccf7a661054318c4066ff723cfd5ea218ea70aefcd"
 )
 # -------------------------------------------------------------------------------------------------------------------------------
 
