@@ -16,4 +16,5 @@ Lúc này vps.wpsila.com sẽ chứa phiên bản mới nhất. Tải có kiểm
 File install_wpsila_no_check_sum.sh dùng để test kiểm tra mã trước khi ra phiên bản chính thức, nó không có các ràng buộc về:
 - Checksum
 - Chặn ghi đè
+
 Do vậy tiện để tải về kiểm tra. Phiên bản chính thức thì không được phép dùng file này.
