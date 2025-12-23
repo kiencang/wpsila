@@ -10,7 +10,7 @@
 # -------------------------------------------------------------------------
 # curl -sL https://vps.wpsila.com | sudo bash
 # -------------------------------------------------------------------------
-# Version 0.2.3 - 23/12/2025
+# Version 0.3.0 - 23/12/2025
 # -------------------------------------------------------------------------
 # Test
 # curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/install_wpsila.sh | sudo bash
@@ -25,7 +25,7 @@ export LC_ALL=C.UTF-8
 export DEBIAN_FRONTEND=noninteractive
 
 # Phiên bản của bash script / rất quan trọng để tải đúng phiên bản các file cài tương ứng
-VERSION="v0.2.3"
+VERSION="v0.3.0"
 
 # +++
 
@@ -412,6 +412,7 @@ ln -sf "$INSTALL_DIR/wpsila_menu.sh" "$BIN_LINK"
 # 8. Hoàn tất
 if [[ -x "$BIN_LINK" ]]; then
     echo -e "${GREEN}=== CAI DAT THANH CONG! ===${NC}"
+	echo -e "Phien ban: ${GREEN}${VERSION}${NC}"
     echo -e "Xin chuc mung ban! Hay go lenh: ${YELLOW}wpsila${NC} de bat dau su dung."
 else
     error_exit "Loi khi tao lenh shortcut wpsila."
