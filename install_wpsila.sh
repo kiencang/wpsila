@@ -25,7 +25,7 @@ export LC_ALL=C.UTF-8
 export DEBIAN_FRONTEND=noninteractive
 
 # Phiên bản của bash script / rất quan trọng để tải đúng phiên bản các file cài tương ứng
-VERSION="v0.3.0"
+SILA_VERSION="v0.3.0"
 
 # +++
 
@@ -47,7 +47,7 @@ INSTALL_DIR="/opt/kiencang-wpsila"
 
 # Chú ý link Repo, cần cập nhật cả vps.wpsila.com nếu nó có thay đổi
 # vps.wpsila.com là nơi chứa mã nguồn này, có thể để chuyển hướng hoặc chứa trực tiếp.
-REPO_URL="https://raw.githubusercontent.com/kiencang/wpsila/${VERSION}"
+REPO_URL="https://raw.githubusercontent.com/kiencang/wpsila/${SILA_VERSION}"
 BIN_LINK="/usr/local/bin/wpsila"
 
 # Hàm báo lỗi và thoát
@@ -414,7 +414,7 @@ ln -sf "$INSTALL_DIR/wpsila_menu.sh" "$BIN_LINK"
 # 8. Hoàn tất
 if [[ -x "$BIN_LINK" ]]; then
     echo -e "${GREEN}=== CAI DAT THANH CONG! ===${NC}"
-	echo -e "Phien ban: ${GREEN}${VERSION}${NC}"
+	echo -e "Phien ban: ${GREEN}${SILA_VERSION}${NC}"
     echo -e "Xin chuc mung ban! Hay go lenh: ${YELLOW}wpsila${NC} de bat dau su dung."
 else
     error_exit "Loi khi tao lenh shortcut wpsila."
