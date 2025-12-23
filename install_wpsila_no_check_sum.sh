@@ -231,20 +231,16 @@ download_file "$REPO_URL/remove_web.sh" "$INSTALL_DIR/remove_web.sh"
 # -------------------------
 # Tải về file tạo tài khoản sFTP
 download_file "$REPO_URL/setup_sftp.sh" "$INSTALL_DIR/setup_sftp.sh"
-download_file "$REPO_URL/psftp.sh" "$INSTALL_DIR/psftp.sh"
 # -------------------------
 
 # -------------------------
 # Tải về file cài adminer để tạo trang quản trị database (không cài nếu không cần)
 download_file "$REPO_URL/setup_adminer.sh" "$INSTALL_DIR/setup_adminer.sh"
 # -------------------------
-# File để hiển thị mật khẩu adminer
-download_file "$REPO_URL/padminer.sh" "$INSTALL_DIR/padminer.sh"
-# -------------------------
 
 # -------------------------
-# File để hiển thị mật khẩu WordPress
-download_file "$REPO_URL/wpp.sh" "$INSTALL_DIR/wpp.sh"
+# File để hiển thị mật khẩu 
+download_file "$REPO_URL/show_pass.sh" "$INSTALL_DIR/show_pass.sh"
 
 # -------------------------
 # Kiểm tra cập nhật cho wpsila

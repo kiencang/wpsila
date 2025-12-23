@@ -4,7 +4,7 @@
 set -euo pipefail
 
 # Phiên bản của bash script
-VERSION="v0.1.10"
+VERSION="v0.2.3"
 
 # +++
 
@@ -39,10 +39,8 @@ FILE_LIST=(
     "tune_pool.sh"
     "remove_web.sh"
     "setup_sftp.sh"
-    "psftp.sh"
     "setup_adminer.sh"
-	"padminer.sh"
-    "wpp.sh"
+    "show_pass.sh"
 	"check_for_update.sh"
 )
 
