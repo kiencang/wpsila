@@ -88,4 +88,36 @@ else
     # Không exit 1 ở đây để script tổng quyết định, hoặc có thể exit luôn tùy bạn
 fi
 
+# -------------------------------------------------------------------------
+# [NEW] CẤU HÌNH KIẾN TRÚC MODULAR (SITES-ENABLED)
+# -------------------------------------------------------------------------
+echo -e "${GREEN}[INFO] Dang thiet lap kien truc Modular cho Caddy...${NC}"
+
+# B1. Tạo thư mục chứa file cấu hình riêng cho từng web
+# sites-enabled: Nơi chứa file .caddy của từng domain
+mkdir -p /etc/caddy/sites-enabled
+
+# B2. Backup file Caddyfile mặc định của nhà phát hành (nếu chưa backup)
+if [[ ! -f /etc/caddy/Caddyfile.orig ]]; then
+    mv /etc/caddy/Caddyfile /etc/caddy/Caddyfile.orig
+    echo "Da backup Caddyfile goc thanh Caddyfile.orig"
+fi
+
+# B3. Tạo Caddyfile gốc mới (Master Config)
+# File này chỉ làm nhiệm vụ import các file con
+cat > /etc/caddy/Caddyfile <<EOF
+{
+    # Global Options
+    # email admin@localhost # De Caddy tu dong quan ly SSL internal hoac Let's Encrypt
+}
+
+# [QUAN TRONG] Import tat ca file cau hinh trong thu muc sites-enabled
+# Dau sao (*) la ky tu dai dien, Caddy se doc het cac file co duoi .caddy
+import /etc/caddy/sites-enabled/*.caddy
+EOF
+
+# B4. Reload để áp dụng kiến trúc mới
+systemctl reload caddy
+echo -e "${GREEN}>>> Kien truc Caddy Modular da san sang.${NC}"
+
 echo -e "${GREEN}>>> Module Caddy hoan tat.${NC}"

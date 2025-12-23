@@ -64,14 +64,16 @@ read -r -p "Nhap ten mien cho Adminer (VD: db.domain.com): " INPUT_DOMAIN
         fi
     fi
 
-# Caddyfile	
-CADDY_FILE="/etc/caddy/Caddyfile"	
+# Kiểm tra trước sự tồn tại của file domain.caddy xem nó tồn tại hay chưa
+# Chặn sớm để chống rác cài đặt
+# Ví dụ: /etc/caddy/sites-enabled/db.domain.com.caddy
+CADDY_SITE_FILE="/etc/caddy/sites-enabled/${DOMAIN}.caddy"
 
-# Kiểm tra sớm để tránh rác cài đặt
-if grep -Eq "^[^#]*([[:space:]]|^)$DOMAIN([[:space:]]|:|\{|$)" "$CADDY_FILE"; then
-    echo "CANH BAO: $DOMAIN da co trong Caddyfile."
-    echo "-> Da BO QUA viec chen de tranh trung lap."
-	exit 1	
+# Kiểm tra trùng lặp
+if [[ -f "$CADDY_SITE_FILE" ]]; then
+    echo "CANH BAO: File cau hinh cho $DOMAIN da ton tai."
+    echo "-> Da BO QUA viec tao moi."
+    exit 1
 fi	
 # -------------------------------------------------------------------------------------------------------------------------------
 
@@ -134,14 +136,6 @@ if [[ ! -S "$PHP_SOCKET" ]]; then
 fi
 echo "-> OK."
 
-# Kiểm tra trước sự tồn tại của thư mục adminer trong caddyfile để chặn sớm ngay từ đầu
-# Tránh việc cài đặt
-if grep -q "$INSTALL_DIR" "$CADDY_FILE"; then
-    echo "CANH BAO: Duong dan '$INSTALL_DIR' da co trong Caddyfile."
-    echo "-> Da BO QUA viec chen de tranh trung lap."
-	exit 1
-fi	
-
 # --- 2. CÀI ĐẶT ADMINER ---
 echo "[2/4] Dang tai Adminer..."
 mkdir -p "$INSTALL_DIR"
@@ -184,8 +178,7 @@ EOF
 # +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
-# --- F. TỰ ĐỘNG CẤU HÌNH CADDY (DÙNG EOF) ---
-MARKER="#wpsila_kiencang"
+# --- F. TỰ ĐỘNG CẤU HÌNH CADDY (MODULAR) ---
 echo "[4/4] Dang xu ly Caddyfile..."
 
 if ! command -v caddy &> /dev/null; then
@@ -193,39 +186,12 @@ if ! command -v caddy &> /dev/null; then
     exit 1
 fi
 
-# Tạo file backup cho caddyfile
-# Lấy dấu thời gian
-TIMESTAMP=$(date +%s)
+# Hash password
+HASHED_PASS=$(caddy hash-password --plaintext "$WEB_PASS")
 
-# Tạo backup bằng lệnh copy
-echo "Dang tao file backup cho Caddyfile"
-BACKUP_FILE="${CADDY_FILE}.bak_${TIMESTAMP}"
-
-if [[ -f "$CADDY_FILE" ]]; then
-    cp "$CADDY_FILE" "$BACKUP_FILE"
-else
-    echo -e "${RED}Khong tim thay Caddyfile de backup!${NC}"
-    exit 1
-fi
-
-echo "-> Backup cho Caddyfile da duoc tao: $BACKUP_FILE"
-
-# Kiểm tra tồn tại của tên miền trong file caddyfile
-# ^[^#]* : Bắt đầu dòng KHÔNG phải dấu # (bỏ qua comment)
-# [[:space:]] : Domain thường đứng sau khoảng trắng hoặc đầu dòng
-if grep -Eq "^[^#]*([[:space:]]|^)$DOMAIN([[:space:]]|:|\{|$)" "$CADDY_FILE"; then
-    echo "CANH BAO: $DOMAIN da co trong Caddyfile."
-    echo "-> Da BO QUA viec chen de tranh trung lap."
-	exit 1
-else
-    # Hash password
-    HASHED_PASS=$(caddy hash-password --plaintext "$WEB_PASS")
-
-    # Dùng EOF để chèn nội dung vào cuối file Caddyfile
-    # Lưu ý: Các biến $VAR vẫn được hiểu bên trong EOF
-	# Nối vào file Caddyfile
-    cat >> "$CADDY_FILE" <<EOF 
-###start_wpsila_kiencang_$DOMAIN###
+# Tạo nội dung và ghi thẳng vào file mới
+# Không cần Marker nữa
+cat > "$CADDY_SITE_FILE" <<EOF 
 $DOMAIN {
     root * $INSTALL_DIR
     php_fastcgi unix/$PHP_SOCKET
@@ -250,42 +216,29 @@ $DOMAIN {
         }
     }
 }
-    # Danh dau maker de nhan dien sau nay
-    $MARKER
-###end_wpsila_kiencang_$DOMAIN###
 EOF
 
-    echo "-> Da them cau hinh vao Caddyfile."
-    
-    # Format và Reload
-    caddy fmt --overwrite "$CADDY_FILE"
-	
-	# Kiểm tra tính hợp lệ của file Caddydile
-	if ! caddy validate --config "$CADDY_FILE" --adapter caddyfile > /dev/null 2>&1; then
-		echo -e "${RED}CANH BAO: File Caddyfile bi loi cu phap!${NC}"
-		
-		# In ra lỗi cụ thể cho người dùng xem sai ở đâu
-		caddy validate --config "$CADDY_FILE" --adapter caddyfile
-		
-		echo -e "${YELLOW}Dang khoi phuc lai file ban dau...${NC}"
-		
-		if [[ -f "$BACKUP_FILE" ]]; then
-			cp "$BACKUP_FILE" "$CADDY_FILE"
-			echo "Da khoi phuc lai file goc an toan."
-		fi
-		
-		exit 1
-	fi	
+echo "-> Da tao file cau hinh: $CADDY_SITE_FILE"
 
-	# Đến phần này nghĩa là file caddyfile không lỗi, có thể khởi động lại Caddy được.
-	# Nếu không làm bước này, Caddy không thể ghi file vào đây được.
-	# Gán quyền liên quan đến thư mục log, gán lại, phòng root chiếm quyền gây lỗi khởi động lại.
-	chown -R caddy:caddy /var/log/caddy
-	chmod 755 /var/log/caddy	
-	
-    systemctl reload caddy
-    echo "-> Da Reload Caddy."
-fi
+# Format
+caddy fmt --overwrite "$CADDY_SITE_FILE"
+
+# Validate toàn bộ hệ thống
+if ! caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile > /dev/null 2>&1; then
+    echo -e "${RED}CANH BAO: File Caddyfile bi loi cu phap!${NC}"
+    caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile
+    
+    echo -e "${YELLOW}Dang xoa file gay loi...${NC}"
+    rm -f "$CADDY_SITE_FILE"
+    exit 1
+fi	
+
+# Gán quyền log (Adminer dùng chung thư mục log hệ thống hoặc riêng tùy config)
+chown -R caddy:caddy /var/log/caddy
+chmod 755 /var/log/caddy	
+
+systemctl reload caddy
+echo "-> Da Reload Caddy."
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++

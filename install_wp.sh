@@ -160,13 +160,13 @@ echo "--------------------------------------------------------------------------
 # +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
-# I. Chinh sua file Caddyfile
+# I. Chinh sua file Caddyfile (KIẾN TRÚC MODULAR)
 # ---------------------------------------------------------
-# I1. Khai báo biến đường dẫn và Marker
-CADDY_FILE="/etc/caddy/Caddyfile"
-MARKER="#wpsila_kiencang"
 
-# Xác định và chuẩn hóa dạng tên miền
+# I1. Định nghĩa đường dẫn file cấu hình RIÊNG BIỆT cho domain này
+# File sẽ nằm trong /etc/caddy/sites-enabled/domain.com.caddy
+CADDY_SITE_FILE="/etc/caddy/sites-enabled/${DOMAIN}.caddy"
+
 echo "Domain chinh: $DOMAIN"
 
 # Không phải subdomian mới cần thông báo
@@ -174,8 +174,14 @@ if [[ "$INSTALL_TYPE" != "subdomain" ]]; then
 	echo "Domain chuyen huong: $RED_DOMAIN"
 fi
 
+# Kiểm tra nếu file cấu hình cho domain này đã tồn tại
+if [[ -f "$CADDY_SITE_FILE" ]]; then
+    echo -e "${RED}LOI: File cau hinh cho $DOMAIN da ton tai ($CADDY_SITE_FILE).${NC}"
+    echo -e "${YELLOW}Vui long xoa web cu truoc khi cai lai.${NC}"
+    exit 1
+fi
+
 # I2. Nội dung Caddyfile
-#Xác định đường dẫn tuyệt đối đến file caddyfile mẫu để ghi đè vào file server Caddyfile
 # Mặc định / Không phải kiểu subdomain
 CADDY_FILE_TEMP="$SCRIPT_WPSILA_DIR/caddyfile.sh"
 
@@ -184,96 +190,52 @@ if [[ "$INSTALL_TYPE" == "subdomain" ]]; then
 	CADDY_FILE_TEMP="$SCRIPT_WPSILA_DIR/caddyfile_subdomain.sh"
 fi
 
-# Nhúng caddyfile vào, kiểm tra sự tồn tại để đảm bảo không lỗi
+# Nhúng caddyfile mẫu vào để lấy biến $CONTENT
 if [[ -f "$CADDY_FILE_TEMP" ]]; then    
-    # Lệnh source quan trọng để nhúng trực tiếp vào file chính
     source "$CADDY_FILE_TEMP"
 else 
-	echo -e "${RED}KHONG TIM THAY Caddyfile (caddyfile.sh hoac caddyfile_subdomain.sh)!.${NC}"
-	echo -e "${RED}Hay kiem tra lai su ton tai cua file nay, hoac duong dan cua no.${NC}"
+	echo -e "${RED}KHONG TIM THAY Caddyfile mau!${NC}"
 	exit 1
 fi	
 
-# I3. TẠO BACKUP AN TOÀN 
-TIMESTAMP=$(date +%s)
-BACKUP_FILE="${CADDY_FILE}.bak_${TIMESTAMP}"
-
-# Hàm xóa các file backup cũ để tránh rác file backup
-rotate_caddy_backup() {
-    local CADDY_PATH="/etc/caddy/Caddyfile"
-    local MAX_BACKUPS=10
-    
-    # 1. Logic tìm và xóa file cũ
-    # ls -1t: Liệt kê 1 cột, sắp xếp theo thời gian (Mới nhất ở trên cùng)
-    # tail -n +11: Bỏ qua 10 dòng đầu, lấy từ dòng 11 đến hết (Đây là các file cũ thừa ra)
-    # xargs -r rm: Nhận danh sách và xóa. -r để không báo lỗi nếu không có file nào cần xóa.
-    
-    ls -1t "${CADDY_PATH}.bak_"* 2>/dev/null | tail -n +$((MAX_BACKUPS + 1)) | xargs -r rm -f
-    
-    # (Optional) Log ra màn hình để debug
-    local CURRENT_COUNT=$(ls -1 "${CADDY_PATH}.bak_"* 2>/dev/null | wc -l)
-    echo "Backup rotation complete. Current backups: $CURRENT_COUNT (Limit: $MAX_BACKUPS)"
-}
-
-# Kiểm tra nếu file tồn tại thì mới backup để tránh lỗi
-if [[ -f "$CADDY_FILE" ]]; then
-    echo "Dang tao file backup: $BACKUP_FILE"
-    cp "$CADDY_FILE" "$BACKUP_FILE"
-	
-	# Gọi hàm xoay vòng để dọn dẹp ngay lập tức
-	# Tránh việc có một đống các file backup sau này
-	rotate_caddy_backup
-else
-    echo "Day la lan cai dat dau tien, chua co file Caddyfile cu de backup."
-    # Tạo file rỗng để tránh lỗi cho các lệnh phía sau
-    touch "$CADDY_FILE"
+# Kiểm tra biến CONTENT có dữ liệu không
+if [[ -z "${CONTENT:-}" ]]; then
+    echo -e "${RED}LOI: Noi dung cau hinh Caddy (CONTENT) bi rong!${NC}"
+    exit 1
 fi
 
-# I4. Thực hiện ghi vào Caddyfile chính
-if grep -q "$MARKER" "$CADDY_FILE" 2>/dev/null; then
-    echo "TIM THAY marker '$MARKER'. Dang them cau hinh vao cuoi file Caddyfile..."
-    echo "$CONTENT" | tee -a "$CADDY_FILE" > /dev/null
-else
-    echo "CAI DAT WORDPRESS lan dau! Tao file Caddyfile moi..."
-    echo "$CONTENT" | tee "$CADDY_FILE" > /dev/null
-fi
+# I3. GHI FILE CẤU HÌNH (Write New File)
+echo "Dang tao file cau hinh Caddy rieng biet..."
 
-# Format lại cho đẹp
-caddy fmt --overwrite "$CADDY_FILE" > /dev/null 2>&1
+# Ghi nội dung vào file mới
+echo "$CONTENT" > "$CADDY_SITE_FILE"
 
-# I5. VALIDATE & ROLLBACK
+# Format lại cho đẹp (Caddy chuẩn hóa)
+caddy fmt --overwrite "$CADDY_SITE_FILE" > /dev/null 2>&1
+
+# I4. VALIDATE & RELOAD
 echo "Dang kiem tra cu phap Caddyfile..."
 
-# Kiểm tra tính hợp lệ
-if ! caddy validate --config "$CADDY_FILE" --adapter caddyfile > /dev/null 2>&1; then
-    echo -e "${RED}CANH BAO: File Caddyfile bi loi cu phap!${NC}"
+# Kiểm tra tính hợp lệ của TOÀN BỘ cấu hình (bao gồm cả file mới vừa import)
+if ! caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile > /dev/null 2>&1; then
+    echo -e "${RED}CANH BAO: File cau hinh moi gay loi he thong!${NC}"
     
-    # In ra lỗi cụ thể cho người dùng xem sai ở đâu
-    caddy validate --config "$CADDY_FILE" --adapter caddyfile
+    # In ra lỗi cụ thể
+    caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile
     
-    echo -e "${YELLOW}Dang khoi phuc lai file ban dau...${NC}"
-    
-    if [[ -f "$BACKUP_FILE" ]]; then
-        cp "$BACKUP_FILE" "$CADDY_FILE"
-        echo "Da khoi phuc lai file goc an toan."
-    else
-        # Trường hợp cài lần đầu mà lỗi luôn thì xóa file lỗi đi
-        echo "Khong co file backup (cai lan dau). Xoa file loi..."
-        rm "$CADDY_FILE"
-    fi
+    echo -e "${YELLOW}Dang xoa file gay loi de bao dam an toan...${NC}"
+    rm -f "$CADDY_SITE_FILE"
     
     exit 1
 else
     # Nếu mọi thứ OK, Reload lại Caddy
     echo "Cau hinh hop le. Dang reload Caddy..."
-	# Ngăn ngừa việc mất quyền hay xảy ra, khiến cho việc tải lại không thành công.
-	# Nguyên nhân là vì mặc dù phân quyền đã làm, nhưng trong quá trình cài đặt có thể root ghi vào file log.
-	# Nó thành chủ sở hữu và không cho user caddy can thiệp vào nữa, cách phòng thủ tốt nhất là tái lập lại quyền.
-	# Rất dễ xảy ra với việc cài lần đầu tiên.
+	
+	# Fix quyền Log như cũ
 	chown -R caddy:caddy "/var/www/$DOMAIN/logs"
 	
     systemctl reload caddy
-    echo "Da cap nhat cau hinh cho $DOMAIN trong Caddyfile."
+    echo "Da cap nhat cau hinh cho $DOMAIN."
 fi
 # -------------------------------------------------------------------------------------------------------------------------------
 

@@ -227,82 +227,33 @@ fi
 # +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
-# H. Thêm phần xóa cấu hình trong file Caddyfile
+# H. Xóa cấu hình trong Caddy (KIẾN TRÚC MODULAR)
+# H1. Xác định file cấu hình
+CADDY_SITE_FILE="/etc/caddy/sites-enabled/${DOMAIN}.caddy"
 
-# H1. Khai báo biến
-CADDY_FILE="/etc/caddy/Caddyfile"
-
-# Kiểm tra nếu người dùng chưa nhập domain
-if [[ -z "$DOMAIN" ]]; then
-    echo "Loi: Ten mien trong. Thoat chuong trinh, cau hinh trong Caddyfile chua duoc xoa."
-    exit 1
-fi
-
-# H2. Tạo nội dung Marker cần tìm
-# Lưu ý: Marker phải khớp chính xác với những gì bạn đã thêm vào trước đó
-START_MARKER="###start_wpsila_kiencang_${DOMAIN}###"
-END_MARKER="###end_wpsila_kiencang_${DOMAIN}###"
-
-# H3. Kiểm tra xem Marker có tồn tại trong file không
-# Dùng grep -F (fixed string) để tìm chính xác chuỗi, tránh lỗi regex
-if ! grep -Fq "$START_MARKER" "$CADDY_FILE"; then
-    echo "Thong bao: KHONG tim thay cau hinh cho domain $DOMAIN trong Caddyfile."
-    exit 0
-fi
-
-echo "Dang tien hanh xoa cau hinh cho: $DOMAIN..."
-
-# H4. Xử lý tên miền cho Regex (Quan trọng)
-# Dấu chấm (.) trong domain (ví dụ abc.com) là ký tự đặc biệt trong Regex
-# Cần chuyển đổi dấu . thành \. để sed hiểu đó là dấu chấm thực sự.
-DOMAIN_ESCAPED=$(echo "$DOMAIN" | sed 's/\./\\./g')
-# Hoặc có thể sử dụng lệnh này
-# DOMAIN_ESCAPED="${DOMAIN//./\\.}"
-
-# Update lại biến Marker dùng cho Regex (có escaped domain)
-REGEX_START="^###start_wpsila_kiencang_${DOMAIN_ESCAPED}###$"
-REGEX_END="^###end_wpsila_kiencang_${DOMAIN_ESCAPED}###$"
-
-# H5. Backup file Caddyfile hiện tại (An toàn là trên hết)
-# H5.1. Lấy timestamp 1 lần duy nhất và lưu vào biến
-TIMESTAMP=$(date +%s)
-
-# H5.2. Định nghĩa tên file backup cụ thể
-BACKUP_FILE="${CADDY_FILE}.bak_${TIMESTAMP}"
-
-# H.5.3. Tạo file backup cho caddyfile
-echo "Dang tao file backup: $BACKUP_FILE"
-cp "$CADDY_FILE" "$BACKUP_FILE"
-
-# H6. Thực hiện xóa bằng SED
-# Giải thích lệnh sed:
-# -i : Sửa trực tiếp trên file
-# /^...$/ : Dấu ^ là bắt đầu dòng, $ là kết thúc dòng -> Đảm bảo dòng đó chỉ chứa đúng marker, không thừa thiếu khoảng trắng hay ký tự lạ.
-# , : Là phạm vi từ Regex Start đến Regex End
-# d : Delete (xóa)
-sed -i "/$REGEX_START/,/$REGEX_END/d" "$CADDY_FILE"
-
-# H7. Kiểm tra tính hợp lệ của Caddyfile mới (Validation)
-# Nếu Caddy báo lỗi cấu hình, lập tức khôi phục file cũ
-if ! caddy validate --config "$CADDY_FILE" --adapter caddyfile > /dev/null 2>&1; then
-    echo "CANH BAO: File Caddyfile bi loi sau khi sua. Dang khoi phuc lai file ban dau..."
-	
-    cp "$BACKUP_FILE" "$CADDY_FILE"
-	
-    echo "Da khoi phuc lai file Caddyfile goc. Vui long kiem tra lai Caddyfile de xoa thu cong phan tuong ung."
-    exit 1
+# H2. Kiểm tra file có tồn tại không
+if [[ -f "$CADDY_SITE_FILE" ]]; then
+    echo -e "${YELLOW}Dang xoa file cau hinh Caddy: $CADDY_SITE_FILE${NC}"
+    
+    # Xóa file
+    rm -f "$CADDY_SITE_FILE"
+    
+    # H3. Reload Caddy để cập nhật thay đổi
+    # Không cần validate phức tạp vì xóa 1 file con (nếu file đó ko gây lỗi main) thì reload an toàn
+    if systemctl reload caddy; then
+        echo -e "${GREEN}Da xoa cau hinh Caddy va Reload thanh cong.${NC}"
+    else
+        echo -e "${RED}Canh bao: Khong the reload Caddy. Vui long kiem tra trang thai service.${NC}"
+    fi
 else
-    # Nếu mọi thứ OK, Reload lại Caddy
-    echo "Cau hinh hop le. Dang reload Caddy..."	
-    systemctl reload caddy
-    echo "Hoan tat! Da xoa cau hinh cho $DOMAIN trong Caddyfile."
+    echo "Khong tim thay file cau hinh Caddy (Co the da xoa tu truoc)."
 fi
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
-# H8. Kết thúc & thông báo
+# I. Kết thúc & thông báo
 echo -e ""
 echo -e "${GREEN}=== XOA WEBSITE THANH CONG! ===${NC}"
 # -------------------------------------------------------------------------------------------------------------------------------
