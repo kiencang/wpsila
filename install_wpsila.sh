@@ -10,7 +10,7 @@
 # -------------------------------------------------------------------------
 # curl -sL https://vps.wpsila.com | sudo bash
 # -------------------------------------------------------------------------
-# Version 0.2.2 - 23/12/2025
+# Version 0.2.3 - 23/12/2025
 # -------------------------------------------------------------------------
 # Test
 # curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/install_wpsila.sh | sudo bash
@@ -25,7 +25,7 @@ export LC_ALL=C.UTF-8
 export DEBIAN_FRONTEND=noninteractive
 
 # Phiên bản của bash script / rất quan trọng để tải đúng phiên bản các file cài tương ứng
-VERSION="v0.2.2"
+VERSION="v0.2.3"
 
 # +++
 
@@ -227,11 +227,11 @@ rm -f "$INSTALL_DIR/"*.sh
 # Sử dụng mã generate_checksum chạy để lấy mã này về
 # Dev bắt buộc phải dùng trước khi công bố phiên bản mới
 # ----------------------------------------------------------------------------
-# Generated at: Tue Dec 23 13:23:08 +07 2025
-# Version: v0.2.2
+# Generated at: Tue Dec 23 16:19:52 +07 2025
+# Version: v0.2.3
 declare -A CHECKSUMS=(
     ["wpsila.conf"]="37949dce87686d946195ae65dcd0e1e95a763c1bfa40ee7c2583f20040680ac2"
-    ["wpsila_menu.sh"]="28fd4c3f9e1b9bd07a1e1b06313924a7b3e809437ef3c2a8ef285a7c2ad29a59"
+    ["wpsila_menu.sh"]="a457874ea10c7f30ddae4aac9e9c33fbc07ff1f421cec449a8e881987b6c1292"
     ["install_lcmp.sh"]="063980fde7ccb560e2a3ad77330f8468319d973f6ee5e02bcc944a0774185ab0"
     ["install_caddyserver.sh"]="c3475516a670bdaa5a3c1bffc29f7b23e175690221c1958c3eed0d99260c2aa4"
     ["install_php.sh"]="d88717e1a8bfc21f6de225da608433e79f4c8c71e62da8690b4f6ab2008cfd88"
@@ -246,12 +246,10 @@ declare -A CHECKSUMS=(
     ["tune_php.sh"]="745a110a84afee44b0318302b1edb5a4d2a5bf598a8aa1b905dff455eec37e3d"
     ["tune_pool.sh"]="a8c07af10b5a5c5291119cce2bfe749edf3528ccf4dad254e8132b563a12ed83"
     ["remove_web.sh"]="bdb7a7e8a3cef79b4641460c53386eb5731b4df89fe20ffd68f758a2bd7fa144"
-    ["setup_sftp.sh"]="3d61dc9e22e2bdcfbdb6c96ba5a836e7aa134e16dd96350444c4419940645581"
-    ["psftp.sh"]="704fef7ed8374bd313695e2ea2c8aebc0af36ea1c40b968772d2667a71b1b886"
-    ["setup_adminer.sh"]="e8ca0a224d478f177369dccc43247b0ca0039a54d8e3c4cafeb22f57f79f8b93"
-    ["padminer.sh"]="4db06f6743c2db72054d465e28b7fc84120ef7a1cef579a9d578687d945b5057"
-    ["wpp.sh"]="c8e548e9c551c2bb2661cb5d24b26c2aca752e17bcf77c1aad66192ed11e010a"
-    ["check_for_update.sh"]="6c31a047fef096f77a3cce85f31ab90476ca2412a44a75cccc89e23f5b5ef742"
+    ["setup_sftp.sh"]="147be0ddafcfbd162ffd69ec0753aa81ea2b68bc10a0313da4359824df921ab0"
+    ["setup_adminer.sh"]="52987401bc30f0fcadeab3de9a2511b68ccf30e2f7d840201cc5f5a2161cf3cc"
+    ["show_pass.sh"]="bfcb22062e7619d56e90c49ba175a89b707ceec8313289a72ea90d46a112323c"
+    ["check_for_update.sh"]="9dc2a2761fa5d9a8557467c05851ab1ba688ab71d060ba04b7e9adc735876a19"
 )
 # -------------------------------------------------------------------------------------------------------------------------------
 
