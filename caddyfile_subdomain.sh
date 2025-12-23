@@ -2,7 +2,6 @@
 # MODULE: Caddyfile cho subdomain
 # File này được nhúng vào script install_wp.sh
 # -----------------------------------------------------------
-# Lưu ý: thêm $MARKER vào nội dung để lần sau chạy nó sẽ nhận diện được
 read -r -d '' CONTENT <<EOF || true
 ###start_wpsila_kiencang_$DOMAIN###
 # 1. Chuyen huong RED_DOMAIN ve DOMAIN (không cần nếu là cài subdomain)
@@ -84,7 +83,5 @@ $DOMAIN {
 
     file_server
 }
-    # Danh dau maker de nhan dien sau nay
-    $MARKER
 ###end_wpsila_kiencang_$DOMAIN###	
 EOF
