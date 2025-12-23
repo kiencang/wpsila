@@ -331,6 +331,10 @@ done
 
 # -------------------------------------------------------------------------------------------------------------------------------
 # Giải thích ý nghĩa
+# Tải về cấu hình version php & mariadb wpsila
+# "wpsila.conf" 
+# -------------------------
+
 # Tải về menu cho chương trình quản trị wpsila
 # "wpsila_menu.sh" 
 # -------------------------
@@ -368,18 +372,16 @@ done
 # -------------------------
 # Tải về file tạo tài khoản sFTP
 # "setup_sftp.sh"
-# "psftp.sh"
 # -------------------------
 
 # -------------------------
 # Tải về file cài adminer để tạo trang quản trị database (không cài nếu không cần)
 # "setup_adminer.sh"
-# "padminer.sh"
 # -------------------------
 
 # -------------------------
-# File để hiển thị mật khẩu WordPress
-# "wpp.sh" "$INSTALL_DIR/wpp.sh"
+# File để hiển thị mật khẩu 
+# "show_pass.sh" "$INSTALL_DIR/show_pass.sh"
 
 # -------------------------
 # Kiểm tra cập nhật cho wpsila
