@@ -357,9 +357,9 @@ done
 
 # -------------------------
 # Tải về các file để thiết lập cấu hình cho MariaDB và PHP INI cũng như Pool Tune
-# "mariadb_tune.sh" 
-# "php_ini_tune.sh" 
-# "pool_tune.sh" 
+# "tune_mariadb.sh" 
+# "tune_php.sh" 
+# "tune_pool.sh" 
 # -------------------------
 
 # -------------------------
@@ -370,6 +370,7 @@ done
 # -------------------------
 # Tải về file tạo tài khoản sFTP
 # "setup_sftp.sh"
+# "psftp.sh"
 # -------------------------
 
 # -------------------------
