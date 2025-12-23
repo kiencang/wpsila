@@ -72,7 +72,7 @@ show_menu() {
     echo -e "  ${YELLOW}9.${NC} >> Cai dat Adminer (Quan ly Database)"
     echo -e " 10. >> Xem pass Adminer"
     echo -e "${BLUE}-----------------------------------------------------------${NC}"
-    echo -e " ${GREEN}11.${NC} >> Kiem tra cap nhat wpsila"
+    echo -e " ${YELLOW}11.${NC} >> Kiem tra cap nhat wpsila >>"
     echo -e "${BLUE}-----------------------------------------------------------${NC}"
     echo -e "  ${YELLOW}0.${NC} >> Exit (Thoat)"
     echo -e "${BLUE}===========================================================${NC}"
