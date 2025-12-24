@@ -17,7 +17,6 @@ curl -sL https://vps.wpsila.com | sudo bash
 
 Quá trình viết code có tham khảo gợi ý từ Gemini.
 
----
 ## Các theme & plugin nên dùng cùng với wpsila
 
 wpsila có thể dùng kèm với bất kỳ theme & plugin nào, tuy vậy chúng tôi khuyến nghị bạn nên dùng các theme & plugin dưới đây để đảm bảo website an toàn & có hiệu suất cao:
@@ -28,8 +27,6 @@ wpsila có thể dùng kèm với bất kỳ theme & plugin nào, tuy vậy chú
 - Plugin backup: UpdraftPlus
 
 Ngoài ra các tính năng bảo mật miễn phí của Cloudflare cũng rất hợp với người dùng WordPress làm blog, nó dễ triển khai và có chất lượng cao.
-
----
 
 ## Tuyên bố miễn trừ trách nhiệm (Disclaimer)
 
