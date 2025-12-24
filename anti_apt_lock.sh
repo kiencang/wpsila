@@ -5,11 +5,12 @@
 # -----------------------------------------------------------
 # Hàm khôi phục sau khi cài xong
 restore_environment() {
-    echo ">>> [System] Bat lai che do cap nhat nen..."
+    echo ">>> [System] Dang bat lai che do cap nhat nen..."
     # Gỡ bỏ lệnh cấm (unmask) và khởi động lại timer
     systemctl unmask apt-daily.service apt-daily-upgrade.service > /dev/null 2>&1
     systemctl unmask apt-daily.timer apt-daily-upgrade.timer > /dev/null 2>&1
     systemctl start apt-daily.timer apt-daily-upgrade.timer > /dev/null 2>&1
+	echo ">>> [System] Xong!"
 }
 
 # Hàm xử lý lock chuyên nghiệp - An toàn tuyệt đối
