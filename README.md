@@ -17,9 +17,9 @@ curl -sL https://vps.wpsila.com | sudo bash
 
 Quá trình viết code có tham khảo gợi ý từ Gemini.
 
-## Các theme & plugin nên dùng cùng với wpsila
+## Gợi ý các theme & plugin nên dùng cùng với wpsila
 
-wpsila có thể dùng kèm với bất kỳ theme & plugin nào, tuy vậy chúng tôi khuyến nghị bạn nên dùng các theme & plugin dưới đây để đảm bảo website an toàn & có hiệu suất cao:
+wpsila có thể dùng kèm với bất kỳ theme & plugin nào, tuy vậy chúng tôi gợi ý bạn nên dùng các theme & plugin dưới đây để đảm bảo website an toàn & có hiệu suất cao:
 
 - Giao diện: GeneratePress (https://wordpress.org/themes/generatepress/)
 - Plugin tăng tốc (cache): Cache Enabler (https://wordpress.org/plugins/cache-enabler/)
@@ -27,6 +27,8 @@ wpsila có thể dùng kèm với bất kỳ theme & plugin nào, tuy vậy chú
 - Plugin backup: UpdraftPlus (https://wordpress.org/plugins/updraftplus/)
 
 Ngoài ra các tính năng bảo mật miễn phí của Cloudflare (https://www.cloudflare.com/) cũng rất hợp với người dùng WordPress làm blog, nó dễ triển khai và có chất lượng cao.
+
+**Chú ý**: Các công cụ trên chỉ là gợi ý, wpsila không có bất cứ ràng buộc nào là bạn phải dùng theme hay plugin cụ thể nào đó.
 
 ## Tuyên bố miễn trừ trách nhiệm (Disclaimer)
 
