@@ -259,6 +259,9 @@ if [[ -f "$CADDY_SITE_FILE" ]]; then
     
     # Xóa file
     rm -f "$CADDY_SITE_FILE"
+	
+	# Fix quyền Log như cũ, đề phòng root chiếm quyền log
+	chown -R caddy:caddy "/var/www/$DOMAIN/logs"	
     
     # H3. Reload Caddy để cập nhật thay đổi
     # Không cần validate phức tạp vì xóa 1 file con (nếu file đó ko gây lỗi main) thì reload an toàn
