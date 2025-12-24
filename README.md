@@ -2,9 +2,9 @@ Version của bash script: v0.3.0
 ---
 Website: https://wpsila.com
 
-Đây là công cụ cài nhanh blog WordPress trên VPS (chỉ blog & nói chung là website không bao gồm giỏ hàng).
+Đây là công cụ **cài nhanh blog WordPress trên VPS** (chỉ blog & nói chung là website không bao gồm giỏ hàng).
 
-- Yêu cầu hệ thống: Ubuntu LTS 24.04 hoặc 22.04, cài mới trên VPS (tức là bạn chưa có bất cứ website nào hoặc cài bất cứ chương trình gì ngoài Ubuntu trên VPS đó).
+- Yêu cầu hệ thống: **Ubuntu LTS 24.04** hoặc 22.04, cài mới trên VPS (tức là bạn chưa có bất cứ website nào hoặc cài bất cứ chương trình gì ngoài Ubuntu trên VPS đó).
 - RAM tối thiểu 1GB.
 
 Các đoạn mã đang trong giai đoạn thử nghiệm, chỉ cài nó trên website demo của bạn.
@@ -18,8 +18,18 @@ curl -sL https://vps.wpsila.com | sudo bash
 Quá trình viết code có tham khảo gợi ý từ Gemini.
 
 ---
+## Các theme & plugin nên dùng cùng với wpsila
 
-Tuyên bố miễn trừ trách nhiệm (Disclaimer)
+wpsila có thể dùng kèm với bất kỳ theme & plugin nào, tuy vậy chúng tôi khuyến nghị bạn nên dùng các theme & plugin dưới đây để đảm bảo website an toàn & có hiệu suất cao:
+
+- Giao diện: GeneratePress
+- Plugin tăng tốc (cache): Cache Enabler
+- Plugin tối ưu máy tìm kiếm: The SEO Framework
+- Plugin backup: UpdraftPlus
+
+---
+
+## Tuyên bố miễn trừ trách nhiệm (Disclaimer)
 
 Script này được cung cấp miễn phí và mã nguồn mở. Mặc dù tôi đã cố gắng hết sức để kiểm tra kỹ lưỡng, nhưng việc sử dụng script này hoàn toàn thuộc về rủi ro của bạn (Use at your own risk).
 
