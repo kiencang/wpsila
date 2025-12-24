@@ -3,7 +3,7 @@
 # -----------------------------------------------------------
 # Thiết lập quản lý database cho toàn bộ site
 # File: setup_adminer.sh
-# Đây mã ngoài nổi tiếng có tên adminer
+# Đây là mã ngoài nổi tiếng có tên adminer
 # -----------------------------------------------------------
 
 # +++
