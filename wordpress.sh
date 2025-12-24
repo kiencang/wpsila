@@ -1,5 +1,6 @@
 # -----------------------------------------------------------
 # MODULE: Cài đặt WordPress và phân quyền
+# File: wordpress.sh
 # File này được nhúng vào script install_wp.sh
 # -----------------------------------------------------------
 # G1. TẠO CẤU TRÚC THƯ MỤC

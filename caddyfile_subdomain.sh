@@ -1,5 +1,6 @@
 # -----------------------------------------------------------
 # MODULE: Caddyfile cho subdomain
+# File: caddy_subdomain.sh
 # File này được nhúng vào script install_wp.sh
 # -----------------------------------------------------------
 read -r -d '' CONTENT <<EOF || true

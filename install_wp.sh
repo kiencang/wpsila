@@ -1,11 +1,27 @@
 #!/bin/bash
 
+# -----------------------------------------------------------
+# Cài đặt WordPress hoàn chỉnh
+# File: install_wp.sh
+# Các file source quan trọng bao gồm:
+# a. domain_check.sh
+# b. database_user_wp.sh
+# c. wordpress.sh
+# d. caddyfile.sh
+# e. caddyfile_subdomain.sh
+# f. wpsila.conf
+# -----------------------------------------------------------
+
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
 # Dừng script ngay lập tức nếu có lệnh bị lỗi
 set -euo pipefail
 
 # Thiet lap moi truong chuan cho Automation
 export LC_ALL=C.UTF-8
 export DEBIAN_FRONTEND=noninteractive
+# -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
 

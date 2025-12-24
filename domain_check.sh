@@ -1,5 +1,6 @@
 # -----------------------------------------------------------
 # MODULE: Kiểm tra tên miền nhập vào của người dùng
+# File: domain_check.sh
 # File này được nhúng vào script install_wp.sh
 # -----------------------------------------------------------
 
