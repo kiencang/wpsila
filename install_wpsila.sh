@@ -136,10 +136,14 @@ for pkg in $REQUIRED_PKGS; do
 done
 
 if [ "$NEED_INSTALL" = true ]; then
-	# -------------------------------------------------------------------------
+# -------------------------------------------------------------------------
 	# Tắt tiến trình chạy cập nhật ngầm của Ubuntu
-	# -------------------------------------------------------------------------
-	# Hàm khôi phục sau khi cài xong
+# -------------------------------------------------------------------------
+
+# Tương đương module anti_apt_lock.sh (trong install_lcmp.sh) >>
+# >> nhưng cái này là file cài đầu tiên nên phải nhúng trực tiếp
+
+# Hàm khôi phục sau khi cài xong
 	restore_environment() {
 		echo ">>> [System] Bat lai che do cap nhat nen..."
 		# Gỡ bỏ lệnh cấm (unmask) và khởi động lại timer
@@ -148,7 +152,7 @@ if [ "$NEED_INSTALL" = true ]; then
 		systemctl start apt-daily.timer apt-daily-upgrade.timer > /dev/null 2>&1
 	}
 
-	# Hàm xử lý lock chuyên nghiệp - An toàn tuyệt đối
+# Hàm xử lý lock chuyên nghiệp - An toàn tuyệt đối
 	prepare_environment() {
 		echo ">>> [System] Dang kiem tra che do cap nhat nen cua Ubuntu..."
 
@@ -197,7 +201,7 @@ if [ "$NEED_INSTALL" = true ]; then
 	# [QUAN TRỌNG] Đặt TRAP ngay lập tức sau khi khóa. 
 	# Nếu script lỗi bất cứ đâu từ dòng này trở đi, nó sẽ tự động chạy restore_environment
 	trap restore_environment EXIT
-	# -------------------------------------------------------------------------
+# -------------------------------------------------------------------------
 
     echo "Dang cai dat/cap nhat cac goi phu thuoc: $REQUIRED_PKGS..."
 	# shellcheck disable=SC2086
