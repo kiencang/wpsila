@@ -19,7 +19,7 @@ Quá trình viết code có tham khảo gợi ý từ Gemini.
 
 ## Gợi ý các theme & plugin nên dùng cùng với wpsila
 
-wpsila có thể dùng kèm với bất kỳ theme & plugin nào, tuy vậy chúng tôi gợi ý bạn nên dùng các theme & plugin dưới đây để đảm bảo website an toàn & có hiệu suất cao:
+wpsila có thể dùng kèm với *bất kỳ theme & plugin nào*, tuy vậy chúng tôi gợi ý bạn nên dùng các theme & plugin dưới đây để đảm bảo website an toàn & có hiệu suất cao:
 
 - Giao diện: GeneratePress (https://wordpress.org/themes/generatepress/)
 - Plugin tăng tốc (cache): Cache Enabler (https://wordpress.org/plugins/cache-enabler/)
