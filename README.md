@@ -21,12 +21,12 @@ Quá trình viết code có tham khảo gợi ý từ Gemini.
 
 wpsila có thể dùng kèm với bất kỳ theme & plugin nào, tuy vậy chúng tôi khuyến nghị bạn nên dùng các theme & plugin dưới đây để đảm bảo website an toàn & có hiệu suất cao:
 
-- Giao diện: GeneratePress
-- Plugin tăng tốc (cache): Cache Enabler
-- Plugin tối ưu máy tìm kiếm: The SEO Framework
-- Plugin backup: UpdraftPlus
+- Giao diện: GeneratePress (https://wordpress.org/themes/generatepress/)
+- Plugin tăng tốc (cache): Cache Enabler (https://wordpress.org/plugins/cache-enabler/)
+- Plugin tối ưu máy tìm kiếm: The SEO Framework (https://wordpress.org/plugins/autodescription/)
+- Plugin backup: UpdraftPlus (https://wordpress.org/plugins/updraftplus/)
 
-Ngoài ra các tính năng bảo mật miễn phí của Cloudflare cũng rất hợp với người dùng WordPress làm blog, nó dễ triển khai và có chất lượng cao.
+Ngoài ra các tính năng bảo mật miễn phí của Cloudflare (https://www.cloudflare.com/) cũng rất hợp với người dùng WordPress làm blog, nó dễ triển khai và có chất lượng cao.
 
 ## Tuyên bố miễn trừ trách nhiệm (Disclaimer)
 
