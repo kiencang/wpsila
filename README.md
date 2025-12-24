@@ -27,6 +27,8 @@ wpsila có thể dùng kèm với bất kỳ theme & plugin nào, tuy vậy chú
 - Plugin tối ưu máy tìm kiếm: The SEO Framework
 - Plugin backup: UpdraftPlus
 
+Ngoài ra các tính năng bảo mật miễn phí của Cloudflare cũng rất hợp với người dùng WordPress làm blog, nó dễ triển khai và có chất lượng cao.
+
 ---
 
 ## Tuyên bố miễn trừ trách nhiệm (Disclaimer)
