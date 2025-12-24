@@ -201,6 +201,7 @@ download_file "$REPO_URL/wpsila_menu.sh" "$INSTALL_DIR/wpsila_menu.sh"
 # -------------------------
 # Tải về các file phục vụ cho cài đặt LCMP
 download_file "$REPO_URL/install_lcmp.sh" "$INSTALL_DIR/install_lcmp.sh"
+download_file "$REPO_URL/anti_apt_lock.sh" "$INSTALL_DIR/anti_apt_lock.sh"
 download_file "$REPO_URL/install_caddyserver.sh" "$INSTALL_DIR/install_caddyserver.sh"
 download_file "$REPO_URL/install_php.sh" "$INSTALL_DIR/install_php.sh"
 download_file "$REPO_URL/install_mariadb.sh" "$INSTALL_DIR/install_mariadb.sh"

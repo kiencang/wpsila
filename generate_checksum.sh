@@ -25,6 +25,7 @@ FILE_LIST=(
     "wpsila.conf"
     "wpsila_menu.sh"
     "install_lcmp.sh"
+    "anti_apt_lock.sh"	
     "install_caddyserver.sh"
     "install_php.sh"
 	"install_mariadb.sh"
