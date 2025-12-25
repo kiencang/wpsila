@@ -334,67 +334,6 @@ done
 # +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
-# Giải thích ý nghĩa
-# Tải về cấu hình version php & mariadb wpsila
-# "wpsila.conf" 
-# -------------------------
-
-# Tải về menu cho chương trình quản trị wpsila
-# "wpsila_menu.sh" 
-# -------------------------
-
-# -------------------------
-# Tải về các file phục vụ cho cài đặt LCMP
-# "install_lcmp.sh" 
-# "install_caddyserver.sh" 
-# "install_php.sh" 
-# "install_mariadb.sh" 
-# -------------------------
-
-# -------------------------
-# Tải về các file phục vụ cho việc cài đặt WordPress
-# "install_wp.sh"
-# "domain_check.sh"
-# "database_user_wp.sh"
-# "wordpress.sh" 
-# "caddyfile.sh"
-# "caddyfile_subdomain.sh"
-# -------------------------
-
-# -------------------------
-# Tải về các file để thiết lập cấu hình cho MariaDB và PHP INI cũng như Pool Tune
-# "tune_mariadb.sh" 
-# "tune_php.sh" 
-# "tune_pool.sh" 
-# -------------------------
-
-# -------------------------
-# Tải về file phục vụ chức năng xóa website
-# "remove_web.sh"
-# -------------------------
-
-# -------------------------
-# Tải về file tạo tài khoản sFTP
-# "setup_sftp.sh"
-# -------------------------
-
-# -------------------------
-# Tải về file cài adminer để tạo trang quản trị database (không cài nếu không cần)
-# "setup_adminer.sh"
-# -------------------------
-
-# -------------------------
-# File để hiển thị mật khẩu 
-# "show_pass.sh" "$INSTALL_DIR/show_pass.sh"
-
-# -------------------------
-# Kiểm tra cập nhật cho wpsila
-# "check_for_update.sh"
-# -------------------------------------------------------------------------------------------------------------------------------
-
-# +++
-
-# -------------------------------------------------------------------------------------------------------------------------------
 # 6. Phân quyền
 chmod 700 "$INSTALL_DIR"
 chmod 700 "$INSTALL_DIR/"*.sh
