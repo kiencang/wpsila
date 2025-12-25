@@ -18,3 +18,48 @@ File install_wpsila_no_check_sum.sh dùng để test kiểm tra mã trước khi
 - Chặn ghi đè
 
 Do vậy tiện để tải về kiểm tra. Phiên bản chính thức thì không được phép dùng file này.
+
+## Chức năng của các file trong chương trình
+
+Dùng branch main để đối chiếu với thông tin bên dưới, quan trọng cho dev để dễ nhận diện các chức năng file trong chương trình.
+
+a. Tải về cấu hình version php & mariadb wpsila
+- wpsila.conf 
+
+b. Tải về menu cho chương trình quản trị wpsila
+- wpsila_menu.sh 
+
+c. Tải về các file phục vụ cho cài đặt LCMP
+- install_lcmp.sh
+- anti_apt_lock.sh
+- install_caddyserver.sh
+- install_php.sh
+- install_mariadb.sh 
+
+d. Tải về các file phục vụ cho việc cài đặt WordPress
+- install_wp.sh
+- domain_check.sh
+- database_user_wp.sh
+- wordpress.sh
+- caddyfile.sh
+- caddyfile_subdomain.sh
+
+e. Tải về các file để thiết lập cấu hình cho MariaDB và PHP INI cũng như Pool Tune
+- tune_mariadb.sh
+- tune_php.sh
+- tune_pool.sh 
+
+f. Tải về file phục vụ chức năng xóa website
+- remove_web.sh
+
+g. Tải về file tạo tài khoản sFTP
+- setup_sftp.sh
+
+h. Tải về file cài adminer để tạo trang quản trị database (không cài nếu không cần)
+- setup_adminer.sh
+  
+i. File để hiển thị mật khẩu 
+- show_pass.sh
+
+j. Kiểm tra cập nhật cho wpsila
+- check_for_update.sh
