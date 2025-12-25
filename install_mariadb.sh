@@ -3,6 +3,10 @@
 # File: install_mariadb.sh
 # File này được nhúng vào script install_lcmp.sh
 # -----------------------------------------------------------
+
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
 echo -e "${GREEN}[1/3] Dang cai dat MariaDB Server...${NC}"
 
 # 1. Thêm Repo MariaDB chính chủ
@@ -34,7 +38,11 @@ systemctl enable --now mariadb
 # Chờ MariaDB khởi động hoàn toàn (Smart wait)
 echo "Dang doi MariaDB khoi dong..."
 timeout 60s bash -c 'until systemctl is-active --quiet mariadb; do sleep 1; done'
+# -------------------------------------------------------------------------------------------------------------------------------
 
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
 # F1. BẢO MẬT MARIADB (HARDENING)
 echo -e "${GREEN}[2/3] Dang thuc hien bao mat MariaDB (Secure Installation)...${NC}"
 
@@ -62,3 +70,4 @@ else
     echo -e "${RED}Co loi xay ra trong qua trinh cai dat!${NC}"
     exit 1
 fi
+# -------------------------------------------------------------------------------------------------------------------------------
