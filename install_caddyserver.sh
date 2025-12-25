@@ -5,12 +5,15 @@
 # Tuân thủ hướng dẫn: https://caddyserver.com/docs/install
 # -----------------------------------------------------------
 
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
 echo "--------------------------------------------------------"
 echo -e "${GREEN}[MODULE] Bat dau cai dat Caddy Web Server...${NC}"
 
 # 1. Cài đặt các gói phụ trợ cần thiết
 # debian-keyring, debian-archive-keyring: Đảm bảo apt nhận diện đúng signature
-echo -e "${GREEN}[1/5] Cai dat dependencies...${NC}"
+echo -e "${GREEN}[1/5] Cai dat dependencies (cac goi phu thuoc)...${NC}"
 apt-get install -y --no-install-recommends \
     debian-keyring \
     debian-archive-keyring \
@@ -50,23 +53,27 @@ echo -e "${GREEN}[4/5] Cau hinh bao mat UFW...${NC}"
 ufw --force reset > /dev/null
 ufw default deny incoming
 ufw default allow outgoing
+# -------------------------------------------------------------------------------------------------------------------------------
 
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
 # --- TỰ ĐỘNG PHÁT HIỆN CỔNG SSH ---
 echo -e "${GREEN}[INFO] Dang phat hien SSH Port...${NC}"
 
-# B1: Thu dung sshd -T (Chinh xac nhat)
-# grep tim dong "port", head lay dong dau, awk lay cot 2, || true chong loi
+# B1: Thử dùng sshd -T (chính xác nhất)
+# grep tìm dòng "port", head lấy dòng đầu, awk lấy cột 2, || true chống lỗi
 DETECTED_PORT=$(sshd -T 2>/dev/null | grep "^port " | head -n 1 | awk '{print $2}' || true)
 
-# B2: Neu B1 that bai (rong), fallback sang grep file config
+# B2: Nếu B1 thất bại (rỗng), fallback sang grep file config
 if [[ -z "$DETECTED_PORT" ]]; then
     DETECTED_PORT=$(grep -i "^[[:space:]]*Port" /etc/ssh/sshd_config | head -n 1 | awk '{print $2}' || true)
 fi
 
-# B3: Neu ca 2 deu that bai, mac dinh la 22
+# B3: Nếu cả hai thất bại, mặc định là 22
 SSH_PORT=${DETECTED_PORT:-22}
 
-echo -e "${YELLOW}   -> Phat hien SSH Port dang chay: ${SSH_PORT}${NC}"
+echo -e "${YELLOW}Phat hien SSH Port dang chay: ${SSH_PORT}${NC}"
 ufw limit "$SSH_PORT"/tcp comment 'SSH Port'
 
 # Mở Web Ports
@@ -85,12 +92,15 @@ if systemctl is-active --quiet caddy; then
     echo -e "${GREEN}>>> Caddy dang chay (Active).${NC}"
 else
     echo -e "${RED}>>> LOI: Caddy khong hoat dong!${NC}"
-    # Không exit 1 ở đây để script tổng quyết định, hoặc có thể exit luôn tùy bạn
+    echo -e "${YELLOW}>>> Ban can cai moi lai VPS & thu cai lai wpsila.${NC}"
+	exit 1
 fi
+# -------------------------------------------------------------------------------------------------------------------------------
 
-# -------------------------------------------------------------------------
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
 # [NEW] CẤU HÌNH KIẾN TRÚC MODULAR (SITES-ENABLED)
-# -------------------------------------------------------------------------
 echo -e "${GREEN}[INFO] Dang thiet lap kien truc Modular cho Caddy...${NC}"
 
 # B1. Tạo thư mục chứa file cấu hình riêng cho từng web
@@ -105,6 +115,7 @@ fi
 
 # B3. Tạo Caddyfile gốc mới (Master Config)
 # File này chỉ làm nhiệm vụ import các file con
+# Quan trọng: có thể sau này cần tính năng nhập email cho người dùng & đưa thông tin đó vào đây
 cat > /etc/caddy/Caddyfile <<EOF
 {
     # Global Options
@@ -121,3 +132,4 @@ systemctl reload caddy
 echo -e "${GREEN}>>> Kien truc Caddy Modular da san sang.${NC}"
 
 echo -e "${GREEN}>>> Module Caddy hoan tat.${NC}"
+# -------------------------------------------------------------------------------------------------------------------------------
