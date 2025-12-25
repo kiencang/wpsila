@@ -10,7 +10,7 @@
 # -------------------------------------------------------------------------
 # curl -sL https://vps.wpsila.com | sudo bash
 # -------------------------------------------------------------------------
-# Version 0.3.0 - 23/12/2025
+# Version 0.3.1 - 25/12/2025
 # -------------------------------------------------------------------------
 # Test
 # curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/install_wpsila.sh | sudo bash
@@ -25,7 +25,7 @@ export LC_ALL=C.UTF-8
 export DEBIAN_FRONTEND=noninteractive
 
 # Phiên bản của bash script / rất quan trọng để tải đúng phiên bản các file cài tương ứng
-SILA_VERSION="v0.3.0"
+SILA_VERSION="v0.3.1"
 
 # +++
 
@@ -231,29 +231,30 @@ rm -f "$INSTALL_DIR/"*.sh
 # Sử dụng mã generate_checksum chạy để lấy mã này về
 # Dev bắt buộc phải dùng trước khi công bố phiên bản mới
 # ----------------------------------------------------------------------------
-# Generated at: Tue Dec 23 21:44:41 +07 2025
-# Version: v0.3.0
+# Generated at: Thu Dec 25 09:28:26 +07 2025
+# Version: v0.3.1
 declare -A CHECKSUMS=(
     ["wpsila.conf"]="37949dce87686d946195ae65dcd0e1e95a763c1bfa40ee7c2583f20040680ac2"
-    ["wpsila_menu.sh"]="a457874ea10c7f30ddae4aac9e9c33fbc07ff1f421cec449a8e881987b6c1292"
-    ["install_lcmp.sh"]="063980fde7ccb560e2a3ad77330f8468319d973f6ee5e02bcc944a0774185ab0"
+    ["wpsila_menu.sh"]="015d72aade1e588ace99246a70e72e9bfa76d53c6e26d72629e27d2d9bfe5787"
+    ["install_lcmp.sh"]="bbaa4ffd3f2c5c75acaed80833ebdba724f60393e028e1a709fca67377e5fa1f"
+    ["anti_apt_lock.sh"]="156b35535f96580641f177f01120d46817f7da366bdd5221215be6a8333ec4f6"
     ["install_caddyserver.sh"]="96f9a5ed4e6b39ef696c30f5689d5a8b68b951f3d4cd43a5351df7433aafa601"
     ["install_php.sh"]="d88717e1a8bfc21f6de225da608433e79f4c8c71e62da8690b4f6ab2008cfd88"
     ["install_mariadb.sh"]="836c8e841fae50429f0e4b3941aa03745f9818f6b1c77bddc2f72bc2680f88cd"
-    ["install_wp.sh"]="3841e2885a9768cbf151cc3d46edecd3aa581f3390f11f77d6d66dc76808a0d0"
-    ["domain_check.sh"]="8d3c4b17c7552e9b333920680ef92cd0c4b298313e612e21824086698e52b975"
+    ["install_wp.sh"]="e162aa3b5ec2dc09caf6c1a9a62c93a77fbf8f5ec7d417ae416b736756ca312c"
+    ["domain_check.sh"]="a702ed01bc140bcec5f46ec7f5c6a1fb700a0c8480a5f5ba8e3920a048478e0b"
     ["database_user_wp.sh"]="b8f828f59972c5d2bcb874ead560022f6fc62d2ba6bcb949c4162e863e11b792"
-    ["wordpress.sh"]="ce41642e1c7fe06240559f2f6181c49c2d25e1425c7fb02d01b16de1ca602368"
-    ["caddyfile.sh"]="6cf2a24585b0f6b8c367039f8ae520a9a21f6fe9571d32312104d0cf48a11460"
-    ["caddyfile_subdomain.sh"]="6aaac1fe52f407be8895531ac3a57fb56094f051e4dbab027a460c2b72a97d9b"
+    ["wordpress.sh"]="cdd28f30d6ae4c2b587ec58f86d57a2cd78933afcfd93bc72b532aa6c80157f9"
+    ["caddyfile.sh"]="1dc3c517126f4fabca597e3d934b4a83d48a816a64a92dab4f03d2302ba81d00"
+    ["caddyfile_subdomain.sh"]="2e88d32e2a265732b5712ea9682fedb9be4df3ba744191f9578700483dfaee0b"
     ["tune_mariadb.sh"]="c0d6d37705ac870429150ad8a05a2fc9628a0c1a0b5fe0588588f9686187eb28"
-    ["tune_php.sh"]="745a110a84afee44b0318302b1edb5a4d2a5bf598a8aa1b905dff455eec37e3d"
-    ["tune_pool.sh"]="a8c07af10b5a5c5291119cce2bfe749edf3528ccf4dad254e8132b563a12ed83"
-    ["remove_web.sh"]="e3fa30d6895e86c2005665932b4214bf895925dccfa31bf21f8ba2183b755d95"
-    ["setup_sftp.sh"]="147be0ddafcfbd162ffd69ec0753aa81ea2b68bc10a0313da4359824df921ab0"
-    ["setup_adminer.sh"]="dc2422443b9609c03e8b7f4e3f249a8c7cd2be73d3f66930aa89b6f9dae751ad"
-    ["show_pass.sh"]="ea1877c03f225a3ca28693191b348cd5359e2cefaa9a7cae79f3478ca7c5e6c9"
-    ["check_for_update.sh"]="2d9b5d90af2b7f3759115bccf7a661054318c4066ff723cfd5ea218ea70aefcd"
+    ["tune_php.sh"]="ee512b5608f0c6151b8f4281a895854e34638a62d3b59e056b307d8ad516760c"
+    ["tune_pool.sh"]="c5bbbbbbabc788b28148e1b41ee1f1786c214f945923670a6d2ca47f191255cf"
+    ["remove_web.sh"]="e2fd8a2174fda78c07be1524b389837616c17b2871a2506237fb1a31c0a09520"
+    ["setup_sftp.sh"]="204de081c8bdbb2ff384ac9f2506d35036ae2983cf05cf1b23b66d886b3d483f"
+    ["setup_adminer.sh"]="63ede23b94cc968050a577ca0e1492423a1825f6624d74b00ef6425e9251e22a"
+    ["show_pass.sh"]="1cef0cde8bb5b444ba55b0be9cf676c4bd246f20221ad041d8f5c4aa5785e2e3"
+    ["check_for_update.sh"]="678099ed54dc58d73c4549c3d4c7afc721ad33c87de129a1655ca4ec3cd242d4"
 )
 # -------------------------------------------------------------------------------------------------------------------------------
 
