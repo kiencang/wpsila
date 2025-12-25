@@ -77,19 +77,7 @@ if [[ "$INSTALL_TYPE" != "subdomain" ]]; then
     WEB_ROOT_DIR_CHECK_RED="/var/www/$RED_DOMAIN"
 fi
 
-# 1. Kiểm tra Caddyfile (Deep Scan & Ignore Comments)
-if [[ -f "$CADDY_CONF_CHECK" ]]; then
-    # Grep logic cải tiến:
-    # ^[^#]* : Bắt đầu dòng KHÔNG phải dấu # (bỏ qua comment)
-    # [[:space:]] : Domain thường đứng sau khoảng trắng hoặc đầu dòng
-    if grep -Eq "^[^#]*([[:space:]]|^)$DOMAIN([[:space:]]|:|\{|$)" "$CADDY_CONF_CHECK"; then
-        echo -e "${RED}NGUY HIEM: Ten mien [$DOMAIN] da duoc cau hinh trong Caddyfile!${NC}"
-        echo -e "Script phat hien domain nay dang hoat dong (khong tinh dong comment)."
-        exit 1
-    fi
-fi
-
-# 2. Kiểm tra thư mục Web
+# 1. Kiểm tra thư mục Web
 if [[ -d "$WEB_ROOT_DIR_CHECK" ]]; then
     echo -e "${RED}NGUY HIEM: Thu muc web [$WEB_ROOT_DIR_CHECK] da ton tai!${NC}"
     exit 1
@@ -97,6 +85,17 @@ fi
 
 if [[ -n "$WEB_ROOT_DIR_CHECK_RED" && -d "$WEB_ROOT_DIR_CHECK_RED" ]]; then
     echo -e "${RED}NGUY HIEM: Thu muc web redirection [$WEB_ROOT_DIR_CHECK_RED] da ton tai!${NC}"
+    exit 1
+fi
+
+# 2. KIỂM TRA TỒN TẠI TRONG CẤU HÌNH CADDY (FILE CHECK)
+# Logic: wpsila quy định mỗi domain là 1 file riêng biệt, nên check file là chính xác nhất.
+CADDY_SITE_FILE_CHECK="/etc/caddy/sites-enabled/${DOMAIN}.caddy"
+
+if [[ -f "$CADDY_SITE_FILE_CHECK" ]]; then
+    echo -e "${RED}LOI: Ten mien $DOMAIN da duoc cai dat truoc do!${NC}"
+    echo -e "${YELLOW}Chi tiet: Tim thay file cau hinh tai $CADDY_SITE_FILE_CHECK${NC}"
+    echo -e "Vui long dung chuc nang Xoa Website (so 8) de go bo sach se truoc khi cai lai."
     exit 1
 fi
 
