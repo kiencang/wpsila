@@ -3,6 +3,10 @@
 # File: wordpress.sh
 # File này được nhúng vào script install_wp.sh
 # -----------------------------------------------------------
+
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
 # G1. TẠO CẤU TRÚC THƯ MỤC
 echo -e "${GREEN}[1/5] Dang tao thu muc chua ma nguon...${NC}"
 # Tạo thư mục web root (-p giúp không báo lỗi nếu thư mục đã tồn tại)
@@ -150,3 +154,4 @@ echo -e "Web Root:      ${YELLOW}$WP_ROOT${NC}"
 echo -e "Logs Directory: ${YELLOW}/var/www/$DOMAIN/logs${NC}"
 echo -e "${GREEN}>>> Buoc tiep theo: Cau hinh Caddyfile.${NC}"
 sleep 2
+# -------------------------------------------------------------------------------------------------------------------------------
