@@ -216,7 +216,7 @@ if [ "$NEED_INSTALL" = true ]; then
        error_exit "Khong the cai dat cac phu thuoc co ban."
     fi
 else
-    echo "${GREEN}Tat ca cac goi phu thuoc da co san.${NC}"
+    echo -e "${GREEN}Tat ca cac goi phu thuoc da co san.${NC}"
 fi
 # -------------------------------------------------------------------------------------------------------------------------------
 
