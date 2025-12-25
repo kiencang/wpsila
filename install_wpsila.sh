@@ -237,20 +237,20 @@ rm -f "$INSTALL_DIR/"*.sh
 # Dev bắt buộc phải dùng trước khi công bố phiên bản mới
 # Có tác dụng ngăn chặn các vấn đề liên quan đến lỗi đường truyền
 # ----------------------------------------------------------------------------
-# Generated at: Thu Dec 25 09:28:26 +07 2025
-# Version: v0.3.1
+# Generated at: Thu Dec 25 16:41:35 +07 2025
+# Version: v0.3.2
 declare -A CHECKSUMS=(
     ["wpsila.conf"]="37949dce87686d946195ae65dcd0e1e95a763c1bfa40ee7c2583f20040680ac2"
     ["wpsila_menu.sh"]="015d72aade1e588ace99246a70e72e9bfa76d53c6e26d72629e27d2d9bfe5787"
-    ["install_lcmp.sh"]="bbaa4ffd3f2c5c75acaed80833ebdba724f60393e028e1a709fca67377e5fa1f"
+    ["install_lcmp.sh"]="82c765c2f5d5ffb369de0800f39ecad10abb7494096d30a530419dae71d63e5b"
     ["anti_apt_lock.sh"]="156b35535f96580641f177f01120d46817f7da366bdd5221215be6a8333ec4f6"
-    ["install_caddyserver.sh"]="96f9a5ed4e6b39ef696c30f5689d5a8b68b951f3d4cd43a5351df7433aafa601"
+    ["install_caddyserver.sh"]="2742cc4dd3d7392d7e985b42d364f3d988f0d04728d02ab4c1662b036cb0e09d"
     ["install_php.sh"]="d88717e1a8bfc21f6de225da608433e79f4c8c71e62da8690b4f6ab2008cfd88"
-    ["install_mariadb.sh"]="836c8e841fae50429f0e4b3941aa03745f9818f6b1c77bddc2f72bc2680f88cd"
+    ["install_mariadb.sh"]="687467d098f6f17d746178f0a832cd9f2037c986c04123592c9adf59e95b7b60"
     ["install_wp.sh"]="e162aa3b5ec2dc09caf6c1a9a62c93a77fbf8f5ec7d417ae416b736756ca312c"
-    ["domain_check.sh"]="a702ed01bc140bcec5f46ec7f5c6a1fb700a0c8480a5f5ba8e3920a048478e0b"
+    ["domain_check.sh"]="781c85fad6d0f9b92991bdaa59c84dfcf9429c4c35b8a18bbd7cd872dfec27e0"
     ["database_user_wp.sh"]="b8f828f59972c5d2bcb874ead560022f6fc62d2ba6bcb949c4162e863e11b792"
-    ["wordpress.sh"]="cdd28f30d6ae4c2b587ec58f86d57a2cd78933afcfd93bc72b532aa6c80157f9"
+    ["wordpress.sh"]="2ead91ef1dd072959e856a0c2bbd9cc8a6fdee5b525bb828fee5a9084f8ba60e"
     ["caddyfile.sh"]="1dc3c517126f4fabca597e3d934b4a83d48a816a64a92dab4f03d2302ba81d00"
     ["caddyfile_subdomain.sh"]="2e88d32e2a265732b5712ea9682fedb9be4df3ba744191f9578700483dfaee0b"
     ["tune_mariadb.sh"]="c0d6d37705ac870429150ad8a05a2fc9628a0c1a0b5fe0588588f9686187eb28"
@@ -260,7 +260,7 @@ declare -A CHECKSUMS=(
     ["setup_sftp.sh"]="204de081c8bdbb2ff384ac9f2506d35036ae2983cf05cf1b23b66d886b3d483f"
     ["setup_adminer.sh"]="63ede23b94cc968050a577ca0e1492423a1825f6624d74b00ef6425e9251e22a"
     ["show_pass.sh"]="1cef0cde8bb5b444ba55b0be9cf676c4bd246f20221ad041d8f5c4aa5785e2e3"
-    ["check_for_update.sh"]="678099ed54dc58d73c4549c3d4c7afc721ad33c87de129a1655ca4ec3cd242d4"
+    ["check_for_update.sh"]="64c44b06827c940ed1d93823c645ad7e231f429cea748f51f24bbbefd4f3e1c7"
 )
 # -------------------------------------------------------------------------------------------------------------------------------
 
