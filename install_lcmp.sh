@@ -158,7 +158,7 @@ while [ "$count" -lt "$MAX_RETRIES" ]; do
         echo "⚠️ Ban con $remaining lan thu."
     else
         echo ""
-        echo "⛔ QUÁ SỐ LẦN THỬ CHO PHÉP ($MAX_RETRIES lan)."
+        echo "⛔ Qua so lan thu cho phep ($MAX_RETRIES lan)."
         echo "Script se dung lai de bao dam an toan."
         exit 1  # Dừng script ngay lập tức
     fi
