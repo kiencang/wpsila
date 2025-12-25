@@ -137,9 +137,9 @@ echo ">>Dang reload lai PHP-FPM..."
 # Test cấu hình trước khi reload để tránh sập web
 if php-fpm"${PHP_VER}" -t; then
     service php"${PHP_VER}"-fpm reload
-    echo "${GREEN}THANH CONG! Da cap nhat file: $CONFIG_FILE ${NC}"
+    echo -e "${GREEN}THANH CONG! Da cap nhat file: $CONFIG_FILE ${NC}"
 else
-    echo "${RED}Loi cau hinh! Da huy bo reload. Vui long kiem tra lai file log.${NC}"
+    echo -e "${RED}Loi cau hinh! Da huy bo reload. Vui long kiem tra lai file log.${NC}"
     rm "${CONFIG_FILE}"
     echo "Da xoa bo cau hinh loi de khoi phuc lai trang thai cu."
 fi

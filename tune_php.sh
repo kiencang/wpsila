@@ -111,8 +111,8 @@ EOF
 # --- KHỞI ĐỘNG LẠI PHP ---
 echo ">> Dang reload lai PHP-FPM..."
 if service php"${PHP_VER}"-fpm reload; then
-    echo "${GREEN}Hoan tat! Cau hinh da duoc ap dung cho PHP $PHP_VER.${NC}"
+    echo -e "${GREEN}Hoan tat! Cau hinh da duoc ap dung cho PHP $PHP_VER.${NC}"
     echo "File cau hinh: $CONFIG_FILE"
 else
-    echo "${RED}KHONG the reload PHP tu dong. Vui long chay lenh: service php${PHP_VER}-fpm reload${NC}"
+    echo -e "${RED}KHONG the reload PHP tu dong. Vui long chay lenh: service php${PHP_VER}-fpm reload${NC}"
 fi
