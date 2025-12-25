@@ -16,6 +16,9 @@
 # curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/install_wpsila.sh | sudo bash
 # -------------------------------------------------------------------------
 
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
 # Dừng script ngay lập tức nếu có biến chưa khai báo hoặc pipeline bị lỗi
 # Lưu ý: set -e sẽ được xử lý khéo léo trong hàm download để không ngắt script đột ngột
 set -euo pipefail
@@ -26,6 +29,7 @@ export DEBIAN_FRONTEND=noninteractive
 
 # Phiên bản của bash script / rất quan trọng để tải đúng phiên bản các file cài tương ứng
 SILA_VERSION="v0.3.1"
+# -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
 
@@ -40,13 +44,14 @@ NC='\033[0m' # No Color (ngắt màu)
 # +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
-# --- Cấu hình ---
+# 0. Cấu hình
 # Thư mục lưu các file cài đặt
 # Thêm tiền tố kiencang để giảm tối đa xác suất trùng tên
 INSTALL_DIR="/opt/kiencang-wpsila"
 
 # Chú ý link Repo, cần cập nhật cả vps.wpsila.com nếu nó có thay đổi
 # vps.wpsila.com là nơi chứa mã nguồn này, có thể để chuyển hướng hoặc chứa trực tiếp.
+# Đang để chứa trực tiếp mã nguồn
 REPO_URL="https://raw.githubusercontent.com/kiencang/wpsila/${SILA_VERSION}"
 BIN_LINK="/usr/local/bin/wpsila"
 
@@ -87,7 +92,7 @@ else
     exit 1
 fi
 
-# Kiểm tra xem có phải là yêu cầu update không
+# Kiểm tra xem có phải là yêu cầu update mã nguồn không
 UPDATE_WPSILA="${1:-noupdate}"
 # -------------------------------------------------------------------------------------------------------------------------------
 
@@ -137,7 +142,7 @@ done
 
 if [ "$NEED_INSTALL" = true ]; then
 # -------------------------------------------------------------------------
-	# Tắt tiến trình chạy cập nhật ngầm của Ubuntu
+# Tắt tiến trình chạy cập nhật ngầm của Ubuntu
 # -------------------------------------------------------------------------
 
 # Tương đương module anti_apt_lock.sh (trong install_lcmp.sh) >>
@@ -177,7 +182,7 @@ if [ "$NEED_INSTALL" = true ]; then
 		# fuser trả về 0 nghĩa là có tiến trình đang dùng file -> Cần chờ
 		while fuser "${LOCK_FILES[@]}" >/dev/null 2>&1; do
 			if [ "$COUNT" -ge "$TIMEOUT" ]; then
-				echo "!!! [Loi] Qua trinh cap nhat he thong bi ket qua lau (> 5 phut)."
+				echo "!!! [Loi] Qua trinh cap nhat he thong bi ket lai qua lau (> 5 phut)."
 				echo "!!! Vui long cai lai va chay script wpsila ngay sau khi cai."
 				# Chuyên nghiệp là: Nếu kẹt quá lâu, hãy dừng lại báo lỗi thay vì phá hỏng hệ thống
 				# Tuy nhiên, bước unmask bên dưới vẫn phải chạy để trả lại trạng thái.
@@ -211,7 +216,7 @@ if [ "$NEED_INSTALL" = true ]; then
        error_exit "Khong the cai dat cac phu thuoc co ban."
     fi
 else
-    echo "Tat ca cac goi phu thuoc da co san."
+    echo "${GREEN}Tat ca cac goi phu thuoc da co san.${NC}"
 fi
 # -------------------------------------------------------------------------------------------------------------------------------
 
@@ -228,8 +233,9 @@ rm -f "$INSTALL_DIR/"*.sh
 
 # -------------------------------------------------------------------------------------------------------------------------------
 # 4.1 MA BASH DE DAN VAO install_wpsila.sh
-# Sử dụng mã generate_checksum chạy để lấy mã này về
+# Sử dụng mã generate_checksum bên branches Dev chạy để lấy mã này về
 # Dev bắt buộc phải dùng trước khi công bố phiên bản mới
+# Có tác dụng ngăn chặn các vấn đề liên quan đến lỗi đường truyền
 # ----------------------------------------------------------------------------
 # Generated at: Thu Dec 25 09:28:26 +07 2025
 # Version: v0.3.1
