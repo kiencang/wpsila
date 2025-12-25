@@ -17,7 +17,7 @@
 # Dừng script ngay lập tức nếu có lệnh bị lỗi
 set -euo pipefail
 
-# Thiet lap moi truong chuan cho Automation
+# Thiết lập môi trường chuẩn cho Automation
 export LC_ALL=C.UTF-8
 export DEBIAN_FRONTEND=noninteractive
 # -------------------------------------------------------------------------------------------------------------------------------
@@ -147,7 +147,7 @@ apt-get install -y --no-install-recommends -o Dpkg::Lock::Timeout=60 \
     unzip \
     gnupg
 
-echo -e "${GREEN}[OK] Da cai dat xong dependencies.${NC}"
+echo -e "${GREEN}[OK] Da cai dat xong dependencies (cac goi phu thuoc).${NC}"
 sleep 2
 # -------------------------------------------------------------------------------------------------------------------------------
 
@@ -158,7 +158,7 @@ sleep 2
 CADDYWS_INSTALL_FILE="$SCRIPT_WPSILA_DIR/install_caddyserver.sh"
 
 if [[ -f "$CADDYWS_INSTALL_FILE" ]]; then
-	echo -e "${GREEN}Chuan bi cai Caddy Web Server...${NC}"
+	echo -e "${GREEN}Chuan bi cai Caddy Server...${NC}"
     source "$CADDYWS_INSTALL_FILE"
 else
     echo -e "${RED}Khong tim thay file: install_caddyserver.sh${NC}"
@@ -210,10 +210,7 @@ sleep 2
 # G. HOÀN TẤT
 INSTALLED_SUCCESSFULLY="$SCRIPT_WPSILA_DIR/wpsila_success.txt"
 
-# Xóa file cũ (cho chắc chắn)
-rm -f "$INSTALLED_SUCCESSFULLY"
-
-# Ghi file log (ghi đè)
+# Ghi file log (ghi đè nếu đã có, tạo mới nếu chưa có)
 cat > "$INSTALLED_SUCCESSFULLY" <<EOF
 ----------------------------------------
 wpsila CLI
