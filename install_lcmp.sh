@@ -89,22 +89,6 @@ fi
 
 # -------------------------------------------------------------------------
 
-# -------------------------------------------------------------------------
-# Tắt tiến trình chạy cập nhật ngầm của Ubuntu
-# -------------------------------------------------------------------------
-echo "1. Lay quyen APT va dung tien trinh chay ngam..."
-# Xác định đường dẫn
-ANTI_APT_LOCK="$SCRIPT_WPSILA_DIR/anti_apt_lock.sh"
-
-# Nhúng file vào
-if [[ -f "$ANTI_APT_LOCK" ]]; then
-    source "$ANTI_APT_LOCK"
-else
-    echo -e "${RED}Khong tim thay file: anti_apt_lock.sh${NC}"
-	exit 1
-fi
-# -------------------------------------------------------------------------
-
 # C2. Kiểm tra Port 80 & 443
 # Dùng grep -E để gộp lệnh, code gọn hơn
 if ss -tuln | grep -qE ":(80|443) "; then
@@ -123,9 +107,86 @@ fi
 
 echo -e "${GREEN}[OK] Moi truong sach se.${NC}"
 sleep 1
+# -------------------------------------------------------------------------------------------------------------------------------
+
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
+# Dx Hỏi thăm địa chỉ email trước, để dùng làm yêu cầu SSL & nhận thông báo sau này
+# 1. Hàm kiểm tra định dạng
+is_valid_email() {
+    local email="$1"
+    # Regex: support các định dạng email phổ biến
+    local regex="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+    
+    if [[ "$email" =~ $regex ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+# 2. Cấu hình giới hạn
+MAX_RETRIES=3       # Tổng số lần cho phép
+count=0             # Biến đếm số lần đã thử
+
+# 3. Vòng lặp giới hạn
+while [ "$count" -lt "$MAX_RETRIES" ]; do
+    echo ""
+    read -r -p "Nhap Email quan tri (Bat buoc, day phai la email cua ban): " ADMIN_EMAIL
+
+    # --- Kiểm tra Rỗng ---
+    if [[ -z "$ADMIN_EMAIL" ]]; then
+        echo "❌ Loi: Email khong duoc de trong!"
+    
+    # --- Kiểm tra Regex ---
+    elif ! is_valid_email "$ADMIN_EMAIL"; then
+        echo "❌ Loi: Dinh dang email khong hop le."
+    
+    # --- Nếu Hợp lệ ---
+    else
+        echo "✔ Email hop le: $ADMIN_EMAIL"
+        break  # Thoát vòng lặp ngay lập tức, biến $ADMIN_EMAIL đã sẵn sàng sử dụng
+    fi
+
+    # --- Xử lý khi nhập sai ---
+    # Tăng biến đếm (An toàn với set -e)
+    count=$((count + 1))
+    remaining=$((MAX_RETRIES - count))
+    
+    if [ "$remaining" -gt 0 ]; then
+        echo "⚠️ Ban con $remaining lan thu."
+    else
+        echo ""
+        echo "⛔ QUÁ SỐ LẦN THỬ CHO PHÉP ($MAX_RETRIES lan)."
+        echo "Script se dung lai de bao dam an toan."
+        exit 1  # Dừng script ngay lập tức
+    fi
+done
+
+export ADMIN_EMAIL
+# -------------------------------------------------------------------------------------------------------------------------------
+
+# +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
 # C4. UPDATE SYSTEM & DEPENDENCIES
+# -------------------------------------------------------------------------
+# Tắt tiến trình chạy cập nhật ngầm của Ubuntu
+# -------------------------------------------------------------------------
+echo "1. Lay quyen APT va dung tien trinh chay ngam..."
+# Xác định đường dẫn
+ANTI_APT_LOCK="$SCRIPT_WPSILA_DIR/anti_apt_lock.sh"
+
+# Nhúng file vào
+if [[ -f "$ANTI_APT_LOCK" ]]; then
+    source "$ANTI_APT_LOCK"
+else
+    echo -e "${RED}Khong tim thay file: anti_apt_lock.sh${NC}"
+	exit 1
+fi
+# -------------------------------------------------------------------------
+
 echo "--------------------------------------------------------"
 echo "Cap nhat he thong va cai dat cac goi co ban..."
 
@@ -215,8 +276,10 @@ cat > "$INSTALLED_SUCCESSFULLY" <<EOF
 ----------------------------------------
 wpsila CLI
 Cai thanh cong LCMP
-PHP Version: $PHP_VER
 Date: $(date)
+PHP Version: $PHP_VER
+MariaDB Version: $MARIADB_VER
+Admin Email: $ADMIN_EMAIL
 ----------------------------------------
 EOF
 

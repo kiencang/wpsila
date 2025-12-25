@@ -2,6 +2,7 @@
 # MODULE: Cài đặt Caddy Web Server
 # File: install_caddyserver.sh
 # File này được nhúng vào script install_lcmp.sh
+# Yêu cầu: biến $ADMIN_EMAIL phải được export từ script cha
 # Tuân thủ hướng dẫn: https://caddyserver.com/docs/install
 # -----------------------------------------------------------
 
@@ -10,6 +11,14 @@
 # -------------------------------------------------------------------------------------------------------------------------------
 echo "--------------------------------------------------------"
 echo -e "${GREEN}[MODULE] Bat dau cai dat Caddy Web Server...${NC}"
+
+# [SAFETY CHECK] Kiểm tra biến môi trường bắt buộc
+# ${ADMIN_EMAIL:-} giúp tránh lỗi "unbound variable" nếu set -u đang bật
+if [[ -z "${ADMIN_EMAIL:-}" ]]; then
+    echo -e "${RED}[LOI] Khong tim thay bien ADMIN_EMAIL.${NC}"
+    echo -e "${YELLOW}Vui long chay script tu file install_lcmp.sh${NC}"
+    exit 1
+fi
 
 # 1. Cài đặt các gói phụ trợ cần thiết
 # debian-keyring, debian-archive-keyring: Đảm bảo apt nhận diện đúng signature
@@ -115,17 +124,19 @@ fi
 
 # B3. Tạo Caddyfile gốc mới (Master Config)
 # File này chỉ làm nhiệm vụ import các file con
-# Quan trọng: có thể sau này cần tính năng nhập email cho người dùng & đưa thông tin đó vào đây
 cat > /etc/caddy/Caddyfile <<EOF
 {
     # Global Options
-    # email admin@localhost # De Caddy tu dong quan ly SSL internal hoac Let's Encrypt
+    # Tu dong quan ly SSL qua Email nay
+    email $ADMIN_EMAIL
 }
 
 # [QUAN TRONG] Import tat ca file cau hinh trong thu muc sites-enabled
-# Dau sao (*) la ky tu dai dien, Caddy se doc het cac file co duoi .caddy
 import /etc/caddy/sites-enabled/*.caddy
 EOF
+
+# Format lại file cho đẹp chuẩn Caddy
+caddy fmt --overwrite /etc/caddy/Caddyfile
 
 # B4. Reload để áp dụng kiến trúc mới
 systemctl reload caddy
