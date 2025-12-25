@@ -2,7 +2,7 @@
 
 # -------------------------------------------------------------------------
 # wpsila - Update Manager
-# Version 0.3.0 - Optimized for Ubuntu 22.04 & 24.04
+# Version 0.3.1 - Optimized for Ubuntu 22.04 & 24.04
 # -------------------------------------------------------------------------
 
 set -euo pipefail
@@ -15,7 +15,7 @@ if [[ $EUID -ne 0 ]]; then
    exit $?
 fi
 
-SCRIPT_VERSION="v0.3.0"
+SCRIPT_VERSION="v0.3.1"
 GITHUB_USER="kiencang"
 GITHUB_REPO="wpsila"
 
