@@ -2,7 +2,23 @@
 
 Các cập nhật mới nhất cho hướng dẫn sử dụng, bạn xem ở đây: https://wpsila.com/huong-dan/
 
-Trước khi thao tác, hãy tắt trình gõ tiếng Việt, hoặc để sang dạng tiếng Anh, để việc nhập dữ liệu đỡ nhầm lẫn.
+Lưu ý: Trước khi thao tác, hãy tắt trình gõ tiếng Việt, hoặc để sang dạng tiếng Anh, để việc nhập dữ liệu đỡ nhầm lẫn.
+
+Yêu cầu hệ thống:
+
+- Ubuntu LTS 24.04 hoặc 22.04
+- VPS mới tinh, chưa cài bất cứ thứ gì khác ngoài Ubuntu
+- RAM tối thiểu 1GB
+
+wpsila sẽ tự động cài phiên bản PHP, MariaDB & Caddy Server có thông số như bên dưới:
+
+- Bản PHP mặc định: 8.3
+- Bản MariaDB mặc định: 10.11
+- Caddy Server bản ổn định mới nhất
+
+```
+curl -sL https://vps.wpsila.com | sudo bash
+```
 
 Sau khi nhập lệnh trên vào VPS, nó sẽ tải các file cài đặt về.
 
