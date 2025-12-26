@@ -88,6 +88,8 @@ Nhap lua chon (0-11):
 
 Tuy nhiên để bắt đầu sử dụng, bạn cần cài Caddy, PHP & MariaDB. Đây là nền tảng để bắt đầu sử dụng WordPress.
 
+**Bước 1:**
+
 Để cài, bạn nhấn số 1. Chương trình sẽ hỏi email của bạn, bạn cần nhập email đang sử dụng của bạn vào. Email dùng để lấy cấp phát https & dùng để đăng ký quản trị WordPress.
 
 ```
@@ -100,7 +102,46 @@ Dang kiem tra moi truong VPS (Clean OS Check)...
 Nhap Email quan tri (Bat buoc, day phai la email cua ban):
 ```
 
-Sau khi bạn nhập email, chương trình sẽ bắt đầu cài đặt. Sẽ tốn khoảng 5 phút để hoàn tất quá trình này.
+Sau khi bạn nhập email, chương trình sẽ bắt đầu cài đặt. Sẽ tốn khoảng 3-5 phút để hoàn tất quá trình này.
+
+-
+
+**Bước 2:**
+
+Cài đặt xong bước 1, bạn nhấn Enter để quay lại các tùy chọn của menu.
+
+Nhập số 2 để thiết lập cấu hình tối ưu cho PHP và database. Bước này rất nhanh, chỉ khoảng 10s là xong hết.
+
+Lại nhấn Enter để quay lại menu.
+
+Xong bước 1 & bước 2 là bạn xong nền tảng cho WordPress. Và bạn không cần lặp lại thao tác này nữa.
+
+Bây giờ bạn sẽ chính thức cài đặt WordPress cho tên miền của bạn.
+
+**Bước 3:**
+
+Trước khi bạn cài WordPress cho tên miền, bạn cần đảm bảo đã trỏ DNS của tên miền về IP của VPS. Cách nhanh chóng và đơn giản để làm việc này là sử dụng Cloudflare để trỏ, nhớ ở bước này cần tắt đám mây vàng đi để tên miền trỏ về IP thực của VPS.
+
+Cả 2 bản ghi @ và www đều cần trỏ về IP của VPS. 
+
+Nếu bạn dùng DNS của nhà cung cấp tên miền, thì tốc độ cập nhật thường sẽ chậm hơn Cloudflare, bạn cần dùng https://dnschecker.org/ để kiểm tra chắc chắn là nó đã cập nhật IP mới thì mới nên cài. Vì nếu chưa nhận IP mới, việc cấp phát https không thể diễn ra được. 
+
+Nếu dùng Cloudflare để trỏ IP, việc này thường diễn ra rất nhanh, bạn thưởng chỉ cần đợi chưa tới 3 phút là tất cả sẽ được cập nhật.
+
+OK, giờ chúng ta sẽ bắt đầu cài.
+
+Bạn chọn số 3 để cài. Ở đây bạn cần nhập địa chỉ của trang, phải xác định rõ là địa chỉ có-www (ví dụ www.example.com) hay không-www (ví dụ example.com)
+
+Chương trình sẽ mặc định chuyển hướng địa chỉ còn lại về địa chỉ chính thức. Ví dụ, nếu bạn chọn không-www làm địa chỉ chính, thì có-www sẽ được chuyển hướng về địa chỉ mặc định đó. Ngược lại cũng vậy.
+
+Sau khi bạn nhập địa chỉ và Enter, quá trình cài đặt diễn ra rất nhanh, chỉ khoảng 30s là hoàn tất.
+
+**Một số lưu ý:**
+
+- Username mặc định để đăng nhập WordPress là admin
+- Email mặc định là email bạn khai báo ở bước 1
+- Pass chương trình sẽ tạo một chuỗi ngẫu nhiên và được lưu lại. Bạn có thể xem pass bằng cách nhập số 4
+- Lưu ý là bạn cần lưu lại pass này ngay, và nên đăng nhập để đổi thành pass khác nếu bạn muốn
 
 ## Gợi ý các theme & plugin nên dùng cùng với wpsila
 
