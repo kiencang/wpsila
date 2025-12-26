@@ -90,7 +90,7 @@ Nhap lua chon (0-11):
 
 Tuy nhiên để bắt đầu sử dụng, bạn cần cài Caddy, PHP & MariaDB. Đây là nền tảng để bắt đầu sử dụng WordPress.
 
-**Bước 1:**
+**Bước 1:** Cài chương trình nền cho WordPress
 
 Để cài, bạn nhấn số 1. Chương trình sẽ hỏi email của bạn, bạn cần nhập email đang sử dụng của bạn vào. Email dùng để lấy cấp phát https & dùng để đăng ký quản trị WordPress.
 
@@ -108,7 +108,7 @@ Sau khi bạn nhập email, chương trình sẽ bắt đầu cài đặt. Sẽ 
 
 ---
 
-**Bước 2:**
+**Bước 2:** Thực hiện các tối ưu cơ bản
 
 Cài đặt xong bước 1, bạn nhấn Enter để quay lại các tùy chọn của menu.
 
@@ -122,7 +122,7 @@ Bây giờ bạn sẽ chính thức cài đặt WordPress cho tên miền của 
 
 ---
 
-**Bước 3:**
+**Bước 3:** Cài đặt trang WordPress đầu tiên
 
 Trước khi bạn cài WordPress cho tên miền, bạn cần đảm bảo đã trỏ DNS của tên miền về IP của VPS. Cách nhanh chóng và đơn giản để làm việc này là sử dụng Cloudflare để trỏ, nhớ ở bước này cần tắt đám mây vàng đi để tên miền trỏ về IP thực của VPS.
 
