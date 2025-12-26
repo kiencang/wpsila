@@ -53,9 +53,9 @@ chmod 755 /var/log/caddy
 # -------------------------------------------------------------------------------------------------------------------------------
 # D. NHẬP THÔNG TIN TÊN MIỀN CHO QUẢN TRỊ DATABASE
 echo "========================================================"
-echo "   SETUP ADMINER (PHP 8.3) & AUTO CADDY CONFIG"
+echo "   SETUP ADMINER (Để quản trị cơ sở dữ liệu/database)"
 echo "========================================================"
-read -r -p "Nhap ten mien cho Adminer (VD: db.domain.com): " INPUT_DOMAIN
+read -r -p "Nhap dia chi cho phan quan tri database (VD: db.domain.com): " INPUT_DOMAIN
 
     # Xử lý chuỗi
     TEMP_DOMAIN=$(echo "$INPUT_DOMAIN" | tr -d ' ' | tr '[:upper:]' '[:lower:]')
