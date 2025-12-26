@@ -169,7 +169,7 @@ Sau đó bạn nhập tên user cho tài khoản sFTP. Chương trình sẽ tự
 
 ### **Thêm trang web dạng subdomain**
 
-Nếu bạn muốn thêm một trang WordPress dạng subdomain như hoctap.ten-mien-cua-ban.com thì bạn cần chọn mục số 7, lý do là vì địa chỉ dạng subdomain thì không cần chuyển hướng như kiểu www.hoctap.ten-mien-cua-ban.com về hoctap.ten-mien-cua-ban.com, do vậy bạn không nên dùng mục số 3 để cài.
+Nếu bạn muốn thêm một trang WordPress dạng subdomain như hoctap.ten-mien-cua-ban.com thì bạn cần chọn mục số 7, lý do là vì địa chỉ dạng subdomain thì không cần chuyển hướng như kiểu có-www về không-www, do vậy bạn không nên dùng mục số 3 để cài.
 
 Trước hết bạn cũng cần trỏ DNS của subdomain về IP của VPS. Sau đó nhập chính xác địa chỉ cần cài đặt vào rồi Enter.
 
