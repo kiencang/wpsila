@@ -293,7 +293,7 @@ cat >> "$WPSILA_CONFIG_FILE" <<EOF
 INSTALL_WP_EMAIL="$ADMIN_EMAIL"
 EOF
 
-echo -e "Da cap nhat {GREEN}email${NC} vao file cau hinh."
+echo -e "Da cap nhat ${GREEN}email${NC} vao file cau hinh."
 
 echo "Don dep rac he thong..."
 apt-get autoremove -y
