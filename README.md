@@ -15,7 +15,7 @@ Cài đặt với quyền root:
 curl -sL https://vps.wpsila.com | sudo bash
 ```
 
-Quá trình viết code có tham khảo gợi ý từ Gemini.
+Hướng dẫn sử dụng đầy đủ mời bạn xem chi tiết ở đây: https://wpsila.com/huong-dan/
 
 ## Gợi ý các theme & plugin nên dùng cùng với wpsila
 
