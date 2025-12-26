@@ -104,7 +104,7 @@ Nhap Email quan tri (Bat buoc, day phai la email cua ban):
 
 Sau khi bạn nhập email, chương trình sẽ bắt đầu cài đặt. Sẽ tốn khoảng 3-5 phút để hoàn tất quá trình này.
 
--
+---
 
 **Bước 2:**
 
@@ -117,6 +117,8 @@ Lại nhấn Enter để quay lại menu.
 Xong bước 1 & bước 2 là bạn xong nền tảng cho WordPress. Và bạn không cần lặp lại thao tác này nữa.
 
 Bây giờ bạn sẽ chính thức cài đặt WordPress cho tên miền của bạn.
+
+---
 
 **Bước 3:**
 
@@ -140,8 +142,22 @@ Sau khi bạn nhập địa chỉ và Enter, quá trình cài đặt diễn ra r
 
 - Username mặc định để đăng nhập WordPress là admin
 - Email mặc định là email bạn khai báo ở bước 1
-- Pass chương trình sẽ tạo một chuỗi ngẫu nhiên và được lưu lại. Bạn có thể xem pass bằng cách nhập số 4
-- Lưu ý là bạn cần lưu lại pass này ngay, và nên đăng nhập để đổi thành pass khác nếu bạn muốn
+- Pass chương trình sẽ tạo một chuỗi ngẫu nhiên và được lưu lại. Bạn có thể xem pass bằng cách quay lại menu điều khiển và nhập số 4
+- Lưu ý là bạn cần lưu lại pass này ngay, và nên đăng nhập để đổi thành pass khác nếu bạn muốn.
+
+---
+
+Như vậy là bạn đã tạo trang WordPress thành công. Giờ nếu bạn muốn thêm một số tính năng thì hãy theo dõi tiếp các bước tiếp theo.
+
+**Thêm tài khoản sFTP**
+
+Tài khoản sFTP dùng để vào thư mục chính của website để tải lên hoặc xóa file. Bạn có thể tạo tài khoản này bằng cách nhấn số 5 ở menu điều khiển.
+
+Chương trình sẽ hỏi bạn muốn tạo tài khoản sFTP cho địa chỉ website nào, bạn cần nhập đúng địa chỉ website muốn tạo vào.
+
+Sau đó bạn nhập tên user cho tài khoản sFTP. Chương trình sẽ tự động tạo pass cho user này.
+
+Để xem lại pass cho user sFPT, bạn nhập số 6 ở menu điều khiển chính. Lưu ý bạn phải chủ động lưu lại pass này, vì chương trình sẽ chỉ lưu pass gần nhất mà thôi (tức là nếu bạn tài khoản sFTP khác thì thông tin pass của tài khoản sFTP trước sẽ không thấy nữa, vì thế bạn cần chủ động lưu lại pass sau khi tạo).
 
 ## Gợi ý các theme & plugin nên dùng cùng với wpsila
 
