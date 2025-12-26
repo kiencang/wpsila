@@ -19,9 +19,11 @@ Quá trình viết code có tham khảo gợi ý từ Gemini.
 
 ## Hướng dẫn sử dụng
 
+Trước khi thao tác, hãy tắt trình gõ tiếng Việt, hoặc để sang dạng tiếng Anh, để việc nhập dữ liệu đỡ nhầm lẫn.
+
 Sau khi nhập lệnh trên vào VPS, nó sẽ tải các file cài đặt về.
 
-Bạn sẽ thấy tiến trình nhu bên dưới
+Bạn sẽ thấy tiến trình nhu bên dưới:
 
 ```
 === DANG CAI DAT WPSILA ===
