@@ -145,9 +145,9 @@ Sau khi bạn nhập địa chỉ và Enter, quá trình cài đặt diễn ra r
 - Pass chương trình sẽ tạo một chuỗi ngẫu nhiên và được lưu lại. Bạn có thể xem pass bằng cách quay lại menu điều khiển và nhập số 4
 - Lưu ý là bạn cần lưu lại pass này ngay, và nên đăng nhập để đổi thành pass khác nếu bạn muốn.
 
----
-
 Như vậy là bạn đã tạo trang WordPress thành công. Giờ nếu bạn muốn thêm một số tính năng thì hãy theo dõi tiếp các bước tiếp theo.
+
+---
 
 **Thêm tài khoản sFTP**
 
