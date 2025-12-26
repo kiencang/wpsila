@@ -287,14 +287,13 @@ Admin Email: $ADMIN_EMAIL
 EOF
 
 # Ghi nối vào file quản trị tổng thể wpsila.conf
-WPSILA_CONF="$SCRIPT_WPSILA_DIR/wpsila.conf"
-
-# Ghi thông tin vào wpsila.conf
-cat >> "$WPSILA_CONF" <<EOF
+cat >> "$WPSILA_CONFIG_FILE" <<EOF
 
 # 3. Email của admin WP
 INSTALL_WP_EMAIL="$ADMIN_EMAIL"
 EOF
+
+echo -e "Da cap nhat {GREEN}email${NC} vao file cau hinh."
 
 echo "Don dep rac he thong..."
 apt-get autoremove -y
