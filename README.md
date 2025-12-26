@@ -2,7 +2,7 @@ Version của bash script: v1.0.1
 ---
 Website: https://wpsila.com
 
-Đây là công cụ **cài nhanh blog WordPress trên VPS** (chỉ blog & nói chung là website không bao gồm giỏ hàng).
+Đây là công cụ dòng lệnh (CLI) giúp **cài đặt nhanh blog WordPress trên VPS** (chỉ blog & nói chung là website không bao gồm giỏ hàng).
 
 - Yêu cầu hệ thống: **Ubuntu LTS 24.04** hoặc 22.04, cài mới trên VPS (tức là bạn chưa có bất cứ website nào hoặc cài bất cứ chương trình gì ngoài Ubuntu trên VPS đó).
 - RAM tối thiểu 1GB.
