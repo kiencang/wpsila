@@ -47,6 +47,12 @@ rm -f latest.tar.gz
 # -------------------------------------------------------------------------------------------------------------------------------
 # G3. TỰ ĐỘNG CẤU HÌNH WP-CONFIG VÀ INSTALL DB
 echo -e "${GREEN}>>> Dang tu dong cau hinh wp-config.php va database...${NC}"
+DEFAULT_INSTALL_WP_EMAIL="admin@$DOMAIN"
+
+# Giá trị $INSTALL_WP_EMAIL lấy từ wpsila.conf
+# Nếu nó không tồn tại thì lấy giá trị $DEFAULT_INSTALL_WP_EMAIL
+# Vì giá trị INSTALL_WP_EMAIL phải có thì mới cài được
+INSTALL_WP_EMAIL="${INSTALL_WP_EMAIL:-$DEFAULT_INSTALL_WP_EMAIL}"
 
 # G3.1. Cài đặt WP-CLI nếu chưa có
     if ! [ -x "$(command -v wp)" ]; then
@@ -60,7 +66,7 @@ echo -e "${GREEN}>>> Dang tu dong cau hinh wp-config.php va database...${NC}"
     WP_PATH="/var/www/$DOMAIN/public_html"
     WP_ADMIN_USER="admin"
     WP_ADMIN_PASS="p_$(openssl rand -hex 12)" # Tạo pass ngẫu nhiên
-    WP_ADMIN_EMAIL="admin@$DOMAIN"
+    WP_ADMIN_EMAIL="$INSTALL_WP_EMAIL"
 
     # Di chuyển vào thư mục code
     cd "$WP_PATH" || { echo "Loi: Khong tim thay thu muc!"; exit 1; }

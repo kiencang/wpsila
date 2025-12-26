@@ -133,7 +133,10 @@ count=0             # Biến đếm số lần đã thử
 # 3. Vòng lặp giới hạn
 while [ "$count" -lt "$MAX_RETRIES" ]; do
     echo ""
-    read -r -p "Nhap Email quan tri (Bat buoc, day phai la email cua ban): " ADMIN_EMAIL
+    read -r -p "Nhap Email quan tri (Bat buoc, day phai la email cua ban): " TEMP_EMAIL
+	
+	# Xóa khoảng trắng dư thừa
+	ADMIN_EMAIL=$(echo "$TEMP_EMAIL" | tr -d ' ')
 
     # --- Kiểm tra Rỗng ---
     if [[ -z "$ADMIN_EMAIL" ]]; then
@@ -282,6 +285,17 @@ MariaDB Version: $MARIADB_VER
 Admin Email: $ADMIN_EMAIL
 ----------------------------------------
 EOF
+
+# Ghi nối vào file quản trị tổng thể wpsila.conf
+WPSILA_CONF="$SCRIPT_WPSILA_DIR/wpsila.conf"
+
+if [[ -f "$WPSILA_CONF" ]]; then
+cat >> "$WPSILA_CONF" <<EOF
+
+# 3. Email của admin WP
+INSTALL_WP_EMAIL="$ADMIN_EMAIL"
+EOF
+fi
 
 echo "Don dep rac he thong..."
 apt-get autoremove -y
