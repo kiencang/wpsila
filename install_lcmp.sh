@@ -287,8 +287,9 @@ Admin Email: $ADMIN_EMAIL
 EOF
 
 # Ghi nối vào file quản trị tổng thể wpsila.conf
+# Thêm khoảng trắng vào cuối
+echo "" >> "$WPSILA_CONFIG_FILE"
 cat >> "$WPSILA_CONFIG_FILE" <<EOF
-
 # 3. Email của admin WP
 INSTALL_WP_EMAIL="$ADMIN_EMAIL"
 EOF

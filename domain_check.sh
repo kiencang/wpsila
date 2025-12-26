@@ -17,8 +17,8 @@ if [[ "$INSTALL_TYPE" == "subdomain" ]]; then
     PROMPT_TEXT="Nhap SubDomain (vi du: hello.example.com): "
     TYPE_TEXT="SubDomain"
 else
-    PROMPT_TEXT="Nhap ten mien (vi du: example.com): "
-    TYPE_TEXT="Ten mien"
+    PROMPT_TEXT="Nhap dia chi website (vi du: example.com): "
+    TYPE_TEXT="Dia chi website"
 fi
 
 echo -e "${GREEN}>>> Vui long nhap ${TYPE_TEXT} cua ban.${NC}"
@@ -52,7 +52,7 @@ while [[ $COUNT -lt $MAX_RETRIES ]]; do
     if [[ -z "$DOMAIN" ]]; then
          echo -e "${RED}Loi: Khong duoc de trong!${NC}"
     elif [[ ! "$DOMAIN" =~ ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\.[a-z]{2,}$ ]]; then
-         echo -e "${RED}Loi: Ten mien '$DOMAIN' chua ky tu khong hop le hoac sai dinh dang.${NC}"
+         echo -e "${RED}Loi: Dia chi website '$DOMAIN' chua ky tu khong hop le hoac sai dinh dang.${NC}"
     else
         # Input hợp lệ
         if [[ "$INPUT_DOMAIN" != "$DOMAIN" ]]; then
@@ -104,7 +104,7 @@ fi
 CADDY_SITE_FILE_CHECK="/etc/caddy/sites-enabled/${DOMAIN}.caddy"
 
 if [[ -f "$CADDY_SITE_FILE_CHECK" ]]; then
-    echo -e "${RED}LOI: Ten mien $DOMAIN da duoc cai dat truoc do!${NC}"
+    echo -e "${RED}LOI: Dia chi $DOMAIN da duoc cai dat truoc do!${NC}"
     echo -e "${YELLOW}Chi tiet: Tim thay file cau hinh tai $CADDY_SITE_FILE_CHECK${NC}"
     echo -e "Vui long dung chuc nang Xoa Website (so 8) de go bo sach se truoc khi cai lai."
     exit 1
