@@ -23,7 +23,7 @@ Trước khi thao tác, hãy tắt trình gõ tiếng Việt, hoặc để sang 
 
 Sau khi nhập lệnh trên vào VPS, nó sẽ tải các file cài đặt về.
 
-Bạn sẽ thấy tiến trình nhu bên dưới:
+Bạn sẽ thấy tiến trình như bên dưới:
 
 ```
 === DANG CAI DAT WPSILA ===
@@ -148,6 +148,10 @@ Sau khi bạn nhập địa chỉ và Enter, quá trình cài đặt diễn ra r
 - Lưu ý là bạn cần lưu lại pass này ngay, và nên đăng nhập để đổi thành pass khác nếu bạn muốn.
 
 Như vậy là bạn đã tạo trang WordPress thành công. Giờ nếu bạn muốn thêm một số tính năng thì hãy theo dõi tiếp các bước tiếp theo.
+
+Nếu muốn thêm một website WordPress khác vào VPS, bạn lặp lại các thao tác ở bước 3. 
+
+**Lưu ý**: chỉ pass mới nhất mới xem lại được nên bạn cần chủ động lưu lại pass mỗi khi tạo trang mới.
 
 ---
 
