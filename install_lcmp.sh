@@ -291,6 +291,7 @@ WPSILA_CONF="$SCRIPT_WPSILA_DIR/wpsila.conf"
 
 # Ghi thông tin vào wpsila.conf
 cat >> "$WPSILA_CONF" <<EOF
+
 # 3. Email của admin WP
 INSTALL_WP_EMAIL="$ADMIN_EMAIL"
 EOF
