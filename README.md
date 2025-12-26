@@ -159,6 +159,35 @@ Sau đó bạn nhập tên user cho tài khoản sFTP. Chương trình sẽ tự
 
 Để xem lại pass cho user sFPT, bạn nhập số 6 ở menu điều khiển chính. Lưu ý bạn phải chủ động lưu lại pass này, vì chương trình sẽ chỉ lưu pass gần nhất mà thôi (tức là nếu bạn tài khoản sFTP khác thì thông tin pass của tài khoản sFTP trước sẽ không thấy nữa, vì thế bạn cần chủ động lưu lại pass sau khi tạo).
 
+---
+
+**Thêm tài khoản quản trị database**
+
+Quản trị database (cơ sở dữ liệu) rất ít khi phải dùng so với việc tạo tài khoản sFTP. Do vậy nếu bạn cần thì mới nên cài.
+
+Quản lý database cần một địa chỉ để bạn có thể truy cập, do vậy trước khi cài bạn cần phải trỏ DNS cho địa chỉ này, ví dụ db.ten-mien-cua-ban.com
+
+Sau khi trỏ DNS xong (đợi khoảng 3 phút để nó cập nhật), bạn làm như sau:
+
+- Nhập số 9 ở menu cài đặt chính.
+- Nhập địa chỉ cho chương trình.
+- Quá trình cài đặt sẽ rất nhanh, chưa đến 1 phút sẽ xong toàn bộ.
+
+Pass sẽ được tạo tự động, và để an toàn, với phần quản trị database có 2 lớp pass được tạo ra:
+
+- Lớp pass đầu tiên áp dụng khi bạn truy cập lần đầu, hoặc lâu lâu mới vào.
+- Lớp pass thứ hai sẽ hỏi bất kỳ lần nào bạn yêu cầu vào quản trị.
+
+Để xem các pass này, bạn hãy nhập số 10 ở menu quản trị chính. Hãy chủ động lưu lại các pass này để dùng khi cần.
+
+---
+
+**Kiểm tra cập nhật**
+
+Để kiểm tra cập nhật cho wpsila, bạn nhấn số 11 ở menu chính, chương trình sẽ xem có phiên bản cài đặt mới nhất không. Nếu phiên bản cài đặt mới nhất phù hợp, nó sẽ cho phép tải về nếu bạn muốn.
+
+Nếu phiên bản cài đặt mới nhất không phù hợp, chương trình sẽ thông báo, và bạn sẽ tiếp tục dùng phiên bản hiện tại.
+
 ## Gợi ý các theme & plugin nên dùng cùng với wpsila
 
 wpsila có thể dùng kèm với *bất kỳ theme & plugin nào*, tuy vậy chúng tôi gợi ý bạn nên dùng các theme & plugin dưới đây để đảm bảo website an toàn & có hiệu suất cao:
