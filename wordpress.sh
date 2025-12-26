@@ -55,12 +55,15 @@ DEFAULT_INSTALL_WP_EMAIL="admin@$DOMAIN"
 INSTALL_WP_EMAIL="${INSTALL_WP_EMAIL:-$DEFAULT_INSTALL_WP_EMAIL}"
 
 # G3.1. Cài đặt WP-CLI nếu chưa có
-    if ! [ -x "$(command -v wp)" ]; then
-        echo " -> Dang tai WP-CLI..."
-        curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
-        chmod +x wp-cli.phar
-        mv wp-cli.phar /usr/local/bin/wp
-    fi
+if ! [ -x "$(command -v wp)" ]; then
+    echo " -> Dang tai WP-CLI..."
+    curl -fLO https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+    chmod +x wp-cli.phar
+    mv wp-cli.phar /usr/local/bin/wp
+else
+    # Nếu có rồi thì cập nhật lên phiên bản mới		
+    wp cli update --allow-root --yes || true	
+fi
 
 # G3.2. Định nghĩa biến nội bộ cho quá trình cài đặt
     WP_PATH="/var/www/$DOMAIN/public_html"
