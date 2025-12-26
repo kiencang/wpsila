@@ -289,13 +289,11 @@ EOF
 # Ghi nối vào file quản trị tổng thể wpsila.conf
 WPSILA_CONF="$SCRIPT_WPSILA_DIR/wpsila.conf"
 
-if [[ -f "$WPSILA_CONF" ]]; then
+# Ghi thông tin vào wpsila.conf
 cat >> "$WPSILA_CONF" <<EOF
-
 # 3. Email của admin WP
 INSTALL_WP_EMAIL="$ADMIN_EMAIL"
 EOF
-fi
 
 echo "Don dep rac he thong..."
 apt-get autoremove -y
