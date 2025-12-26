@@ -55,6 +55,53 @@ Phien ban: v1.0.0
 Xin chuc mung ban! Hay go lenh: wpsila de bat dau su dung.
 ```
 
+Tiếp theo hãy gõ wpsila để vào menu điều khiển chính:
+
+```
+===========================================================
+                   WPSILA WORDPRESS BLOG
+===========================================================
+  1. <Cai dat Caddy Web Server (mot lan la du)>
+  2. <Toi uu he thong (mot lan la du)>
+-----------------------------------------------------------
+  3. >> Cai dat Website WordPress moi
+  4. >> Xem pass WordPress vua tao
+-----------------------------------------------------------
+  5. >> Them tai khoan sFTP
+  6. >> Xem pass sFTP
+-----------------------------------------------------------
+  7. >> Cai dat Subdomain WordPress
+-----------------------------------------------------------
+  8. >> Xoa (delete) Website WordPress
+-----------------------------------------------------------
+  9. >> Cai dat Adminer (Quan ly Database)
+ 10. >> Xem pass Adminer
+-----------------------------------------------------------
+ 11. >> Kiem tra cap nhat (update) wpsila
+-----------------------------------------------------------
+  0. >> Exit (Thoat)
+===========================================================
+Nhap lua chon (0-11):
+```
+
+Ở đây bạn muốn chọn mục nào thì nhập số tương ứng cho mục đấy.
+
+Tuy nhiên để bắt đầu sử dụng, bạn cần cài Caddy, PHP & MariaDB. Đây là nền tảng để bắt đầu sử dụng WordPress.
+
+Để cài, bạn nhấn số 1. Chương trình sẽ hỏi email của bạn, bạn cần nhập email đang sử dụng của bạn vào. Email dùng để lấy cấp phát https & dùng để đăng ký quản trị WordPress.
+
+```
+Da tim thay file cau hinh: /opt/kiencang-wpsila/wpsila.conf
+Phien ban PHP se cai dat: 8.3
+--------------------------------------------------------
+Dang kiem tra moi truong VPS (Clean OS Check)...
+[OK] Moi truong sach se.
+
+Nhap Email quan tri (Bat buoc, day phai la email cua ban):
+```
+
+Sau khi bạn nhập email, chương trình sẽ bắt đầu cài đặt. Sẽ tốn khoảng 5 phút để hoàn tất quá trình này.
+
 ## Gợi ý các theme & plugin nên dùng cùng với wpsila
 
 wpsila có thể dùng kèm với *bất kỳ theme & plugin nào*, tuy vậy chúng tôi gợi ý bạn nên dùng các theme & plugin dưới đây để đảm bảo website an toàn & có hiệu suất cao:
