@@ -90,7 +90,7 @@ Nhap lua chon (0-11):
 
 Tuy nhiên để bắt đầu sử dụng, bạn cần cài Caddy, PHP & MariaDB. Đây là nền tảng để bắt đầu sử dụng WordPress.
 
-**Bước 1:** Cài chương trình nền cho WordPress
+### **Bước 1:** Cài chương trình nền cho WordPress
 
 Để cài, bạn nhấn số 1. Chương trình sẽ hỏi email của bạn, bạn cần nhập email đang sử dụng của bạn vào. Email dùng để lấy cấp phát https & dùng để đăng ký quản trị WordPress.
 
@@ -108,7 +108,7 @@ Sau khi bạn nhập email, chương trình sẽ bắt đầu cài đặt. Sẽ 
 
 ---
 
-**Bước 2:** Thực hiện các tối ưu cơ bản
+### **Bước 2:** Thực hiện các tối ưu cơ bản
 
 Cài đặt xong bước 1, bạn nhấn Enter để quay lại các tùy chọn của menu.
 
@@ -122,7 +122,7 @@ Bây giờ bạn sẽ chính thức cài đặt WordPress cho tên miền của 
 
 ---
 
-**Bước 3:** Cài đặt trang WordPress đầu tiên
+### **Bước 3:** Cài đặt trang WordPress đầu tiên
 
 Trước khi bạn cài WordPress cho tên miền, bạn cần đảm bảo đã trỏ DNS của tên miền về IP của VPS. Cách nhanh chóng và đơn giản để làm việc này là sử dụng Cloudflare để trỏ, nhớ ở bước này cần tắt đám mây vàng đi để tên miền trỏ về IP thực của VPS.
 
@@ -155,7 +155,7 @@ Nếu muốn thêm một website WordPress khác vào VPS, bạn lặp lại cá
 
 ---
 
-**Thêm tài khoản sFTP**
+### **Thêm tài khoản sFTP**
 
 Tài khoản sFTP dùng để vào thư mục chính của website để tải lên hoặc xóa file. Bạn có thể tạo tài khoản này bằng cách nhấn số 5 ở menu điều khiển.
 
@@ -167,7 +167,7 @@ Sau đó bạn nhập tên user cho tài khoản sFTP. Chương trình sẽ tự
 
 ---
 
-**Thêm trang web dạng subdomain**
+### **Thêm trang web dạng subdomain**
 
 Nếu bạn muốn thêm một trang WordPress dạng subdomain như hoctap.ten-mien-cua-ban.com thì bạn cần chọn mục số 7, lý do là vì địa chỉ dạng subdomain thì không cần chuyển hướng như kiểu www.hoctap.ten-mien-cua-ban.com về hoctap.ten-mien-cua-ban.com, do vậy bạn không nên dùng mục số 3 để cài.
 
@@ -177,7 +177,7 @@ Quá trình cài đặt sau đó cũng tương tự bước 3. Bạn cần lưu 
 
 ---
 
-**Thêm tài khoản quản trị database**
+### **Thêm tài khoản quản trị database**
 
 Quản trị database (cơ sở dữ liệu) rất ít khi phải dùng so với việc tạo tài khoản sFTP. Do vậy nếu bạn cần thì mới nên cài.
 
@@ -198,7 +198,7 @@ Pass sẽ được tạo tự động, và để an toàn, với phần quản t
 
 ---
 
-**Xóa một trang WordPress**
+### **Xóa một trang WordPress**
 
 Để xóa một trang, bạn vào mục số 8 từ menu quản trị. Xin lưu ý rằng việc xóa này nó sẽ xóa toàn bộ dữ liệu của website tương ứng mà bạn muốn xóa, do vậy bạn cần phải **backup trước toàn bộ dữ liệu**.
 
@@ -234,7 +234,7 @@ Da xoa cau hinh Caddy va Reload thanh cong.
 
 ---
 
-**Kiểm tra cập nhật**
+### **Kiểm tra cập nhật**
 
 Để kiểm tra cập nhật cho wpsila, bạn nhấn số 11 ở menu chính, chương trình sẽ xem có phiên bản cài đặt mới nhất không. Nếu phiên bản cài đặt mới nhất phù hợp, nó sẽ cho phép tải về nếu bạn muốn.
 
