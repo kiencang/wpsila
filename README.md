@@ -17,6 +17,44 @@ curl -sL https://vps.wpsila.com | sudo bash
 
 Quá trình viết code có tham khảo gợi ý từ Gemini.
 
+## Hướng dẫn sử dụng
+
+Sau khi nhập lệnh trên vào VPS, nó sẽ tải các file cài đặt về.
+
+Bạn sẽ thấy tiến trình nhu bên dưới
+
+```
+=== DANG CAI DAT WPSILA ===
+[OK] He dieu hanh hop le: Ubuntu 24.04.3 LTS
+Tat ca cac goi phu thuoc da co san.
+Dang lam sach thu muc cai dat...
+Dang tai cac module...
+[CHECKSUM OK] check_for_update.sh
+[CHECKSUM OK] install_caddyserver.sh
+[CHECKSUM OK] install_mariadb.sh
+[CHECKSUM OK] wpsila_menu.sh
+[CHECKSUM OK] caddyfile.sh
+[CHECKSUM OK] domain_check.sh
+[CHECKSUM OK] install_php.sh
+[CHECKSUM OK] setup_sftp.sh
+[CHECKSUM OK] wpsila.conf
+[CHECKSUM OK] show_pass.sh
+[CHECKSUM OK] remove_web.sh
+[CHECKSUM OK] setup_adminer.sh
+[CHECKSUM OK] tune_pool.sh
+[CHECKSUM OK] tune_mariadb.sh
+[CHECKSUM OK] tune_php.sh
+[CHECKSUM OK] database_user_wp.sh
+[CHECKSUM OK] anti_apt_lock.sh
+[CHECKSUM OK] install_wp.sh
+[CHECKSUM OK] caddyfile_subdomain.sh
+[CHECKSUM OK] install_lcmp.sh
+[CHECKSUM OK] wordpress.sh
+=== CAI DAT THANH CONG! ===
+Phien ban: v1.0.0
+Xin chuc mung ban! Hay go lenh: wpsila de bat dau su dung.
+```
+
 ## Gợi ý các theme & plugin nên dùng cùng với wpsila
 
 wpsila có thể dùng kèm với *bất kỳ theme & plugin nào*, tuy vậy chúng tôi gợi ý bạn nên dùng các theme & plugin dưới đây để đảm bảo website an toàn & có hiệu suất cao:
