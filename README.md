@@ -198,6 +198,42 @@ Pass sẽ được tạo tự động, và để an toàn, với phần quản t
 
 ---
 
+**Xóa một trang WordPress**
+
+Để xóa một trang, bạn vào mục số 8 từ menu quản trị. Xin lưu ý rằng việc xóa này nó sẽ xóa toàn bộ dữ liệu của website tương ứng mà bạn muốn xóa, do vậy bạn cần phải **backup trước toàn bộ dữ liệu**.
+
+Ở bước tiếp theo bạn nhập địa chỉ website muốn xóa, nếu địa chỉ bạn muốn xóa có tồn tại nó sẽ thông báo một số thông tin, và hỏi lần cuối xem bạn có chắc chắn muốn xóa không, ví dụ:
+
+```
+Nhap ten mien muon xoa (VD: example.com): dev.freehost.page
+--- Dang quet thong tin website: dev.freehost.page ---
+Da tim thay wp-config.php.
+Phat hien Database: wp_0f695d1f53f578d1
+Phat hien DB User:  u_60ab841a060d68
+
+Ban co chac muon XOA VINH VIEN du lieu cua website? (y/n):
+```
+
+Nếu bạn nhập y, quá trình xóa sẽ được tiến hành. Nếu đổi ý, không muốn xóa, hãy nhập n.
+
+Khi bạn đồng ý xóa, chương trình sẽ cố gắng tìm mọi dấu vết liên quan đến website và xóa nó khỏi hệ thống, ví dụ:
+
+```
+Dang xoa Database va User...
+Da xoa Database & User thanh cong.
+Dang xoa thu muc web: /var/www/dev.freehost.page ...
+Da xoa thu muc /var/www/dev.freehost.page thanh cong.
+Dang xoa chung chi cu cua dev.freehost.page...
+Xoa thanh cong chung chi cu cua dev.freehost.page...
+Khong tim thay chung chi cu cua www.dev.freehost.page (Co the chua duoc tao bao gio).
+Dang xoa file cau hinh Caddy: /etc/caddy/sites-enabled/dev.freehost.page.caddy
+Da xoa cau hinh Caddy va Reload thanh cong.
+```
+
+**Lưu ý lần cuối**: Vì đã xóa thì không vãn hồi được nữa, nên bạn bắt buộc phải backup dữ liệu trước khi xóa.
+
+---
+
 **Kiểm tra cập nhật**
 
 Để kiểm tra cập nhật cho wpsila, bạn nhấn số 11 ở menu chính, chương trình sẽ xem có phiên bản cài đặt mới nhất không. Nếu phiên bản cài đặt mới nhất phù hợp, nó sẽ cho phép tải về nếu bạn muốn.
