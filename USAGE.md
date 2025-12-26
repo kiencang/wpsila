@@ -1,5 +1,7 @@
 ## Hướng dẫn sử dụng
 
+Các cập nhật mới nhất cho hướng dẫn sử dụng, bạn xem ở đây: https://wpsila.com/huong-dan/
+
 Trước khi thao tác, hãy tắt trình gõ tiếng Việt, hoặc để sang dạng tiếng Anh, để việc nhập dữ liệu đỡ nhầm lẫn.
 
 Sau khi nhập lệnh trên vào VPS, nó sẽ tải các file cài đặt về.
