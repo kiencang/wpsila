@@ -98,17 +98,10 @@ if id "caddy" &>/dev/null; then
 fi
 
 # C3. Kiểm tra Port 80 & 443
-# Phuong phap: Native Filter (Khong phu thuoc cot, khong phu thuoc regex)
-# Lenh nay se tra ve output neu cong 80 hoac 443 dang nghe, nguoc lai se tra ve rong
-CHECK_PORT=$(ss -tuln 'sport = :80 or sport = :443')
-
-if [[ -n "$CHECK_PORT" ]]; then
+# Dùng grep -E để gộp lệnh, code gọn hơn
+if ss -tuln | grep -qE ":(80|443) "; then
     echo -e "${RED}[X] LOI NGHIEM TRONG: Cong 80 hoac 443 dang ban!${NC}"
-    echo -e "${YELLOW}Nguyen nhan:${NC} VPS dang chay Web Server khac."
-    echo -e "${YELLOW}Chi tiet (Tien trinh dang chiem dung):${NC}"
-    # Hien thi chinh xac tien trinh nao dang giu cong
-    # -p: show process, -H: no header (de in cho dep)
-    ss -tulnp 'sport = :80 or sport = :443' | sed 's/users://g'
+    echo -e "${YELLOW}Nguyen nhan:${NC} VPS dang chay Web Server khac (Apache, Nginx...)."
     echo -e "${YELLOW}Giai phap:${NC} Vui long su dung VPS moi tinh (Clean OS)."
     exit 1
 fi
