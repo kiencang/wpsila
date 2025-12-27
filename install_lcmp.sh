@@ -90,22 +90,26 @@ fi
 
 # -------------------------------------------------------------------------
 
-# C2. Kiểm tra Port 80 & 443
-# Su dung \b de dam bao bat chinh xac port 80/443 chu khong phai 8080/8443
-if ss -tuln | grep -qE ":(80|443)\b"; then
-    echo -e "${RED}[X] LOI NGHIEM TRONG: Cong 80 hoac 443 dang ban!${NC}"
-    echo -e "${YELLOW}Nguyen nhan:${NC} VPS dang chay Web Server khac (Apache, Nginx, OpenLiteSpeed...)."
-    echo -e "${YELLOW}Chi tiet:${NC}"
-    # In ra tien trinh cu the dang chiem dung de user de debug
-    ss -tulnp | grep -E ":(80|443)\b" | awk '{print $5, $7}' | sed 's/users://g'
-    echo -e "${YELLOW}Giai phap:${NC} Vui long su dung VPS moi tinh (Clean OS) hoac go bo web server cu."
-    exit 1
-fi
-
-# C3. Kiểm tra user "caddy"
+# C2. Kiểm tra user "caddy"
 if id "caddy" &>/dev/null; then
     echo -e "${RED}[X] LOI: User 'caddy' da ton tai.${NC}"
     echo -e "${YELLOW}Giai phap:${NC} Reinstall OS ve trang thai ban dau."
+    exit 1
+fi
+
+# C3. Kiểm tra Port 80 & 443
+# Phuong phap: Native Filter (Khong phu thuoc cot, khong phu thuoc regex)
+# Lenh nay se tra ve output neu cong 80 hoac 443 dang nghe, nguoc lai se tra ve rong
+CHECK_PORT=$(ss -tuln 'sport = :80 or sport = :443')
+
+if [[ -n "$CHECK_PORT" ]]; then
+    echo -e "${RED}[X] LOI NGHIEM TRONG: Cong 80 hoac 443 dang ban!${NC}"
+    echo -e "${YELLOW}Nguyen nhan:${NC} VPS dang chay Web Server khac."
+    echo -e "${YELLOW}Chi tiet (Tien trinh dang chiem dung):${NC}"
+    # Hien thi chinh xac tien trinh nao dang giu cong
+    # -p: show process, -H: no header (de in cho dep)
+    ss -tulnp 'sport = :80 or sport = :443' | sed 's/users://g'
+    echo -e "${YELLOW}Giai phap:${NC} Vui long su dung VPS moi tinh (Clean OS)."
     exit 1
 fi
 
