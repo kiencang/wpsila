@@ -91,11 +91,14 @@ fi
 # -------------------------------------------------------------------------
 
 # C2. Kiểm tra Port 80 & 443
-# Dùng grep -E để gộp lệnh, code gọn hơn
-if ss -tuln | grep -qE ":(80|443) "; then
+# Su dung \b de dam bao bat chinh xac port 80/443 chu khong phai 8080/8443
+if ss -tuln | grep -qE ":(80|443)\b"; then
     echo -e "${RED}[X] LOI NGHIEM TRONG: Cong 80 hoac 443 dang ban!${NC}"
-    echo -e "${YELLOW}Nguyen nhan:${NC} VPS dang chay Web Server khac (Apache, Nginx...)."
-    echo -e "${YELLOW}Giai phap:${NC} Vui long su dung VPS moi tinh (Clean OS)."
+    echo -e "${YELLOW}Nguyen nhan:${NC} VPS dang chay Web Server khac (Apache, Nginx, OpenLiteSpeed...)."
+    echo -e "${YELLOW}Chi tiet:${NC}"
+    # In ra tien trinh cu the dang chiem dung de user de debug
+    ss -tulnp | grep -E ":(80|443)\b" | awk '{print $5, $7}' | sed 's/users://g'
+    echo -e "${YELLOW}Giai phap:${NC} Vui long su dung VPS moi tinh (Clean OS) hoac go bo web server cu."
     exit 1
 fi
 
