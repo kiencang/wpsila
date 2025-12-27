@@ -190,6 +190,7 @@ if systemctl restart mariadb; then
     if systemctl is-active --quiet mariadb; then
         echo -e "${GREEN}THANH CONG! MariaDB da san sang cho Blog & Backup.${NC}"
         echo "Max Packet Size: 128M (An toan cho 1000+ bai viet)"
+		echo "File cau hinh: $CONFIG_FILE"
     else
         echo -e "${RED}CANH BAO: Service restart OK nhung KHONG active.${NC}"
         rm -f "$CONFIG_FILE"
