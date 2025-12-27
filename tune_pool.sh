@@ -1,21 +1,34 @@
 #!/bin/bash
 
+# -------------------------------------------------------------------------------------------------------------------------------
 # Dừng script ngay lập tức nếu có lệnh bị lỗi
 set -euo pipefail
+# -------------------------------------------------------------------------------------------------------------------------------
 
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
 # Kiểm tra quyền root & nâng quyền
 if [[ $EUID -ne 0 ]]; then
    # Thêm tham số -E cho sudo để giữ lại các biến môi trường (nếu có)
    sudo -E "$0" "$@"
    exit $?
 fi
+# -------------------------------------------------------------------------------------------------------------------------------
 
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
 # Màu sắc cho thông báo
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m' # No Color (ngắt màu)
+# -------------------------------------------------------------------------------------------------------------------------------
 
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
 # QUAN TRỌNG: CẤU HÌNH PHIÊN BẢN PHP
 # 1. Đặt giá trị mặc định (phòng hờ không tìm thấy file config)
 DEFAULT_PHP_VER="8.3"
@@ -23,7 +36,7 @@ DEFAULT_PHP_VER="8.3"
 # 2. Định nghĩa đường dẫn file config 
 # (Ví dụ: file config nằm cùng thư mục với script đang chạy)
 # Lấy đường dẫn tuyệt đối của thư mục chứa file script đang chạy
-SCRIPT_DIR="$(dirname "$(realpath "$0")")"
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
 # Trỏ vào file config nằm cùng thư mục đó
 WPSILA_CONFIG_FILE="$SCRIPT_DIR/wpsila.conf"
@@ -42,21 +55,25 @@ fi
 PHP_VER="${PHP_VER:-$DEFAULT_PHP_VER}"
 
 echo "Phien ban PHP: $PHP_VER"
+# -------------------------------------------------------------------------------------------------------------------------------
 
-# ==============================================================================
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
+# ========================================================================
 # SCRIPT TỰ ĐỘNG TỐI ƯU PHP-FPM POOL THEO RAM (Dành cho Ubuntu/Debian)
-# ==============================================================================
+# ========================================================================
 
 # Kiểm tra xem có đang cài đặt PHP không?
 if ! command -v php &> /dev/null; then
-    echo "Khong tim thay PHP. Vui long cai dat PHP truoc."
+    echo -e "${YELLOW}Khong tim thay PHP. Vui long cai dat PHP truoc.${NC}"
     exit 1
 fi
 
 CONF_DIR="/etc/php/${PHP_VER}/fpm/pool.d"
 
 if [[ ! -d "$CONF_DIR" ]]; then
-    echo "Khong tim thay thu muc cau hinh: $CONF_DIR"
+    echo -e "${YELLOW}Khong tim thay thu muc cau hinh: $CONF_DIR ${NC}"
     exit 1
 fi
 
@@ -111,16 +128,20 @@ fi
 echo ">>Ap dung cau hinh cho muc RAM: $RAM_PROFILE"
 echo "- pm.max_children = $PM_MAX_CHILDREN"
 echo "- pm.start_servers = $PM_START_SERVERS"
+# -------------------------------------------------------------------------------------------------------------------------------
 
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
 # 5. TẠO FILE CẤU HÌNH (GHI ĐÈ)
 # Link dẫn của file
 CONFIG_FILE="${CONF_DIR}/99-wpsila-pool-tune.conf"
 
 cat > "${CONFIG_FILE}" <<EOF
-; ==============================================================================
+; =========================================================================
 ; TUNED BY WPSILA SCRIPT - RAM PROFILE: ${RAM_PROFILE}
 ; File này ghi đè cấu hình mặc định trong www.conf
-; ==============================================================================
+; =========================================================================
 
 [www]
 pm = dynamic
@@ -130,7 +151,11 @@ pm.min_spare_servers = ${PM_MIN_SPARE}
 pm.max_spare_servers = ${PM_MAX_SPARE}
 pm.max_requests = 1000
 EOF
+# -------------------------------------------------------------------------------------------------------------------------------
 
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
 # 6. RELOAD PHP-FPM
 echo ">>Dang reload lai PHP-FPM..."
 
@@ -141,5 +166,6 @@ if php-fpm"${PHP_VER}" -t; then
 else
     echo -e "${RED}Loi cau hinh! Da huy bo reload. Vui long kiem tra lai file log.${NC}"
     rm "${CONFIG_FILE}"
-    echo "Da xoa bo cau hinh loi de khoi phuc lai trang thai cu."
+    echo -e "${YELLOW}Da xoa bo cau hinh loi de khoi phuc lai trang thai cu.${NC}"
 fi
+# -------------------------------------------------------------------------------------------------------------------------------

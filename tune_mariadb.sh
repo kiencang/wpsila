@@ -1,14 +1,32 @@
 #!/bin/bash
 
+# -------------------------------------------------------------------------------------------------------------------------------
 # Dừng script ngay lập tức nếu có lệnh bị lỗi
 set -euo pipefail
+# -------------------------------------------------------------------------------------------------------------------------------
 
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
 # Kiểm tra quyền root & nâng quyền
 if [[ $EUID -ne 0 ]]; then
    # Thêm tham số -E cho sudo để giữ lại các biến môi trường (nếu có)
    sudo -E "$0" "$@"
    exit $?
 fi
+# -------------------------------------------------------------------------------------------------------------------------------
+
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
+# Màu sắc cho thông báo
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
+NC='\033[0m' # No Color (ngắt màu)
+# -------------------------------------------------------------------------------------------------------------------------------
+
+# +++
 
 # ======================================================
 # WP SILA MARIADB TUNER (BACKUP SAFE EDITION)
@@ -16,6 +34,9 @@ fi
 # Use Case: Blog 1000+ Posts & Frequent Backups
 # ======================================================
 
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
 echo ">> Dang kiem tra cau hinh he thong..."
 
 # Lấy tổng RAM theo KB từ Kernel (Chính xác tuyệt đối, không phụ thuộc ngôn ngữ)
@@ -32,14 +53,20 @@ echo "- Tong RAM he thong: ${total_ram_mb} MB"
 CONF_DIR="/etc/mysql/mariadb.conf.d"
 
 if [[ ! -d "$CONF_DIR" ]]; then
-    echo "Loi: Khong tim thay thu muc cau hinh MariaDB ($CONF_DIR)."
+    echo -e "${YELLOW}Loi: Khong tim thay thu muc cau hinh MariaDB ($CONF_DIR). ${NC}"
     exit 1
 fi
+# -------------------------------------------------------------------------------------------------------------------------------
+
+# +++
 
 # ======================================================
 # LOGIC TÍNH TOÁN (ĐÃ ĐIỀU CHỈNH CHO BACKUP SITE LỚN)
 # ======================================================
 
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
 pool_instances=1
 perf_schema="OFF"
 
@@ -75,7 +102,6 @@ else
     perf_schema="ON"
 fi
 
-
 # Xử lý trường hợp buffer_pool là dạng phần trăm (ví dụ "50%")
 if [[ "$buffer_pool" == *"%" ]]; then
     percent=${buffer_pool%\%} # Lấy số 50 ra khỏi chuỗi "50%"
@@ -95,7 +121,11 @@ if [[ "$buffer_pool" == *"%" ]]; then
 
     buffer_pool="${buffer_pool_mb}M"
 fi
+# -------------------------------------------------------------------------------------------------------------------------------
 
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
 # ======================================================
 # TẠO FILE CẤU HÌNH (AN TOÀN TUYỆT ĐỐI CHO BACKUP)
 # ======================================================
@@ -107,7 +137,7 @@ CONFIG_FILE="$CONF_DIR/99-wpsila-db-tune.cnf"
 echo ">> Dang tao file cau hinh toi uu cho blog nhieu bai viet va backup thuong xuyen..."
 
 cat > "$CONFIG_FILE" <<EOF
-# Cấu hình tối ưu bởi WP SILA (Blog 1000+ Posts Edition)
+# Cấu hình tối ưu bởi WPSILA (Blog 1000+ Posts Edition)
 [mysqld]
 
 # === 1. CƠ BẢN & KẾT NỐI ===
@@ -145,7 +175,11 @@ performance_schema      = ${perf_schema}
 character-set-server    = utf8mb4
 collation-server        = utf8mb4_unicode_ci
 EOF
+# -------------------------------------------------------------------------------------------------------------------------------
 
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
 # ======================================================
 # KIỂM TRA & KHỞI ĐỘNG LẠI
 # ======================================================
@@ -154,17 +188,18 @@ echo ">> Dang khoi dong lai MariaDB..."
 
 if systemctl restart mariadb; then
     if systemctl is-active --quiet mariadb; then
-        echo "THANH CONG! MariaDB da san sang cho Blog & Backup."
+        echo -e "${GREEN}THANH CONG! MariaDB da san sang cho Blog & Backup.${NC}"
         echo "Max Packet Size: 128M (An toan cho 1000+ bai viet)"
     else
-        echo "CANH BAO: Service restart OK nhung KHONG active."
+        echo -e "${RED}CANH BAO: Service restart OK nhung KHONG active.${NC}"
         rm -f "$CONFIG_FILE"
         systemctl restart mariadb
         echo "Da hoan tac."
     fi
 else
-    echo "Loi: Khong the khoi dong, dang hoan tac..."
+    echo -e "${RED}Loi: Khong the khoi dong, dang hoan tac...${NC}"
     rm -f "$CONFIG_FILE"
     systemctl restart mariadb
-    echo "Da khoi phuc lai trang thai cu."
+    echo -e "${YELLOW}Da khoi phuc lai trang thai cu. ${NC}"
 fi
+# -------------------------------------------------------------------------------------------------------------------------------
