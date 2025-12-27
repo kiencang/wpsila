@@ -45,7 +45,7 @@ WPSILA_CONFIG_FILE="$SCRIPT_DIR/wpsila.conf"
 if [[ -f "$WPSILA_CONFIG_FILE" ]]; then
     # Lệnh 'source' hoặc dấu chấm '.' sẽ đọc biến từ file kia vào script này
     source "$WPSILA_CONFIG_FILE"
-    echo -e "${GREEN}Da tim thay file cau hinh: ${WPSILA_CONFIG_FILE}${NC}"
+    echo -e "${GREEN}Da tim thay file config he thong: ${WPSILA_CONFIG_FILE}${NC}"
 else
     echo -e "${YELLOW}Khong tim thay file config. Su dung phien ban mac dinh.${NC}"
 fi

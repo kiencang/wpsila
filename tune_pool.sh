@@ -45,7 +45,7 @@ WPSILA_CONFIG_FILE="$SCRIPT_DIR/wpsila.conf"
 if [[ -f "$WPSILA_CONFIG_FILE" ]]; then
     # Lệnh 'source' hoặc dấu chấm '.' sẽ đọc biến từ file kia vào script này
     source "$WPSILA_CONFIG_FILE"
-    echo -e "${GREEN}Da tim thay file cau hinh: ${WPSILA_CONFIG_FILE}${NC}"
+    echo -e "${GREEN}Da tim thay file config he thong: ${WPSILA_CONFIG_FILE}${NC}"
 else
     echo -e "${YELLOW}Khong tim thay file config. Su dung phien ban mac dinh.${NC}"
 fi
@@ -162,7 +162,7 @@ echo ">> Dang reload lai PHP-FPM..."
 # Test cấu hình trước khi reload để tránh sập web
 if php-fpm"${PHP_VER}" -t; then
     service php"${PHP_VER}"-fpm reload
-    echo -e "${GREEN}THANH CONG! Cau hinh moi da duoc ap dung cho Pool.{NC}"
+    echo -e "${GREEN}THANH CONG! Cau hinh moi da duoc ap dung cho Pool. ${NC}"
 	echo "File cau hinh: $CONFIG_FILE"
 else
     echo -e "${RED}Loi cau hinh! Da huy bo reload. Vui long kiem tra lai file log.${NC}"
