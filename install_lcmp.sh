@@ -9,6 +9,7 @@
 # c. install_php.sh
 # d. install_mariadb.sh
 # wpsila.conf chứa thông tin phiên bản PHP & MariaDB
+# wpsila.conf cũng được dùng để lưu email người dùng
 # -------------------------------------------------------------------------
 
 # +++
@@ -36,9 +37,9 @@ NC='\033[0m' # No Color (ngắt màu)
 
 # -------------------------------------------------------------------------------------------------------------------------------
 # B. CẤU HÌNH & ĐƯỜNG DẪN
-# Thiết lập các giá trị mặc định, phòng trường hợp config lỗi
-DEFAULT_PHP_VER="8.3"
-DEFAULT_MARIADB_VER="10.11"
+# Thiết lập các giá trị mặc định, phòng trường hợp config (wpsila.conf) lỗi
+DEFAULT_PHP_VER="8.3" # giá trị mặc định của phiên bản PHP
+DEFAULT_MARIADB_VER="10.11" # giá trị mặc định của MariaDB
 
 # B2. Định nghĩa đường dẫn (Sử dụng cách an toàn nhất, không phụ thuộc realpath)
 SCRIPT_WPSILA_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
@@ -46,7 +47,7 @@ SCRIPT_WPSILA_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd 
 # Trỏ vào file config nằm cùng thư mục
 WPSILA_CONFIG_FILE="$SCRIPT_WPSILA_DIR/wpsila.conf"
 
-# B3. Kiểm tra và nạp file config
+# B3. Kiểm tra sự tồn tại và nạp file config
 if [[ -f "$WPSILA_CONFIG_FILE" ]]; then
     source "$WPSILA_CONFIG_FILE"
     echo -e "${GREEN}Da tim thay file cau hinh: ${WPSILA_CONFIG_FILE}${NC}"
@@ -106,7 +107,7 @@ if id "caddy" &>/dev/null; then
 fi
 
 echo -e "${GREEN}[OK] Moi truong sach se.${NC}"
-sleep 1
+sleep 2
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
@@ -167,6 +168,7 @@ while [ "$count" -lt "$MAX_RETRIES" ]; do
     fi
 done
 
+# Cho ra làm biến môi trường
 export ADMIN_EMAIL
 # -------------------------------------------------------------------------------------------------------------------------------
 

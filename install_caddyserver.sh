@@ -101,7 +101,7 @@ if systemctl is-active --quiet caddy; then
     echo -e "${GREEN}>>> Caddy dang chay (Active).${NC}"
 else
     echo -e "${RED}>>> LOI: Caddy khong hoat dong!${NC}"
-    echo -e "${YELLOW}>>> Ban can cai moi lai VPS & thu cai lai wpsila.${NC}"
+    echo -e "${YELLOW}>>> Ban can cai moi lai VPS (reinstall) & thu cai lai wpsila.${NC}"
 	exit 1
 fi
 # -------------------------------------------------------------------------------------------------------------------------------
@@ -124,6 +124,7 @@ fi
 
 # B3. Tạo Caddyfile gốc mới (Master Config)
 # File này chỉ làm nhiệm vụ import các file con
+# Lấy email của người cài để dùng lấy chứng chỉ https
 cat > /etc/caddy/Caddyfile <<EOF
 {
     # Global Options
@@ -141,6 +142,5 @@ caddy fmt --overwrite /etc/caddy/Caddyfile
 # B4. Reload để áp dụng kiến trúc mới
 systemctl reload caddy
 echo -e "${GREEN}>>> Kien truc Caddy Modular da san sang.${NC}"
-
 echo -e "${GREEN}>>> Module Caddy hoan tat.${NC}"
 # -------------------------------------------------------------------------------------------------------------------------------
