@@ -125,7 +125,7 @@ else
     PM_MAX_SPARE=30
 fi
 
-echo ">>Ap dung cau hinh cho muc RAM: $RAM_PROFILE"
+echo ">> Ap dung cau hinh cho muc RAM: $RAM_PROFILE"
 echo "- pm.max_children = $PM_MAX_CHILDREN"
 echo "- pm.start_servers = $PM_START_SERVERS"
 # -------------------------------------------------------------------------------------------------------------------------------
@@ -157,7 +157,7 @@ EOF
 
 # -------------------------------------------------------------------------------------------------------------------------------
 # 6. RELOAD PHP-FPM
-echo ">>Dang reload lai PHP-FPM..."
+echo ">> Dang reload lai PHP-FPM..."
 
 # Test cấu hình trước khi reload để tránh sập web
 if php-fpm"${PHP_VER}" -t; then
@@ -168,4 +168,5 @@ else
     rm "${CONFIG_FILE}"
     echo -e "${YELLOW}Da xoa bo cau hinh loi de khoi phuc lai trang thai cu.${NC}"
 fi
+echo "--------------------------------------------------------"
 # -------------------------------------------------------------------------------------------------------------------------------
