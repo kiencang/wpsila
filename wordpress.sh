@@ -8,6 +8,11 @@
 
 # -------------------------------------------------------------------------------------------------------------------------------
 # G1. TẠO CẤU TRÚC THƯ MỤC
+# Một số điểm lưu ý về cấu trúc thư mục 
+# 1. Mỗi tên miền là một thư mục riêng trong var/www => Chống hoàn toàn việc trùng lặp.
+# 2. logs và public_html (thư mục web) tách riêng để tránh việc phân quyền phức tạp.
+# 3. logs và public_html vẫn thuộc về cùng một thư mục cha chung, điều đó giúp dễ xóa sau này >
+# > Xóa thư mục tên miền là xóa cả logs và thư mục web (public_html).
 echo -e "${GREEN}[1/5] Dang tao thu muc chua ma nguon...${NC}"
 # Tạo thư mục web root (-p giúp không báo lỗi nếu thư mục đã tồn tại)
 mkdir -p "/var/www/$DOMAIN/public_html"
@@ -15,6 +20,7 @@ mkdir -p "/var/www/$DOMAIN/public_html"
 echo -e "${GREEN}[2/5] Dang tao thu muc logs va cap quyen...${NC}"
 # Tạo thư mục logs
 mkdir -p "/var/www/$DOMAIN/logs"
+
 # Cấp quyền cho user caddy để ghi được log truy cập
 chown -R caddy:caddy "/var/www/$DOMAIN/logs"
 # -------------------------------------------------------------------------------------------------------------------------------
@@ -47,9 +53,11 @@ rm -f latest.tar.gz
 # -------------------------------------------------------------------------------------------------------------------------------
 # G3. TỰ ĐỘNG CẤU HÌNH WP-CONFIG VÀ INSTALL DB
 echo -e "${GREEN}>>> Dang tu dong cau hinh wp-config.php va database...${NC}"
+# Dự phòng cho trường hợp không tìm thấy email chính thức của người cài đặt
+# Lấy email mặc định theo tên miền
 DEFAULT_INSTALL_WP_EMAIL="admin@$DOMAIN"
 
-# Giá trị $INSTALL_WP_EMAIL lấy từ wpsila.conf
+# Giá trị $INSTALL_WP_EMAIL (email của người dùng nhập) lấy từ wpsila.conf
 # Nếu nó không tồn tại thì lấy giá trị $DEFAULT_INSTALL_WP_EMAIL
 # Vì giá trị INSTALL_WP_EMAIL phải có thì mới cài được
 INSTALL_WP_EMAIL="${INSTALL_WP_EMAIL:-$DEFAULT_INSTALL_WP_EMAIL}"
@@ -66,25 +74,25 @@ else
 fi
 
 # G3.2. Định nghĩa biến nội bộ cho quá trình cài đặt
-    WP_PATH="/var/www/$DOMAIN/public_html"
-    WP_ADMIN_USER="admin"
-    WP_ADMIN_PASS="p_$(openssl rand -hex 12)" # Tạo pass ngẫu nhiên
-    WP_ADMIN_EMAIL="$INSTALL_WP_EMAIL"
+WP_PATH="/var/www/$DOMAIN/public_html" # Đường dẫn vào thư mục chứa web
+WP_ADMIN_USER="admin" # User quản trị web
+WP_ADMIN_PASS="p_$(openssl rand -hex 12)" # Tạo pass ngẫu nhiên
+WP_ADMIN_EMAIL="$INSTALL_WP_EMAIL" # Email dùng để đăng ký
 
-    # Di chuyển vào thư mục code
-    cd "$WP_PATH" || { echo "Loi: Khong tim thay thu muc!"; exit 1; }
+# Di chuyển vào thư mục code
+cd "$WP_PATH" || { echo "Loi: Khong tim thay thu muc!"; exit 1; }
 
 # G3.3. Tạo file wp-config.php từ thông tin DB ở Bước 2
-    # Dùng --allow-root vì script đang chạy quyền sudo
-    wp config create --dbname="$GEN_DB_NAME" \
-                     --dbuser="$GEN_DB_USER" \
-                     --dbpass="$GEN_DB_PASS" \
-                     --dbhost="localhost" \
-                     --allow-root --force
+# Dùng --allow-root vì script đang chạy quyền sudo
+wp config create --dbname="$GEN_DB_NAME" \
+                    --dbuser="$GEN_DB_USER" \
+                    --dbpass="$GEN_DB_PASS" \
+                    --dbhost="localhost" \
+                    --allow-root --force
 
 # G3.4. Chạy lệnh Install để nạp dữ liệu vào Database
-    echo " -> Dang khoi tao du lieu WordPress..."
-    wp core install --url="https://$DOMAIN" \
+echo "Dang khoi tao du lieu WordPress..."
+wp core install --url="https://$DOMAIN" \
                     --title="Website $DOMAIN" \
                     --admin_user="$WP_ADMIN_USER" \
                     --admin_password="$WP_ADMIN_PASS" \
@@ -124,7 +132,7 @@ PARENT_DIR="/var/www/$DOMAIN"
 chown root:root "$PARENT_DIR"
 chmod 755 "$PARENT_DIR"
 
-# Gán Group www-data là chủ sở hữu (để PHP có thể ghi file, cài plugin, upload ảnh)
+# Gán group www-data là chủ sở hữu (để PHP có thể ghi file, cài plugin, upload ảnh)
 # User sở hữu là root
 chown -R root:www-data "$WP_ROOT"
 
@@ -133,8 +141,9 @@ chown -R root:www-data "$WP_ROOT"
 # - File: 664 (rw-rw-r--)
 # số 2 trước 775 là để các file sau này do sFTP up lên mặc định thuộc quyền sở hữu của group www-data
 # Do vậy user www-data thuộc group www-data sẽ có quyền làm việc với file đó mà không bị lỗi không đủ quyền.
-find "$WP_ROOT" -type d -exec chmod 2775 {} \;
-find "$WP_ROOT" -type f -exec chmod 664 {} \;
+# Cách dùng find "$WP_ROOT" -type d -exec chmod 2775 {} + sẽ nhanh hơn cách find "$WP_ROOT" -type d -exec chmod 2775 {} \;
+find "$WP_ROOT" -type d -exec chmod 2775 {} +
+find "$WP_ROOT" -type f -exec chmod 664 {} +
 
 # Định nghĩa đường dẫn file config 
 WP_CONFIG="$WP_ROOT/wp-config.php"
