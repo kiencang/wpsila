@@ -7,7 +7,7 @@ Website: https://wpsila.com
 - Yêu cầu hệ thống: **Ubuntu LTS 24.04** hoặc 22.04, cài mới trên VPS (tức là bạn chưa có bất cứ website nào hoặc cài bất cứ chương trình gì ngoài Ubuntu trên VPS đó).
 - RAM tối thiểu 1GB.
 
-Các đoạn mã đang trong giai đoạn thử nghiệm, chỉ cài nó trên website demo của bạn.
+Luôn giữ **các bản backup website** để dự phòng trước và sau khi chuyển sang hệ thống của wpsila.
 
 Cài đặt với quyền root: 
 
