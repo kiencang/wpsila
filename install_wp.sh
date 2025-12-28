@@ -62,7 +62,7 @@ echo -e "${GREEN}>>> Dang kiem tra moi truong he thong...${NC}"
 
 if ! id "caddy" &>/dev/null; then
     echo -e "${RED}Loi: User 'caddy' chua ton tai.${NC}"
-    echo -e "${YELLOW}Goi y: Cai dat Caddy Web Server truoc do chua thanh cong.${NC}"
+    echo -e "${YELLOW}Goi y: Cai dat Caddy Server truoc do chua thanh cong hoac ban chua cai Caddy Server (nhan so 1 de cai).${NC}"
     exit 1
 fi
 
