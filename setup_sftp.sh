@@ -16,6 +16,16 @@ set -euo pipefail
 # +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
+# A. Màu sắc cho thông báo
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
+NC='\033[0m' # No Color
+# -------------------------------------------------------------------------------------------------------------------------------
+
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
 # SCRIPT TẠO TÀI KHOẢN SFTP (CHROOT JAIL)
 # Dành cho cấu trúc: Vỏ /var/www/domain (root:root 755)
 # Lõi /var/www/domain/public_html (root:www-data 2775)
@@ -39,6 +49,26 @@ fi
 # +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
+# Cx. Kiểm tra môi trường
+# Script này yêu cầu Caddy và PHP đã được cài trước đó
+echo -e "${GREEN}>>> Dang kiem tra moi truong he thong...${NC}"
+
+if ! id "caddy" &>/dev/null; then
+    echo -e "${RED}Loi: User 'caddy' chua ton tai.${NC}"
+    echo -e "${YELLOW}Goi y: Cai dat Caddy Server truoc do chua thanh cong hoac ban chua cai Caddy Server (nhan so 1 de cai).${NC}"
+    exit 1
+fi
+
+if ! id "www-data" &>/dev/null; then
+    echo -e "${RED}Loi: User 'www-data' chua ton tai.${NC}"
+    echo -e "${YELLOW}Goi y: Hay cai dat PHP-FPM.${NC}"
+    exit 1
+fi
+# -------------------------------------------------------------------------------------------------------------------------------
+
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
 # 2. NHẬP THÔNG TIN
 echo "--------------------------------------------------------"
 echo "CONG CU TAO USER SFTP CHO WORDPRESS (SECURE MODE)"
@@ -51,21 +81,22 @@ if [[ ! "$DOMAIN" =~ ^[a-zA-Z0-9.-]+$ ]]; then
     exit 1
 fi
 
-read -r -p "Nhap user sFTP moi: " SFTP_USER < /dev/tty
-
 # Định nghĩa thư mục Vỏ (Jail)
 JAIL_DIR="/var/www/$DOMAIN"
-# -------------------------------------------------------------------------------------------------------------------------------
 
-# +++
-
-# -------------------------------------------------------------------------------------------------------------------------------
-# 3. KIỂM TRA ĐẦU VÀO
+# Kiểm tra ngay khi nhập tên miền
 if [[ ! -d "$JAIL_DIR" ]]; then
     echo "Loi: Thu muc $JAIL_DIR KHONG ton tai!"
     echo "Hay chac chan trang web co ton tai."
     exit 1
 fi
+# -------------------------------------------------------------------------------------------------------------------------------
+
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
+# Kiểm tra thông tin user sFTP
+read -r -p "Nhap user sFTP moi: " SFTP_USER < /dev/tty
 
 if [[ -z "$SFTP_USER" ]]; then
     echo "Loi: User '$SFTP_USER' khong duoc de trong!"
