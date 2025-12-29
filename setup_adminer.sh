@@ -179,7 +179,7 @@ WEB_PASS=$(openssl rand -base64 12)
 # --- 1. KIỂM TRA MÔI TRƯỜNG ---
 echo "[1/4] Kiem tra moi truong PHP ${PHP_VER}..."
 if [[ ! -S "$PHP_SOCKET" ]]; then
-    echo "Loi: Khong tim thay socket tai $PHP_SOCKET."
+    echo -e "${RED}Loi: Khong tim thay socket tai $PHP_SOCKET.${NC}"
     exit 1
 fi
 echo "OK."
@@ -192,9 +192,9 @@ rm -f "$INSTALL_DIR/index.php"
 # SỬA LỖI: Dùng link chính chủ Adminer.org để luôn lấy bản mới nhất & bỏ -q để hiện tiến trình
 echo "Dang tai source code..."
 if wget -O "$INSTALL_DIR/index.php" "https://www.adminer.org/latest-mysql.php"; then
-    echo "Tai Adminer thanh cong."
+    echo -e "${GREEN}Tai Adminer thanh cong.${NC}"
 else
-    echo "Loi: Khong the tai Adminer tu adminer.org"
+    echo -e "${RED}Loi: Khong the tai Adminer tu adminer.org${NC}"
     exit 1
 fi
 
@@ -211,6 +211,8 @@ chmod 644 "$INSTALL_DIR/index.php"
 # -------------------------------------------------------------------------------------------------------------------------------
 # E. TẠO USER MARIADB 
 echo "[3/4] Dang cau hinh User MariaDB..."
+
+# Nếu đang tắt thì bật lên
 if ! systemctl is-active --quiet mariadb; then
     systemctl start mariadb
 fi
@@ -230,7 +232,7 @@ EOF
 echo "[4/4] Dang xu ly Caddyfile..."
 
 if ! command -v caddy &> /dev/null; then
-    echo "Loi: Caddy chua duoc cai dat."
+    echo -e "${RED}Loi: Caddy chua duoc cai dat.${NC}"
     exit 1
 fi
 
