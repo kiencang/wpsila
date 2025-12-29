@@ -4,7 +4,7 @@
 set -euo pipefail
 
 # Phiên bản hiện tại của wpsila
-SILA_VERSION="v1.0.4"
+SILA_VERSION="v1.0.5"
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
@@ -19,7 +19,7 @@ SILA_VERSION="v1.0.4"
 # -------------------------------------------------------------------------
 # curl -sL https://vps.wpsila.com | sudo bash
 # -------------------------------------------------------------------------
-# Version 1.0.4 - 28/12/2025
+# Version 1.0.5 - 29/12/2025
 # -------------------------------------------------------------------------
 # Test trước khi đẩy lên link chính
 # curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/install_wpsila.sh | sudo bash
@@ -239,30 +239,30 @@ rm -f "$INSTALL_DIR/"*.sh
 # Dev bắt buộc phải dùng trước khi công bố phiên bản mới
 # Có tác dụng ngăn chặn các vấn đề liên quan đến lỗi đường truyền
 # ----------------------------------------------------------------------------
-# Generated at: Sun Dec 28 10:12:56 +07 2025
-# Version: v1.0.4
+# Generated at: Mon Dec 29 21:47:08 +07 2025
+# Version: v1.0.5
 declare -A CHECKSUMS=(
-    ["wpsila.conf"]="37949dce87686d946195ae65dcd0e1e95a763c1bfa40ee7c2583f20040680ac2"
+    ["wpsila.conf"]="662450e1a59c15843872c40e872a686e29adbc4371c259c13cc7ad54c0aaae27"
     ["wpsila_menu.sh"]="015d72aade1e588ace99246a70e72e9bfa76d53c6e26d72629e27d2d9bfe5787"
     ["install_lcmp.sh"]="a5bf28499cef47ef0999e768f234bdfe9aef2ad05111158312ee23be981419ff"
-    ["anti_apt_lock.sh"]="156b35535f96580641f177f01120d46817f7da366bdd5221215be6a8333ec4f6"
+    ["anti_apt_lock.sh"]="4b90f4620011a96117954fdd12e50a751e647101b3d804c24969107cb9b8e5e9"
     ["install_caddyserver.sh"]="a9333ff7768deafc99e5a43c4bc8d6b2f22cbfa0fccb3799d412b1c60e6f9d63"
-    ["install_php.sh"]="d88717e1a8bfc21f6de225da608433e79f4c8c71e62da8690b4f6ab2008cfd88"
-    ["install_mariadb.sh"]="687467d098f6f17d746178f0a832cd9f2037c986c04123592c9adf59e95b7b60"
-    ["install_wp.sh"]="f1661edf80f6cde03c2d626814db4587f7b3237fabd3c3a9924fb8b89a4ec6aa"
+    ["install_php.sh"]="53b33e9609968fb8ca39a8dc5aafe08c7df8260be126e74e523f1fb2472fdc7a"
+    ["install_mariadb.sh"]="d3abc7ac72c97a10054f4534eac0fcc2001375c395b8a5f755a9bcded8e64123"
+    ["install_wp.sh"]="ff70421e91a332f98a9b1108b7cd8c930e6f9056e4565d5de6df48d2933623d5"
     ["domain_check.sh"]="39c29fdf6c6710040c04161bbf4d5797b0f358a71a296ee4a9277f514d7d06ca"
-    ["database_user_wp.sh"]="923a992cf598bdb34150e0952e6536683f5dd22d3042305568d459162234b4a2"
+    ["database_user_wp.sh"]="9f11dc3c7426dc8fb0adcef3cdea9f5a09bf71b0c0529ebf8efeac9d2f730972"
     ["wordpress.sh"]="65d8c6fde5cd9fdaf906a62424595178c33e4b9476ede5223ec74be6039a6e37"
     ["caddyfile.sh"]="1dc3c517126f4fabca597e3d934b4a83d48a816a64a92dab4f03d2302ba81d00"
     ["caddyfile_subdomain.sh"]="2e88d32e2a265732b5712ea9682fedb9be4df3ba744191f9578700483dfaee0b"
-    ["tune_mariadb.sh"]="494485127b52007fd8cf916ddada0a17ab2d240421406d0f7dc97c0ed110b3d7"
-    ["tune_php.sh"]="09244f717ad82946745da70b55cd858fa97599a6abbb1d585a825b5f29beb623"
-    ["tune_pool.sh"]="ae9280f1c591fa968b9615e07b770930bceb65cd8cb5e1bbd0e09c541179a116"
+    ["tune_mariadb.sh"]="a76ca6118bfbad12a86e2b049ca691efbc795b8cda964d85b2228825ee6ccb3b"
+    ["tune_php.sh"]="97ccd09ec9f6bc45c9dcc24bae1dddfb9bdcc6e08ef422c728b70e376a292fb3"
+    ["tune_pool.sh"]="0c3946db1e55a14da878a9f771aedd6864791c54c5839ecb7c71a4371131810b"
     ["remove_web.sh"]="e2fd8a2174fda78c07be1524b389837616c17b2871a2506237fb1a31c0a09520"
     ["setup_sftp.sh"]="a871af2ac9cf24add898996db4c6576b70765f257be93d5fa9dee1b6646f8a8a"
     ["setup_adminer.sh"]="769ec308d0f53c55e74beb8eebe8df77353b6a7eb39474a0cdb5db779b3b7cf2"
     ["show_pass.sh"]="1cef0cde8bb5b444ba55b0be9cf676c4bd246f20221ad041d8f5c4aa5785e2e3"
-    ["check_for_update.sh"]="33b88a57c808b1bbdac5b8461643b3398ffd43bcb9c234e6d66d08130060e725"
+    ["check_for_update.sh"]="7afa52061ee0cf8507693880d622893af43b6481f6d0d3905a205b6be18385b7"
 )
 # -------------------------------------------------------------------------------------------------------------------------------
 
