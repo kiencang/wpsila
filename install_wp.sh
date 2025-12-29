@@ -18,7 +18,7 @@
 # Dừng script ngay lập tức nếu có lệnh bị lỗi
 set -euo pipefail
 
-# Thiet lap moi truong chuan cho Automation
+# Thiết lập môi trường chuẩn cho Automation
 export LC_ALL=C.UTF-8
 export DEBIAN_FRONTEND=noninteractive
 # -------------------------------------------------------------------------------------------------------------------------------
@@ -49,7 +49,7 @@ fi
 
 # Xác định kiểu cài đặt có phải là subdomain hay không
 # Mặc định là nosd, tức là không phải dạng cài subdomain
-# Tham số đầu vào mặc định ở vị trí đầu tiên (1)
+# Tham số đầu vào mặc định ở vị trí đầu tiên (1) trong lệnh bash
 INSTALL_TYPE="${1:-nosd}"
 # -------------------------------------------------------------------------------------------------------------------------------
 
@@ -131,7 +131,6 @@ else
 fi	
 
 echo "-------------------------------------------------------------------------------------------------"
-
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
@@ -185,7 +184,7 @@ CADDY_SITE_FILE="/etc/caddy/sites-enabled/${DOMAIN}.caddy"
 
 echo "Domain chinh: $DOMAIN"
 
-# Không phải subdomian mới cần thông báo
+# Không phải subdomain mới cần thông báo
 if [[ "$INSTALL_TYPE" != "subdomain" ]]; then
 	echo "Domain chuyen huong: $RED_DOMAIN"
 fi
