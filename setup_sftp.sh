@@ -94,7 +94,12 @@ fi
 if [[ ! "$DOMAIN" =~ ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\.[a-z]{2,}$ ]]; then
     echo -e "${RED}Loi: Dia chi website '$DOMAIN' chua ky tu khong hop le hoac sai dinh dang.${NC}"
 	exit 1
-fi		
+fi
+
+# Qua được các cửa ải
+if [[ "$INPUT_DOMAIN" != "$DOMAIN" ]]; then
+    echo -e "${GREEN}Script da tu dong chuan hoa input '${INPUT_DOMAIN}' thanh '${DOMAIN}'${NC}"
+fi
 
 # Định nghĩa thư mục Vỏ (Jail)
 JAIL_DIR="/var/www/$DOMAIN"
