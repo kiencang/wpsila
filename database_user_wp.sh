@@ -3,9 +3,11 @@
 # File: database_user_wp.sh
 # File này được nhúng vào script install_wp.sh
 # -----------------------------------------------------------
-echo -e "${GREEN}Dang tao Database va User cho WordPress...${NC}"
+
+# +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
+echo -e "${GREEN}Dang tao Database va User cho WordPress...${NC}"
 # --- CẤU HÌNH BIẾN NGẪU NHIÊN ---
 # F1. DB Name (Thoải mái độ dài, MySQL cho phép 64 ký tự)
 # Kết quả ví dụ: wp_a1b2c3d4e5f67890
@@ -35,7 +37,7 @@ GEN_DB_PASS="p_$(openssl rand -hex 16)"
 # F4. Tạo bảng trong MariaDB
 # Sử dụng biến đã tạo ở trên vào câu lệnh SQL
 # Lưu ý: Vì biến chỉ chứa chữ cái thường và số nên không cần escape phức tạp, rất an toàn.
-# Tuy nhiên vẫn giữ backtick cho an toàn!
+# Tuy nhiên vẫn giữ backtick dự phòng!
 # Sử dụng Here-Doc (<<EOF) giúp ẩn mật khẩu khỏi danh sách tiến trình (ps aux)
 # Chỉ MariaDB đọc được nội dung này qua luồng stdin
 
@@ -68,6 +70,8 @@ CRED_FILE="$SCRIPT_WPSILA_DIR/wpp.txt"
 rm -f "$CRED_FILE"
 
 # Tạo file mới cho trang WordPress đang cài
+# Chủ động ghi đè chứ không ghi nối tiếp, dấu tích website trước không được lưu
+# Điều này cũng khiến người dùng buộc phải chủ động lưu lại mật khẩu
 cat > "$CRED_FILE" <<EOF
 ----------------------------------------
 WORDPRESS DATABASE CREDENTIALS
@@ -79,7 +83,7 @@ Database Pass : ${GEN_DB_PASS}
 ----------------------------------------
 EOF
 chmod 600 "$CRED_FILE" # Chỉ user hiện tại mới đọc được file này
-# Xem xét bổ sung câu lệnh để xóa file này đi
+# Xem xét bổ sung câu lệnh để xóa file này đi và cho người dùng quyết định
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
