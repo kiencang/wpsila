@@ -100,7 +100,7 @@ fi
 # Kiểm tra cấu trúc tiêu chuẩn, giống ở phần domain check
 if [[ ! "$DOMAIN" =~ ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\.[a-z]{2,}$ ]]; then
     echo -e "${RED}Loi: Dia chi website '$DOMAIN' chua ky tu khong hop le hoac sai dinh dang.${NC}"
-	exit 1
+    exit 1
 fi		 
 
 # Qua được các cửa ải
