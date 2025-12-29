@@ -73,13 +73,28 @@ fi
 echo "--------------------------------------------------------"
 echo "CONG CU TAO USER SFTP CHO WORDPRESS (SECURE MODE)"
 echo "--------------------------------------------------------"
-read -r -p "Nhap ten mien (VD: example.com): " DOMAIN < /dev/tty
+read -r -p "Nhap dia chi website (VD: example.com): " INPUT_DOMAIN < /dev/tty
 
-# Kiểm tra nhẹ nhập tên miền đầu vào
-if [[ ! "$DOMAIN" =~ ^[a-zA-Z0-9.-]+$ ]]; then
-    echo "Ten mien khong hop le"
+# Sanitize input: Xóa khoảng trắng, chuyển chữ hoa thành chữ thường
+DOMAIN=$(echo "$INPUT_DOMAIN" | tr -d ' ' | tr '[:upper:]' '[:lower:]')
+
+# Kiểm tra đầu vào
+if [[ -z "$DOMAIN" ]]; then
+    echo -e "${RED}Loi: Dia chi website khong duoc de trong!${NC}"
     exit 1
 fi
+
+# Thoát sớm với định dạng sai
+if [[ "$DOMAIN" != *"."* ]]; then
+    echo -e "${RED}Loi: Dia chi website '$DOMAIN' khong hop le (thieu dau cham).${NC}"
+    exit 1
+fi
+
+# Kiểm tra chặt hơn với cấu trúc tên miền tiêu chuẩn
+if [[ ! "$DOMAIN" =~ ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\.[a-z]{2,}$ ]]; then
+    echo -e "${RED}Loi: Dia chi website '$DOMAIN' chua ky tu khong hop le hoac sai dinh dang.${NC}"
+	exit 1
+fi		
 
 # Định nghĩa thư mục Vỏ (Jail)
 JAIL_DIR="/var/www/$DOMAIN"
