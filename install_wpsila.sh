@@ -4,7 +4,7 @@
 set -euo pipefail
 
 # Phiên bản hiện tại của wpsila
-SILA_VERSION="v1.0.5"
+SILA_VERSION="v1.0.6"
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
@@ -19,7 +19,7 @@ SILA_VERSION="v1.0.5"
 # -------------------------------------------------------------------------
 # curl -sL https://vps.wpsila.com | sudo bash
 # -------------------------------------------------------------------------
-# Version 1.0.5 - 29/12/2025
+# Version 1.0.6 - 30/12/2025
 # -------------------------------------------------------------------------
 # Test trước khi đẩy lên link chính
 # curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/install_wpsila.sh | sudo bash
@@ -239,8 +239,8 @@ rm -f "$INSTALL_DIR/"*.sh
 # Dev bắt buộc phải dùng trước khi công bố phiên bản mới
 # Có tác dụng ngăn chặn các vấn đề liên quan đến lỗi đường truyền
 # ----------------------------------------------------------------------------
-# Generated at: Mon Dec 29 21:47:08 +07 2025
-# Version: v1.0.5
+# Generated at: Tue Dec 30 04:40:26 +07 2025
+# Version: v1.0.6
 declare -A CHECKSUMS=(
     ["wpsila.conf"]="662450e1a59c15843872c40e872a686e29adbc4371c259c13cc7ad54c0aaae27"
     ["wpsila_menu.sh"]="015d72aade1e588ace99246a70e72e9bfa76d53c6e26d72629e27d2d9bfe5787"
@@ -258,11 +258,11 @@ declare -A CHECKSUMS=(
     ["tune_mariadb.sh"]="a76ca6118bfbad12a86e2b049ca691efbc795b8cda964d85b2228825ee6ccb3b"
     ["tune_php.sh"]="97ccd09ec9f6bc45c9dcc24bae1dddfb9bdcc6e08ef422c728b70e376a292fb3"
     ["tune_pool.sh"]="0c3946db1e55a14da878a9f771aedd6864791c54c5839ecb7c71a4371131810b"
-    ["remove_web.sh"]="e2fd8a2174fda78c07be1524b389837616c17b2871a2506237fb1a31c0a09520"
+    ["remove_web.sh"]="9d455ee42eab6bee63b481d228264fc7d3ef52ad915b1993ddf8dc9c4fb76963"
     ["setup_sftp.sh"]="a871af2ac9cf24add898996db4c6576b70765f257be93d5fa9dee1b6646f8a8a"
-    ["setup_adminer.sh"]="769ec308d0f53c55e74beb8eebe8df77353b6a7eb39474a0cdb5db779b3b7cf2"
+    ["setup_adminer.sh"]="fa01d68aea03acd1801f1bf006b296cc75f011f1a00122091a0346d5fbad8c2a"
     ["show_pass.sh"]="1cef0cde8bb5b444ba55b0be9cf676c4bd246f20221ad041d8f5c4aa5785e2e3"
-    ["check_for_update.sh"]="7afa52061ee0cf8507693880d622893af43b6481f6d0d3905a205b6be18385b7"
+    ["check_for_update.sh"]="6a6153de5f9d92398cbc836d65f1fcef86009a7f4ba6f91b7a48c8fe9c4f319e"
 )
 # -------------------------------------------------------------------------------------------------------------------------------
 
