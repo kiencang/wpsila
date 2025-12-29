@@ -4,6 +4,9 @@
 # File này được nhúng vào script install_lcmp.sh
 # -----------------------------------------------------------
 
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
 echo -e "${GREEN}[1/3] Dang nap PHP Repo ondrej ${PHP_VER} va cac module can thiet...${NC}"
 
 # Setup Repository
@@ -13,11 +16,12 @@ add-apt-repository ppa:ondrej/php -y
 
 # Thêm repo thì cập nhật lại (nhưng cứ thêm cho chắc!)
 apt-get update
+# -------------------------------------------------------------------------------------------------------------------------------
 
-# ==============================================================
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
 # DANH SÁCH CÁC GÓI PHP ĐƯỢC CÀI.
-# ==============================================================
-
 echo -e "${GREEN}[2/3] Dang chuan bi cai dat PHP phien ban: ${PHP_VER} ${NC}"
 
 PHP_PACKAGES=(
@@ -40,11 +44,15 @@ PHP_PACKAGES=(
 
 # Cai dat PHP va cac module
 apt-get install -y "${PHP_PACKAGES[@]}"
+# -------------------------------------------------------------------------------------------------------------------------------
 
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
 # Dam bao PHP-FPM khoi dong
 systemctl enable --now "php${PHP_VER}-fpm"
 
-# E4. Kiểm tra trạng thái cuối cùng
+# Kiểm tra trạng thái cuối cùng
 if	systemctl is-active --quiet "php${PHP_VER}-fpm"; then
     echo -e "${GREEN}[3/3] PHP ${PHP_VER} da cai dat THANH CONG!${NC}"
     # Hiển thị phiên bản để double check
@@ -53,3 +61,4 @@ else
     echo -e "${RED}Co loi xay ra trong qua trinh cai dat!${NC}"
     exit 1
 fi
+# -------------------------------------------------------------------------------------------------------------------------------
