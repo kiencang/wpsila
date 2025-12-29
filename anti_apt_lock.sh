@@ -3,6 +3,10 @@
 # File: anti_apt_lock.sh
 # File này được nhúng vào script install_lcmp.sh
 # -----------------------------------------------------------
+
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
 # Hàm khôi phục sau khi cài xong
 restore_environment() {
     echo ">>> [System] Dang bat lai che do cap nhat nen..."
@@ -12,7 +16,11 @@ restore_environment() {
     systemctl start apt-daily.timer apt-daily-upgrade.timer > /dev/null 2>&1
 	echo ">>> [System] Xong!"
 }
+# -------------------------------------------------------------------------------------------------------------------------------
 
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
 # Hàm xử lý lock chuyên nghiệp - An toàn tuyệt đối
 prepare_environment() {
     echo ">>> [System] Dang kiem tra che do cap nhat nen cua Ubuntu..."
@@ -53,7 +61,11 @@ prepare_environment() {
 
     echo ">>> [System] Khoa da duoc mo. San sang cai dat."
 }
+# -------------------------------------------------------------------------------------------------------------------------------
 
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
 echo "2. Thiet lap moi truong cai dat..."
 
 # Gọi hàm khóa môi trường
@@ -61,4 +73,6 @@ prepare_environment
 
 # [QUAN TRỌNG] Đặt TRAP ngay lập tức sau khi khóa. 
 # Nếu script lỗi bất cứ đâu từ dòng này trở đi, nó sẽ tự động chạy restore_environment
+# Nếu không có lỗi, khi mã chạy hết, nó tự chạy hàm này.
 trap restore_environment EXIT
+# -------------------------------------------------------------------------------------------------------------------------------
