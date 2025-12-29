@@ -73,27 +73,44 @@ chmod 755 /var/log/caddy
 # -------------------------------------------------------------------------------------------------------------------------------
 # D. NHẬP THÔNG TIN TÊN MIỀN CHO QUẢN TRỊ DATABASE
 echo "========================================================"
-echo "   SETUP ADMINER (Để quản trị cơ sở dữ liệu/database)"
+echo "   SETUP ADMINER (De quan tri co so du lieu/database)"
 echo "========================================================"
 read -r -p "Nhap dia chi cho phan quan tri database (VD: db.domain.com): " INPUT_DOMAIN
 
-    # Xử lý chuỗi
-    TEMP_DOMAIN=$(echo "$INPUT_DOMAIN" | tr -d ' ' | tr '[:upper:]' '[:lower:]')
-    DOMAIN=$(echo "$TEMP_DOMAIN" | sed -e 's|^https\?://||' -e 's|/.*$||')
-    
-    # Validation cơ bản
-    if [[ -z "$DOMAIN" ]]; then
-        echo -e "${RED}Loi: Dia chi khong duoc de trong!${NC}"
-		exit 1
-    elif [[ "$DOMAIN" != *"."* ]]; then
-        echo -e "${RED}Loi: Dia chi '$DOMAIN' khong hop le (thieu dau cham).${NC}"
-		exit 1
-    else
-        if [[ "$INPUT_DOMAIN" != "$DOMAIN" ]]; then
-             echo -e "${GREEN}Script da tu dong chuan hoa input '${INPUT_DOMAIN}' thanh '${DOMAIN}'${NC}"
-        fi
-    fi
+# Xử lý chuỗi
+# Xóa khoảng trắng, chuyển chữ hoa thành chữ thường
+TEMP_DOMAIN=$(echo "$INPUT_DOMAIN" | tr -d ' ' | tr '[:upper:]' '[:lower:]')
 
+# Xóa http://, https:// ở đằng trước nếu có
+DOMAIN=$(echo "$TEMP_DOMAIN" | sed -E 's|^https?://||' | sed -E 's|/.*$||' | sed -E 's|:[0-9]+$||')
+    
+# Validation địa chỉ nhập vào
+# Không rỗng
+if [[ -z "$DOMAIN" ]]; then
+    echo -e "${RED}Loi: Dia chi khong duoc de trong!${NC}"
+    exit 1
+fi
+
+# Sai cú pháp cơ bản, dừng sớm	
+if [[ "$DOMAIN" != *"."* ]]; then
+    echo -e "${RED}Loi: Dia chi '$DOMAIN' khong hop le (thieu dau cham).${NC}"
+    exit 1
+fi	
+
+# Kiểm tra cấu trúc tiêu chuẩn, giống ở phần domain check
+if [[ ! "$DOMAIN" =~ ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\.[a-z]{2,}$ ]]; then
+    echo -e "${RED}Loi: Dia chi website '$DOMAIN' chua ky tu khong hop le hoac sai dinh dang.${NC}"
+fi		 
+
+# Qua được các cửa ải
+if [[ "$INPUT_DOMAIN" != "$DOMAIN" ]]; then
+    echo -e "${GREEN}Script da tu dong chuan hoa input '${INPUT_DOMAIN}' thanh '${DOMAIN}'${NC}"
+fi
+# --------------------
+
+#+++
+
+# --------------------
 # Kiểm tra trước sự tồn tại của file domain.caddy xem nó tồn tại hay chưa
 # Chặn sớm để chống rác cài đặt
 # Ví dụ: /etc/caddy/sites-enabled/db.domain.com.caddy
@@ -101,8 +118,8 @@ CADDY_SITE_FILE="/etc/caddy/sites-enabled/${DOMAIN}.caddy"
 
 # Kiểm tra trùng lặp
 if [[ -f "$CADDY_SITE_FILE" ]]; then
-    echo "CANH BAO: File cau hinh cho $DOMAIN da ton tai."
-    echo "-> Da BO QUA viec tao moi."
+    echo -e "${RED}CANH BAO: File cau hinh Caddy cho $DOMAIN da ton tai.${NC}"
+    echo -e "${RED}BO QUA viec tao moi. Dung chay script.${NC}"
     exit 1
 fi	
 # -------------------------------------------------------------------------------------------------------------------------------
@@ -164,7 +181,7 @@ if [[ ! -S "$PHP_SOCKET" ]]; then
     echo "Loi: Khong tim thay socket tai $PHP_SOCKET."
     exit 1
 fi
-echo "-> OK."
+echo "OK."
 
 # --- 2. CÀI ĐẶT ADMINER ---
 echo "[2/4] Dang tai Adminer..."
@@ -172,9 +189,9 @@ mkdir -p "$INSTALL_DIR"
 rm -f "$INSTALL_DIR/index.php"
 
 # SỬA LỖI: Dùng link chính chủ Adminer.org để luôn lấy bản mới nhất & bỏ -q để hiện tiến trình
-echo "  -> Dang tai source code..."
+echo "Dang tai source code..."
 if wget -O "$INSTALL_DIR/index.php" "https://www.adminer.org/latest-mysql.php"; then
-    echo "  -> Tai Adminer thanh cong."
+    echo "Tai Adminer thanh cong."
 else
     echo "Loi: Khong the tai Adminer tu adminer.org"
     exit 1
@@ -248,7 +265,7 @@ $DOMAIN {
 }
 EOF
 
-echo "-> Da tao file cau hinh: $CADDY_SITE_FILE"
+echo "Da tao file cau hinh: $CADDY_SITE_FILE"
 
 # Format
 caddy fmt --overwrite "$CADDY_SITE_FILE"
@@ -268,7 +285,7 @@ chown -R caddy:caddy /var/log/caddy
 chmod 755 /var/log/caddy	
 
 systemctl reload caddy
-echo "-> Da Reload Caddy."
+echo "Da Reload Caddy."
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
