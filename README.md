@@ -1,4 +1,4 @@
-Version của bash script: v1.0.5
+Version của bash script: v1.0.6
 ---
 Website: https://wpsila.com
 
