@@ -46,8 +46,8 @@ timeout 60s bash -c 'until systemctl is-active --quiet mariadb; do sleep 1; done
 # F1. BẢO MẬT MARIADB (HARDENING)
 echo -e "${GREEN}[2/3] Dang thuc hien bao mat MariaDB (Secure Installation)...${NC}"
 
-# Chay SQL Hardening
-# Lưu ý: Vì mới cài đặt nên root chưa có pass, lệnh mariadb sẽ chạy thẳng qua socket
+# Chạy SQL Hardening
+# Lưu ý: Lệnh mariadb sẽ chạy thẳng qua socket
 mariadb <<EOF
 -- Xóa user rỗng (Anonymous)
 DELETE FROM mysql.user WHERE User='';
@@ -58,10 +58,14 @@ DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.
 -- Xóa database test
 DROP DATABASE IF EXISTS test;
 DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';
--- Apply thay đổi
+-- Áp dụng các thay đổi
 FLUSH PRIVILEGES;
 EOF
+# -------------------------------------------------------------------------------------------------------------------------------
 
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
 # F2. Kiểm tra trạng thái cuối cùng
 if systemctl is-active --quiet mariadb; then
     echo -e "${GREEN}[3/3] MariaDB da cai dat THANH CONG!${NC}"
