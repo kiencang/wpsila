@@ -48,25 +48,32 @@ fi
 # C1. Thông báo trước sự nguy hiểm của yêu cầu này
 echo -e "${YELLOW}=== CONG CU XOA WEBSITE WORDPRESS (CADDY) ===${NC}"
 echo -e "${RED}LUY Y: HANH DONG NAY KHONG THE HOAN TAC, HAY BACKUP TRUOC!${NC}"
-read -r -p "Nhap ten mien muon xoa (VD: example.com): " INPUT_DOMAIN < /dev/tty
+read -r -p "Nhap dia chi website muon xoa (VD: example.com): " INPUT_DOMAIN < /dev/tty
 
 # Sanitize input: Xóa khoảng trắng, chuyển chữ hoa thành chữ thường
 DOMAIN=$(echo "$INPUT_DOMAIN" | tr -d ' ' | tr '[:upper:]' '[:lower:]')
 
 # Kiểm tra đầu vào
 if [[ -z "$DOMAIN" ]]; then
-    echo -e "${RED}Loi: Ten mien khong duoc de trong!${NC}"
+    echo -e "${RED}Loi: Dia chi website khong duoc de trong!${NC}"
     exit 1
 fi
 
+# Thoát sớm với định dạng sai
 if [[ "$DOMAIN" != *"."* ]]; then
-    echo -e "${RED}Loi: Ten mien '$DOMAIN' khong hop le (thieu dau cham).${NC}"
+    echo -e "${RED}Loi: Dia chi website '$DOMAIN' khong hop le (thieu dau cham).${NC}"
     exit 1
 fi
+
+# Kiểm tra chặt hơn với cấu trúc tên miền tiêu chuẩn
+if [[ ! "$DOMAIN" =~ ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\.[a-z]{2,}$ ]]; then
+    echo -e "${RED}Loi: Dia chi website '$DOMAIN' chua ky tu khong hop le hoac sai dinh dang.${NC}"
+	exit 1
+fi		 
 
 # C2. Chặn các đường dẫn hệ thống nguy hiểm, mà lệnh xóa có thể gây sụp VPS
 if [[ "$DOMAIN" == "/" ]] || [[ "$DOMAIN" == "." ]] || [[ "$DOMAIN" == ".." ]]; then
-    echo -e "${RED}Loi: Ten mien khong hop le.${NC}"
+    echo -e "${RED}Loi: Dia chi website khong hop le.${NC}"
     exit 1
 fi
 
