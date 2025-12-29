@@ -142,7 +142,7 @@ for pkg in $REQUIRED_PKGS; do
     fi
 done
 
-if [ "$NEED_INSTALL" = true ]; then
+if [[ "$NEED_INSTALL" = true ]]; then
 # -------------------------------------------------------------------------
 # Tắt tiến trình chạy cập nhật ngầm của Ubuntu
 # -------------------------------------------------------------------------
