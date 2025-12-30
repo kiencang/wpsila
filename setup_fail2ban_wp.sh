@@ -25,7 +25,7 @@ NC='\033[0m'
 # [QUAN TRONG] Ban co dung Cloudflare Proxy (Dam may vang) khong?
 # true  = Co dung -> Script se TAT Jail WordPress (De Cloudflare WAF lo), chi bao ve SSH.
 # false = Khong dung (IP truc tiep) -> Script se BAT Jail WordPress (bao ve bang UFW).
-USING_CLOUDFLARE_PROXY="true"
+USING_CLOUDFLARE_PROXY="false"
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
@@ -76,7 +76,7 @@ MSG_REASON=""
 if [[ "$USING_CLOUDFLARE_PROXY" == "true" ]]; then
     # Trường hợp 1: Dùng Cloudflare -> Tắt Jail WP
     WP_JAIL_ENABLED="false"
-    MSG_REASON="Disabled (Cloudflare Mode Active)"
+    MSG_REASON="Disabled (do Cloudflare Mode Active)"
     echo -e "${YELLOW}-> Cloudflare Mode: Jail WP se duoc TAT de tranh conflict IP.${NC}"
 else
     # Trường hợp 2: Không dùng Cloudflare -> Kiểm tra Log
