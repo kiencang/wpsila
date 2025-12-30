@@ -29,6 +29,7 @@ apt-get install -y --no-install-recommends \
     apt-transport-https \
     curl \
     gnupg \
+    fail2ban \
     ufw
 
 # 2. Thêm GPG Key và Repo Caddy
