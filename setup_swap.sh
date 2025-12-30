@@ -1,23 +1,20 @@
 #!/bin/bash
 
 # -----------------------------------------------------------
-# MODULE: Tạo và Cấu hình Swap (Bộ nhớ ảo) - ENHANCED VERSION
+# MODULE: Smart Swap Setup (Safe & Optimized)
 # File: setup_swap.sh
-# Mục đích: Ngăn chặn OOM Killer, tối ưu MariaDB/Caddy trên VPS
-# Cập nhật: Tự động xử lý swap cũ quá nhỏ, chuẩn hóa sysctl.d
 # -----------------------------------------------------------
 
 # +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
-# Dừng script ngay lập tức nếu có lệnh bị lỗi
 set -euo pipefail
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
-# A. Màu sắc & Cấu hình
+# --- CONFIG ---
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 RED='\033[0;31m'
@@ -25,116 +22,108 @@ NC='\033[0m'
 
 SWAP_SIZE_GB=2
 SWAP_FILE="/swapfile"
-MIN_SWAP_KB=1500000 # ~1.5GB. Nếu tổng swap nhỏ hơn mức này sẽ tạo mới.
+MIN_SWAP_KB=1500000 # ~1.5GB
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
-# B. Kiểm tra quyền root
+# --- ROOT CHECK ---
 if [[ $EUID -ne 0 ]]; then
-   echo -e "${RED}Lỗi: Script nay can chay duoi quyen Root.${NC}"
-   exit 1
+   echo -e "${YELLOW}Dang chuyen sang quyen root...${NC}"
+   sudo -E "$0" "$@"
+   exit $?
 fi
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
-# C. KIỂM TRA & XỬ LÝ SWAP
-echo -e "${GREEN}>>> Dang kiem tra trang thai Swap hien tai...${NC}"
+echo -e "${GREEN}>>> [SWAP] Kiem tra hien trang...${NC}"
 
-# Lấy tổng dung lượng Swap hiện tại (đơn vị KB)
+# Lay thong tin Swap hien tai
 CURRENT_SWAP_TOTAL=$(free | grep -i Swap | awk '{print $2}')
+CURRENT_SWAP_USED=$(free | grep -i Swap | awk '{print $3}')
 
-# Logic: Nếu đã có Swap và dung lượng > 1.5GB thì giữ nguyên.
-# Nếu Swap < 1.5GB (ví dụ Cloud-init tạo sẵn 512MB) thì tắt đi làm lại.
+# --- LOGIC XU LY ---
 if [[ "$CURRENT_SWAP_TOTAL" -gt "$MIN_SWAP_KB" ]]; then
     CURRENT_HUMAN=$(free -h | grep -i Swap | awk '{print $2}')
-    echo -e "${YELLOW}He thong da co Swap du dung: $CURRENT_HUMAN${NC}"
-    echo -e "${YELLOW}Bo qua buoc tao Swap. Chuyen sang toi uu Swappiness...${NC}"
+    echo -e "${GREEN}OK: Swap da du dung ($CURRENT_HUMAN).${NC}"
 else
+    # Logic an toan: Kiem tra xem co tat duoc swap cu khong
     if [[ "$CURRENT_SWAP_TOTAL" -gt 0 ]]; then
-        echo -e "${YELLOW}Phat hien Swap cu qua nho (< 1.5GB). Dang tien hanh tai cau truc...${NC}"
-        # Tắt toàn bộ swap để an toàn
+        echo -e "${YELLOW}Swap cu qua nho (< 1.5GB). Can tai tao.${NC}"
+        
+        # KIEM TRA RAM TRONG: Tranh sập DB khi tat swap
+        FREE_RAM_KB=$(free | grep -i Mem | awk '{print $4}')
+        # Lay them buffer/cache vi no co the giai phong duoc
+        BUFF_CACHE_KB=$(free | grep -i Mem | awk '{print $6}')
+        AVAILABLE_RAM_KB=$((FREE_RAM_KB + BUFF_CACHE_KB))
+        
+        # Neu Swap dang dung nhieu hon RAM co the chua -> STOP
+        if [[ "$CURRENT_SWAP_USED" -gt "$AVAILABLE_RAM_KB" ]]; then
+            echo -e "${RED}NGUY HIEM: Swap dang dung ($CURRENT_SWAP_USED KB) lon hon RAM trong ($AVAILABLE_RAM_KB KB).${NC}"
+            echo -e "${RED}Khong the tat Swap cu vi se gay crash he thong (OOM).${NC}"
+            echo "Giai phap: Hay restart VPS hoac tat bot service truoc khi chay script nay."
+            exit 1
+        fi
+
+        echo "Tat swap cu..."
         swapoff -a
-        # Nếu file swap cũ tồn tại, xóa nó đi để giải phóng dung lượng
+        
+        # Xoa sach se
         if [[ -f "$SWAP_FILE" ]]; then
             rm -f "$SWAP_FILE"
-            echo "Da xoa file swap cu: $SWAP_FILE"
         fi
-        # Xóa dòng cấu hình cũ trong fstab để tránh lỗi boot (làm sạch)
         sed -i "\#$SWAP_FILE#d" /etc/fstab
     fi
 
-    echo "Dang tien hanh tao Swap moi dung luong ${SWAP_SIZE_GB}GB..."
-
-    # 1. Kiểm tra dung lượng ổ cứng (Chính xác hơn dùng grep)
-    # Lấy dung lượng trống của thư mục root /, đơn vị GB
-    FREE_DISK=$(df --output=avail -B 1G / | tail -n 1 | tr -d 'G')
+    # Tao Swap Moi
+    echo "Tao Swap moi ${SWAP_SIZE_GB}GB..."
     
-    # Yêu cầu tối thiểu 5GB trống
+    # Check disk space
+    FREE_DISK=$(df --output=avail -B 1G / | tail -n 1 | tr -d 'G')
     if [[ "$FREE_DISK" -lt 5 ]]; then
-        echo -e "${RED}Loi: Dung luong o cung khong du (Con lai ${FREE_DISK}GB).${NC}"
-        echo "Can toi thieu 5GB trong de tao Swap an toan."
+        echo -e "${RED}Loi: O cung chi con ${FREE_DISK}GB (Can > 5GB).${NC}"
         exit 1
     fi
 
-    # 2. Tạo file Swap
-    # Ưu tiên fallocate, fallback sang dd
+    # Tao file
     if ! fallocate -l "${SWAP_SIZE_GB}G" "$SWAP_FILE"; then
-        echo "Fallocate that bai, chuyen sang dung DD (se mat mot luc)..."
+        echo "Fallocate failed. Fallback to DD..."
         dd if=/dev/zero of="$SWAP_FILE" bs=1M count=$((SWAP_SIZE_GB * 1024)) status=progress
     fi
 
-    # 3. Phân quyền bảo mật (600 - Chỉ root đọc ghi)
     chmod 600 "$SWAP_FILE"
-
-    # 4. Kích hoạt Swap
     mkswap "$SWAP_FILE"
     swapon "$SWAP_FILE"
 
-    # 5. Backup & Cập nhật fstab (An toàn)
-    echo "Dang cau hinh fstab..."
-    # Backup fstab trước khi ghi
+    # Fstab Safe Update
     cp /etc/fstab /etc/fstab.bak."$(date +%F_%H%M)"
-    
-    # Kiểm tra kỹ trước khi append để tránh duplicate
     if ! grep -q "$SWAP_FILE" /etc/fstab; then
-        echo "$SWAP_FILE none swap sw 0 0" | tee -a /etc/fstab
-        echo "Da cap nhat fstab."
+        echo "$SWAP_FILE none swap sw 0 0" >> /etc/fstab
     fi
-
-    echo -e "${GREEN}Da tao Swap ${SWAP_SIZE_GB}GB thanh cong!${NC}"
+    
+    echo -e "${GREEN}Da tao Swap moi thanh cong!${NC}"
 fi
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
-# D. TỐI ƯU SWAPPINESS (TUNING - UBUNTU STANDARD)
-# Thay vì sửa trực tiếp sysctl.conf, ta tạo file config riêng trong /etc/sysctl.d/
-# Cách này chuẩn hơn, dễ quản lý và không bị ghi đè khi update OS.
-
-echo -e "${GREEN}>>> Dang toi uu thong so Swappiness (High Performance)...${NC}"
-
+# --- TUNING ---
+echo -e "${GREEN}>>> [SWAP] Toi uu sysctl...${NC}"
 SYSCTL_D_FILE="/etc/sysctl.d/99-wpsila-swap.conf"
-SWAPPINESS=20
-VFS_CACHE_PRESSURE=50
 
-# 1. Tạo file cấu hình riêng biệt
+# Swappiness=10: Tot cho VPS chay Web Server (MariaDB thich RAM that hon)
+# VFS Cache=50: Can bang giua viec cache file va giai phong RAM
 cat > "$SYSCTL_D_FILE" <<EOF
-# --- WPSILA SWAP TUNING ---
-# Giam su dung Swap, uu tien RAM toc do cao
-vm.swappiness=$SWAPPINESS
-# Giu cache file system lau hon (Tot cho WordPress nhieu file nho)
-vm.vfs_cache_pressure=$VFS_CACHE_PRESSURE
+vm.swappiness=10
+vm.vfs_cache_pressure=50
 EOF
 
-# 2. Áp dụng cấu hình ngay lập tức từ file vừa tạo
-sysctl -p "$SYSCTL_D_FILE"
+sysctl -p "$SYSCTL_D_FILE" > /dev/null
 
-echo -e "${GREEN}Da toi uu: Swappiness = $SWAPPINESS | Cache Pressure = $VFS_CACHE_PRESSURE${NC}"
-echo "Cau hinh luu tai (chuan Ubuntu): $SYSCTL_D_FILE"
-echo "-------------------------------------------------------------"
+echo -e "${GREEN}DONE. Trang thai hien tai:${NC}"
+free -h
 # -------------------------------------------------------------------------------------------------------------------------------
