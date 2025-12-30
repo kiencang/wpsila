@@ -110,7 +110,10 @@ while true; do
             if [[ -f "$BASE_DIR/tune_pool.sh" ]]; then bash "$BASE_DIR/tune_pool.sh"; fi
 
             echo -e "${GREEN}>> Dang kiem tra va tao Swap...${NC}"
-            if [[ -f "$BASE_DIR/setup_swap.sh" ]]; then bash "$BASE_DIR/setup_swap.sh"; fi			
+            if [[ -f "$BASE_DIR/setup_swap.sh" ]]; then bash "$BASE_DIR/setup_swap.sh"; fi
+
+            echo -e "${GREEN}>> Dang cai dat Fail2Ban Security...${NC}"
+            if [[ -f "$BASE_DIR/setup_fail2ban.sh" ]]; then bash "$BASE_DIR/setup_fail2ban.sh"; fi		
             
             pause_screen 
             ;;
