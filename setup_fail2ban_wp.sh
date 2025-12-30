@@ -57,9 +57,8 @@ FILTER_FILE="/etc/fail2ban/filter.d/caddy-wp-login.conf"
 
 cat > "$FILTER_FILE" <<EOF
 [Definition]
-# Regex bat JSON log cua Caddy v2
-failregex = ^.*"remote_ip":"<HOST>",.*"method":"POST",.*"uri":"/wp-login.php".*$
-            ^.*"method":"POST",.*"uri":"/wp-login.php",.*"remote_ip":"<HOST>".*$
+# Regex khop chinh xac voi log Caddy cua ban (IP -> POST -> URI)
+failregex = ^.*"remote_ip":"<HOST>".*"method":"POST".*"uri":"/wp-login\.php"
 ignoreregex =
 EOF
 # -------------------------------------------------------------------------------------------------------------------------------
