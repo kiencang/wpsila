@@ -112,7 +112,7 @@ fi
 
 # -------------------------------------------------------------------------------------------------------------------------------
 # --- TUNING ---
-echo -e "${GREEN}>>> [SWAP] Toi uu sysctl...${NC}"
+echo -e "${GREEN}>>> [SWAP] Toi uu sysctl (swappiness & vfs_cache_pressure). ${NC}"
 SYSCTL_D_FILE="/etc/sysctl.d/99-wpsila-swap.conf"
 
 # Swappiness=10: Tot cho VPS chay Web Server (MariaDB thich RAM that hon)
@@ -126,4 +126,5 @@ sysctl -p "$SYSCTL_D_FILE" > /dev/null
 
 echo -e "${GREEN}DONE. Trang thai hien tai:${NC}"
 free -h
+echo "-------------------------------------------------------------"
 # -------------------------------------------------------------------------------------------------------------------------------
