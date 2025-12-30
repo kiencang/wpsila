@@ -127,6 +127,11 @@ echo -e "${GREEN}>>> [CORE] Khoi dong Fail2Ban...${NC}"
 systemctl unmask fail2ban > /dev/null 2>&1 || true
 
 if systemctl restart fail2ban; then
+    # --- THÊM DÒNG NÀY ---
+    echo "Dang cho Fail2Ban khoi tao (sleep 10s)..."
+    sleep 10
+    # ---------------------
+    
     echo -e "${GREEN}SUCCESS: Fail2Ban Core (SSH) da hoat dong!${NC}"
     echo "--------------------------------------------------------"
     echo "Trang thai SSH Jail:"
