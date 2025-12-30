@@ -251,7 +251,7 @@ download_file "$REPO_URL/check_for_update.sh" "$INSTALL_DIR/check_for_update.sh"
 # -------------------------
 # File Fail2Ban
 download_file "$REPO_URL/setup_fail2ban_core.sh" "$INSTALL_DIR/setup_fail2ban_core.sh"
-download_file "$REPO_URL/setup_fail2ban_wp.sh" "$INSTALL_DIR/setup_fail2ban_wp.sh"
+#Chỉ dùng cho SSH
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
