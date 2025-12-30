@@ -38,6 +38,8 @@ FILE_LIST=(
     "tune_mariadb.sh"
     "tune_php.sh"
     "tune_pool.sh"
+    "setup_swap.sh"
+    "setup_fail2ban_core.sh"	
     "remove_web.sh"
     "setup_sftp.sh"
     "setup_adminer.sh"
