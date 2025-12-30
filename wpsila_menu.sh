@@ -82,6 +82,8 @@ show_menu() {
     echo -e "${BLUE}-----------------------------------------------------------${NC}"
     echo -e " ${YELLOW}11.${NC} >> Kiem tra cap nhat (update) wpsila"
     echo -e "${BLUE}-----------------------------------------------------------${NC}"
+    echo -e " ${YELLOW}12.${NC} >> Bat Fail2Ban cho WordPress"
+    echo -e "${BLUE}-----------------------------------------------------------${NC}"	
     echo -e "  ${YELLOW}0.${NC} >> Exit (Thoat)"
     echo -e "${BLUE}===========================================================${NC}"
     echo -n "Nhap lua chon (0-11): "
@@ -112,8 +114,8 @@ while true; do
             echo -e "${GREEN}>> Dang kiem tra va tao Swap...${NC}"
             if [[ -f "$BASE_DIR/setup_swap.sh" ]]; then bash "$BASE_DIR/setup_swap.sh"; fi
 
-            echo -e "${GREEN}>> Dang cai dat Fail2Ban Security...${NC}"
-            if [[ -f "$BASE_DIR/setup_fail2ban.sh" ]]; then bash "$BASE_DIR/setup_fail2ban.sh"; fi		
+            echo -e "${GREEN}>> Dang cai dat Fail2Ban Security Core...${NC}"
+            if [[ -f "$BASE_DIR/setup_fail2ban_core.sh" ]]; then bash "$BASE_DIR/setup_fail2ban_core.sh"; fi		
             
             pause_screen 
             ;;
@@ -135,6 +137,8 @@ while true; do
         10) run_script "show_pass.sh" "adminerp.txt" ;;
         
         11) run_script "check_for_update.sh" ;;
+		
+		12) run_script "setup_fail2ban_wp.sh" ;;		
         
         0) echo -e "${GREEN}Tam biet!${NC}"; exit 0 ;;
         
