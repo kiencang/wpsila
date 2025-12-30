@@ -81,8 +81,6 @@ show_menu() {
     echo -e " 10. >> Xem pass Adminer"
     echo -e "${BLUE}-----------------------------------------------------------${NC}"
     echo -e " ${YELLOW}11.${NC} >> Kiem tra cap nhat (update) wpsila"
-    echo -e "${BLUE}-----------------------------------------------------------${NC}"
-    echo -e " ${YELLOW}12.${NC} >> Bat Fail2Ban cho WordPress"
     echo -e "${BLUE}-----------------------------------------------------------${NC}"	
     echo -e "  ${YELLOW}0.${NC} >> Exit (Thoat)"
     echo -e "${BLUE}===========================================================${NC}"
@@ -136,9 +134,7 @@ while true; do
         
         10) run_script "show_pass.sh" "adminerp.txt" ;;
         
-        11) run_script "check_for_update.sh" ;;
-		
-		12) run_script "setup_fail2ban_wp.sh" ;;		
+        11) run_script "check_for_update.sh" ;;	
         
         0) echo -e "${GREEN}Tam biet!${NC}"; exit 0 ;;
         
