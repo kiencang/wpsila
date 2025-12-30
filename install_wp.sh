@@ -257,6 +257,30 @@ fi
 # +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
+# [NEW] Kích hoạt Fail2Ban Jail nếu nó đang bị tắt
+F2B_WP_CONF="/etc/fail2ban/jail.d/99-wordpress-caddy.conf"
+
+# Chỉ chạy nếu file config tồn tại (tức là đã cài Fail2Ban)
+if [[ -f "$F2B_WP_CONF" ]]; then
+    echo "Dang cap nhat trang thai Fail2Ban..."
+    
+    if grep -q "enabled = false" "$F2B_WP_CONF"; then
+        echo "-> Phat hien Jail WordPress dang tat. Dang kich hoat..."
+        sed -i 's/enabled = false/enabled = true/' "$F2B_WP_CONF"
+        # Restart để áp dụng config mới (thêm || true để không crash script nếu lỗi)
+        systemctl restart fail2ban || true
+        echo "-> Da bat bao ve Fail2Ban."
+    else
+        # Nếu đang bật thì reload để nhận file log mới
+        # Dùng reload an toàn hơn restart (không làm gián đoạn các jail khác)
+        systemctl reload fail2ban || true
+    fi
+fi
+# -------------------------------------------------------------------------------------------------------------------------------
+
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
 echo "Hoan tat! Xin chuc mung ban da cai thanh cong WordPress trên Caddy Web Server."
 echo "Nhap muc <4> de xem thong tin pass cua trang WordPress ban vua tao."
 # -------------------------------------------------------------------------------------------------------------------------------
