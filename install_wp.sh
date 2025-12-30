@@ -257,23 +257,37 @@ fi
 # +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
-# [NEW] Kích hoạt Fail2Ban Jail nếu nó đang bị tắt
+# [SMART] CẬP NHẬT FAIL2BAN
+# Logic: Chỉ bật Jail WP nếu nó tắt do "thiếu log". 
+# Nếu nó tắt do "Cloudflare Mode", tuyệt đối không bật lại.
+# -------------------------------------------------------------------------------------------------------------------------------
 F2B_WP_CONF="/etc/fail2ban/jail.d/99-wordpress-caddy.conf"
 
-# Chỉ chạy nếu file config tồn tại (tức là đã cài Fail2Ban)
 if [[ -f "$F2B_WP_CONF" ]]; then
-    echo "Dang cap nhat trang thai Fail2Ban..."
+    echo "Dang kiem tra Fail2Ban..."
     
+    # Kiểm tra xem có đang dùng chế độ Cloudflare không (dựa vào comment trong file config ở bước trước)
+    # Hoặc đơn giản là kiểm tra xem Jail có đang tắt không
     if grep -q "enabled = false" "$F2B_WP_CONF"; then
-        echo "-> Phat hien Jail WordPress dang tat. Dang kich hoat..."
-        sed -i 's/enabled = false/enabled = true/' "$F2B_WP_CONF"
-        # Restart để áp dụng config mới (thêm || true để không crash script nếu lỗi)
-        systemctl restart fail2ban || true
-        echo "-> Da bat bao ve Fail2Ban."
+        
+        # KEY LOGIC: Kiểm tra lý do tắt.
+        # Nếu file config chứa từ khóa "Cloudflare Mode", ta sẽ KHÔNG bật nó.
+        if grep -q "Cloudflare Mode" "$F2B_WP_CONF"; then
+            echo -e "${YELLOW}-> Fail2Ban WP Jail dang TAT do che do Cloudflare. Giu nguyen trang thai.${NC}"
+        else
+            echo "-> Phat hien Jail WP dang tat (do chua co log). Dang kich hoat..."
+            sed -i 's/enabled = false/enabled = true/' "$F2B_WP_CONF"
+            
+            # Cập nhật lý do trạng thái trong file (để đẹp file config)
+            sed -i 's/Disabled (No log files found yet)/Enabled (Log found)/' "$F2B_WP_CONF"
+            
+            systemctl restart fail2ban || echo -e "${YELLOW}Canh bao: Restart Fail2Ban that bai. Hay kiem tra thu cong.${NC}"
+            echo -e "${GREEN}-> Da bat bao ve WordPress.${NC}"
+        fi
     else
-        # Nếu đang bật thì reload để nhận file log mới
-        # Dùng reload an toàn hơn restart (không làm gián đoạn các jail khác)
+        # Nếu đang bật sẵn rồi thì reload để Fail2Ban nhận diện file log mới
         systemctl reload fail2ban || true
+        echo "-> Fail2Ban da duoc Reload."
     fi
 fi
 # -------------------------------------------------------------------------------------------------------------------------------
