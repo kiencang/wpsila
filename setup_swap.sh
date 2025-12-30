@@ -82,22 +82,22 @@ else
 
     # 2. Tạo file Swap
     # Ưu tiên fallocate, fallback sang dd
-    if ! fallocate -l "${SWAP_SIZE_GB}G" $SWAP_FILE; then
+    if ! fallocate -l "${SWAP_SIZE_GB}G" "$SWAP_FILE"; then
         echo "Fallocate that bai, chuyen sang dung DD (se mat mot luc)..."
-        dd if=/dev/zero of=$SWAP_FILE bs=1M count=$((SWAP_SIZE_GB * 1024)) status=progress
+        dd if=/dev/zero of="$SWAP_FILE" bs=1M count=$((SWAP_SIZE_GB * 1024)) status=progress
     fi
 
     # 3. Phân quyền bảo mật (600 - Chỉ root đọc ghi)
-    chmod 600 $SWAP_FILE
+    chmod 600 "$SWAP_FILE"
 
     # 4. Kích hoạt Swap
-    mkswap $SWAP_FILE
-    swapon $SWAP_FILE
+    mkswap "$SWAP_FILE"
+    swapon "$SWAP_FILE"
 
     # 5. Backup & Cập nhật fstab (An toàn)
     echo "Dang cau hinh fstab..."
     # Backup fstab trước khi ghi
-    cp /etc/fstab /etc/fstab.bak.$(date +%F_%H%M)
+    cp /etc/fstab /etc/fstab.bak."$(date +%F_%H%M)"
     
     # Kiểm tra kỹ trước khi append để tránh duplicate
     if ! grep -q "$SWAP_FILE" /etc/fstab; then
@@ -123,7 +123,7 @@ SWAPPINESS=20
 VFS_CACHE_PRESSURE=50
 
 # 1. Tạo file cấu hình riêng biệt
-cat > $SYSCTL_D_FILE <<EOF
+cat > "$SYSCTL_D_FILE" <<EOF
 # --- WPSILA SWAP TUNING ---
 # Giam su dung Swap, uu tien RAM toc do cao
 vm.swappiness=$SWAPPINESS
@@ -132,9 +132,9 @@ vm.vfs_cache_pressure=$VFS_CACHE_PRESSURE
 EOF
 
 # 2. Áp dụng cấu hình ngay lập tức từ file vừa tạo
-sysctl -p $SYSCTL_D_FILE
+sysctl -p "$SYSCTL_D_FILE"
 
 echo -e "${GREEN}Da toi uu: Swappiness = $SWAPPINESS | Cache Pressure = $VFS_CACHE_PRESSURE${NC}"
-echo -e "${GREEN}Cau hinh luu tai: $SYSCTL_D_FILE (Chuan Ubuntu)${NC}"
+echo "Cau hinh luu tai (chuan Ubuntu): $SYSCTL_D_FILE"
 echo "-------------------------------------------------------------"
 # -------------------------------------------------------------------------------------------------------------------------------
