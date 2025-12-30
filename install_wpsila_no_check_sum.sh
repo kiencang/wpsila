@@ -222,6 +222,7 @@ download_file "$REPO_URL/caddyfile_subdomain.sh" "$INSTALL_DIR/caddyfile_subdoma
 download_file "$REPO_URL/tune_mariadb.sh" "$INSTALL_DIR/tune_mariadb.sh"
 download_file "$REPO_URL/tune_php.sh" "$INSTALL_DIR/tune_php.sh"
 download_file "$REPO_URL/tune_pool.sh" "$INSTALL_DIR/tune_pool.sh"
+download_file "$REPO_URL/setup_swap.sh" "$INSTALL_DIR/setup_swap.sh"
 # -------------------------
 
 # -------------------------
