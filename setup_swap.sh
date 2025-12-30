@@ -136,5 +136,5 @@ sysctl -p $SYSCTL_D_FILE
 
 echo -e "${GREEN}Da toi uu: Swappiness = $SWAPPINESS | Cache Pressure = $VFS_CACHE_PRESSURE${NC}"
 echo -e "${GREEN}Cau hinh luu tai: $SYSCTL_D_FILE (Chuan Ubuntu)${NC}"
-echo "--------------------------------------------------------"
+echo "-------------------------------------------------------------"
 # -------------------------------------------------------------------------------------------------------------------------------
