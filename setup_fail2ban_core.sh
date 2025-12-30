@@ -110,8 +110,8 @@ echo -e "   - SSH Port detected: ${YELLOW}${SSH_PORT}${NC}"
 cat > /etc/fail2ban/jail.d/99-ssh-wpsila.conf <<EOF
 [sshd]
 enabled = true
-port    = $SSH_PORT
-mode    = aggressive
+port = $SSH_PORT
+mode = aggressive
 EOF
 # mode = aggressive giup bat duoc nhieu dang tan cong SSH hon (DDOS, Auth fail...)
 # -------------------------------------------------------------------------------------------------------------------------------
