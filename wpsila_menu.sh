@@ -62,7 +62,7 @@ run_script() {
 show_menu() {
     clear
     echo -e "${BLUE}===========================================================${NC}"
-    echo -e "${GREEN}                   WPSILA WORDPRESS BLOG                  ${NC}"
+    echo -e "${GREEN}                  WPSILA WORDPRESS BLOG                  ${NC}"
     echo -e "${BLUE}===========================================================${NC}"
     echo -e "  ${YELLOW}1.${NC} <Cai dat Caddy Web Server (mot lan la du)>"
     echo -e "  ${YELLOW}2.${NC} <Toi uu he thong (mot lan la du)>"
@@ -108,6 +108,9 @@ while true; do
             
             echo -e "${GREEN}>> Dang chay toi uu PHP Pool...${NC}"
             if [[ -f "$BASE_DIR/tune_pool.sh" ]]; then bash "$BASE_DIR/tune_pool.sh"; fi
+
+            echo -e "${GREEN}>> Dang kiem tra va tao Swap...${NC}"
+            if [[ -f "$BASE_DIR/setup_swap.sh" ]]; then bash "$BASE_DIR/setup_swap.sh"; fi			
             
             pause_screen 
             ;;
