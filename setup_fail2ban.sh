@@ -140,7 +140,7 @@ ignoreip = $IGNORE_IPS
 EOF
 
 if [[ "$WP_JAIL_ENABLED" == "false" ]]; then
-    echo -e "${RED}Luu y: Sau khi ban tao website, hay sua 'enabled = true' trong $JAIL_WP_FILE va restart Fail2Ban.${NC}"
+    echo -e "${GREEN}Sau khi ban tao website, $JAIL_WP_FILE se tu enabled va restart Fail2Ban.${NC}"
 fi
 # -------------------------------------------------------------------------------------------------------------------------------
 
@@ -165,7 +165,7 @@ if systemctl restart fail2ban; then
         exit 1
     fi
 else
-    echo -e "${RED}Restart Failed. Config check:${NC}"
+    echo -e "${RED}Restart Loi. Kiem tra Config:${NC}"
     fail2ban-client -d # Chạy debug để xem lỗi cú pháp
     exit 1
 fi
