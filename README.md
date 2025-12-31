@@ -22,6 +22,10 @@ Do vậy tiện để tải về kiểm tra. Phiên bản chính thức thì kh�
 ## Cập nhật dự kiến
 - Cập nhật danh sách IP của Cloudflare một cách tự động
 
+Dải IP của Cloudflare được lưu trữ ở đây: https://www.cloudflare.com/ips/
+
+Nó dường như ít thay đổi, hơn 2 năm qua dải IP đó vẫn giữ nguyên.
+
 ## Chức năng của các file trong chương trình
 
 Dùng branch main để đối chiếu với thông tin bên dưới, quan trọng cho dev để dễ nhận diện các chức năng file trong chương trình.
