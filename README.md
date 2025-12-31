@@ -19,6 +19,9 @@ File install_wpsila_no_check_sum.sh dùng để test kiểm tra mã trước khi
 
 Do vậy tiện để tải về kiểm tra. Phiên bản chính thức thì không được phép dùng file này.
 
+## Cập nhật dự kiến
+- Cập nhật danh sách IP của Cloudflare một cách tự động
+
 ## Chức năng của các file trong chương trình
 
 Dùng branch main để đối chiếu với thông tin bên dưới, quan trọng cho dev để dễ nhận diện các chức năng file trong chương trình.
