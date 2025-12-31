@@ -66,3 +66,9 @@ i. File để hiển thị mật khẩu
 
 j. Kiểm tra cập nhật cho wpsila
 - check_for_update.sh
+
+k. Cấu hình swap (tăng RAM cho web)
+- setup_swap.sh
+
+l. Tăng cường bảo mật
+- setup_fail2ban_core.sh
