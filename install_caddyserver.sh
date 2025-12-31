@@ -126,6 +126,7 @@ fi
 # B3. Tạo Caddyfile gốc mới (Master Config)
 # File này chỉ làm nhiệm vụ import các file con
 # Lấy email của người cài để dùng lấy chứng chỉ https
+# Dựa trên https://www.cloudflare.com/ips-v4 & https://www.cloudflare.com/ips-v6 để lấy nguồn IP proxy
 cat > /etc/caddy/Caddyfile <<EOF
 {
     # Global Options
