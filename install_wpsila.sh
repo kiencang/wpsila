@@ -4,7 +4,7 @@
 set -euo pipefail
 
 # Phiên bản hiện tại của wpsila
-SILA_VERSION="v1.0.7"
+SILA_VERSION="v1.1.0"
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
@@ -19,7 +19,7 @@ SILA_VERSION="v1.0.7"
 # -------------------------------------------------------------------------
 # curl -sL https://vps.wpsila.com | sudo bash
 # -------------------------------------------------------------------------
-# Version 1.0.7 - 30/12/2025
+# Version 1.1.0 - 31/12/2025
 # -------------------------------------------------------------------------
 # Test trước khi đẩy lên link chính
 # curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/install_wpsila.sh | sudo bash
@@ -239,14 +239,14 @@ rm -f "$INSTALL_DIR/"*.sh
 # Dev bắt buộc phải dùng trước khi công bố phiên bản mới
 # Có tác dụng ngăn chặn các vấn đề liên quan đến lỗi đường truyền
 # ----------------------------------------------------------------------------
-# Generated at: Tue Dec 30 05:52:45 +07 2025
-# Version: v1.0.7
+# Generated at: Wed Dec 31 14:55:01 +07 2025
+# Version: v1.1.0
 declare -A CHECKSUMS=(
     ["wpsila.conf"]="662450e1a59c15843872c40e872a686e29adbc4371c259c13cc7ad54c0aaae27"
-    ["wpsila_menu.sh"]="015d72aade1e588ace99246a70e72e9bfa76d53c6e26d72629e27d2d9bfe5787"
+    ["wpsila_menu.sh"]="a8f7f06e0cbeacb7afbee1d602fbf6d8c762495f9a68e04c4a48456841189669"
     ["install_lcmp.sh"]="a5bf28499cef47ef0999e768f234bdfe9aef2ad05111158312ee23be981419ff"
     ["anti_apt_lock.sh"]="4b90f4620011a96117954fdd12e50a751e647101b3d804c24969107cb9b8e5e9"
-    ["install_caddyserver.sh"]="a9333ff7768deafc99e5a43c4bc8d6b2f22cbfa0fccb3799d412b1c60e6f9d63"
+    ["install_caddyserver.sh"]="c332071539a6cd085c5539a57d49d8260354d1239abfc5833a6ec6647ac78e41"
     ["install_php.sh"]="53b33e9609968fb8ca39a8dc5aafe08c7df8260be126e74e523f1fb2472fdc7a"
     ["install_mariadb.sh"]="d3abc7ac72c97a10054f4534eac0fcc2001375c395b8a5f755a9bcded8e64123"
     ["install_wp.sh"]="ff70421e91a332f98a9b1108b7cd8c930e6f9056e4565d5de6df48d2933623d5"
@@ -258,11 +258,13 @@ declare -A CHECKSUMS=(
     ["tune_mariadb.sh"]="a76ca6118bfbad12a86e2b049ca691efbc795b8cda964d85b2228825ee6ccb3b"
     ["tune_php.sh"]="97ccd09ec9f6bc45c9dcc24bae1dddfb9bdcc6e08ef422c728b70e376a292fb3"
     ["tune_pool.sh"]="0c3946db1e55a14da878a9f771aedd6864791c54c5839ecb7c71a4371131810b"
+    ["setup_swap.sh"]="bcfa315ec6dffdb0c9c5573d2fe66338a8dac68e0ef6bf35cc3fa2e70e964780"
+    ["setup_fail2ban_core.sh"]="d0176ff97fec2143628be358bf00c00036983a1e221ed422580212ae50297984"
     ["remove_web.sh"]="9d455ee42eab6bee63b481d228264fc7d3ef52ad915b1993ddf8dc9c4fb76963"
     ["setup_sftp.sh"]="c810290a609c56cabe7ecc9937605a3cebf972205347a78b06b80a5f7b79d2c7"
     ["setup_adminer.sh"]="fa01d68aea03acd1801f1bf006b296cc75f011f1a00122091a0346d5fbad8c2a"
     ["show_pass.sh"]="1cef0cde8bb5b444ba55b0be9cf676c4bd246f20221ad041d8f5c4aa5785e2e3"
-    ["check_for_update.sh"]="692868ef88d83a2a3bf06df151ba6cbaaa09f1cc017b85a1dd27680e7cd4e2c2"
+    ["check_for_update.sh"]="b87efedddc14fa8e49aebc199879882003954ab593f197eb7c420bef0ed3517f"
 )
 # -------------------------------------------------------------------------------------------------------------------------------
 
