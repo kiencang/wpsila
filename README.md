@@ -43,3 +43,6 @@ Tác giả không chịu trách nhiệm cho bất kỳ thiệt hại nào liên 
 - Các vấn đề bảo mật phát sinh.
 
 Tuyên bố miễn trừ trách nhiệm đầy đủ được tôi công bố tại đây: https://wpsila.com/disclaimer
+
+---
+*Cảm ơn bạn đã sử dụng giải pháp từ wpsila! Nếu thấy hữu ích, hãy giới thiệu cho bạn bè cùng sử dụng.*
