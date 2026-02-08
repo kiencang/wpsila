@@ -81,10 +81,12 @@ show_menu() {
     echo -e " 10. >> Xem pass Adminer"
     echo -e "${BLUE}-----------------------------------------------------------${NC}"
     echo -e " ${YELLOW}11.${NC} >> Kiem tra cap nhat (update) wpsila"
-    echo -e "${BLUE}-----------------------------------------------------------${NC}"	
+    echo -e "${BLUE}-----------------------------------------------------------${NC}"    
+    echo -e " ${YELLOW}12.${NC} >> Khoa/Mo khoa wp-config.php (Cho phep plugin hoac sFTP sua)"
+    echo -e "${BLUE}-----------------------------------------------------------${NC}"    
     echo -e "  ${YELLOW}0.${NC} >> Exit (Thoat)"
     echo -e "${BLUE}===========================================================${NC}"
-    echo -n "Nhap lua chon (0-11): "
+    echo -n "Nhap lua chon (0-12): "
 }
 
 # -------------------------------------------------------------------------------------------------------------------------------
@@ -134,7 +136,48 @@ while true; do
         
         10) run_script "show_pass.sh" "adminerp.txt" ;;
         
-        11) run_script "check_for_update.sh" ;;	
+        11) run_script "check_for_update.sh" ;;
+		
+		12)
+            echo -e "${GREEN}=== QUAN LY QUYEN GHI FILE WP-CONFIG.PHP ===${NC}"
+            read -r -p "Nhap ten mien (VD: example.com, blog.example.com): " INPUT_DOMAIN
+            
+            # Chuan hoa ten mien (xoa khoang trang, chu thuong)
+			TEMP_DOMAIN=$(echo "$INPUT_DOMAIN" | tr '[:upper:]' '[:lower:]' | tr -d ' ')
+			DOMAIN=$(echo "$TEMP_DOMAIN" | sed -E 's|^https?://||' | sed -E 's|/.*$||' | sed -E 's|:[0-9]+$||')
+            CONFIG_FILE="/var/www/$DOMAIN/public_html/wp-config.php"
+
+            if [[ -f "$CONFIG_FILE" ]]; then
+                echo -e "Trang thai hien tai: $(stat -c '%a' "$CONFIG_FILE") (640=Khoa, 660=Mo)"
+                echo "------------------------------------------------"
+                echo "1. MO KHOA (Chmod 660)"
+                echo "   => Cho phep plugin ghi file wp-config.php, cho phep sua qua sFTP."
+                echo "2. KHOA LAI (Chmod 640) - KHUYEN DUNG"
+                echo "   => Bao mat tuyet doi. Plugin va sFTP chi duoc doc (khong duoc ghi) wp-config.php."
+                echo "------------------------------------------------"
+                read -r -p "Chon thao tac (1/2): " ACTION
+
+                if [[ "$ACTION" == "1" ]]; then
+                    # Cap quyen 660: Owner(root) RW, Group(www-data) RW
+                    chmod 660 "$CONFIG_FILE"
+                    echo -e "${RED}>> DA MO KHOA (UNLOCKED)!${NC}"
+                    echo "Bay gio ban co the sua file wp-config.php qua sFTP hoac cho phep plugin sua wp-config.php."
+                    echo "NHO KHOA LAI wp-config.php SAU KHI XONG VIEC!"
+                elif [[ "$ACTION" == "2" ]]; then
+                    # Cap quyen 640: Owner(root) RW, Group(www-data) R
+                    chmod 640 "$CONFIG_FILE"
+                    echo -e "${GREEN}>> DA KHOA LAI (LOCKED)!${NC}"
+                    echo "File wp-config.php da duoc bao ve an toan."
+                else
+                    echo -e "${YELLOW}Huy thao tac.${NC}"
+                fi
+            else
+                echo -e "${RED}Loi: Khong tim thay file wp-config.php tai:${NC}"
+                echo "$CONFIG_FILE"
+                echo "Vui long kiem tra lai ten mien."
+            fi
+            pause_screen
+            ;;	
         
         0) echo -e "${GREEN}Tam biet!${NC}"; exit 0 ;;
         

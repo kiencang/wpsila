@@ -153,8 +153,10 @@ WP_CONFIG="$WP_ROOT/wp-config.php"
 wp config set FS_METHOD direct --type=constant --allow-root --path="$WP_ROOT"
 
 # Phân quyền để quản lý chặt file wp-config
+# Giới hạn quyền của plugin chỉ đọc wp-config.php thay vì cho sửa
+# Muốn sửa cần phải điều chỉnh qua giao diện điều khiển (lựa chọn số 12)
 if [[ -f "$WP_CONFIG" ]]; then
-    chmod 660 "$WP_CONFIG"
+    chmod 640 "$WP_CONFIG"
 fi
 
 # Đảm bảo Caddy có thể "đi xuyên qua" thư mục /var/www để đọc file
@@ -167,8 +169,8 @@ systemctl reload "php${PHP_VER}-fpm"
 echo -e "${GREEN}=============================================${NC}"
 echo -e "${GREEN}   Cai Dat Ma Nguon WordPress Hoan Tat!   ${NC}"
 echo -e "${GREEN}=============================================${NC}"
-echo -e "Domain:        ${YELLOW}$DOMAIN${NC}"
-echo -e "Web Root:      ${YELLOW}$WP_ROOT${NC}"
+echo -e "Domain:	${YELLOW}$DOMAIN${NC}"
+echo -e "Web Root:	${YELLOW}$WP_ROOT${NC}"
 echo -e "Logs Directory: ${YELLOW}/var/www/$DOMAIN/logs${NC}"
 echo -e "${GREEN}>>> Buoc tiep theo: Cau hinh Caddyfile.${NC}"
 sleep 2
