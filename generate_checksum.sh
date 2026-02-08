@@ -14,6 +14,7 @@ VERSION="v1.1.2"
 # Đoạn mã này dành cho dev, không phải người dùng cuối.
 # Mỗi bản cập nhật bắt buộc phải làm để đảm bảo mã nguồn tải được.
 # Có thể chạy mã này trong WSL trên Windows.
+# Chạy lệnh bash ./checksum.sh hoặc bash ./generate_checksum.sh, tùy vào cách đặt tên file
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # --- Cấu hình ---
