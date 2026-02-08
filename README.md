@@ -76,3 +76,10 @@ k. Cấu hình swap (tăng RAM cho web)
 
 l. Tăng cường bảo mật
 - setup_fail2ban_core.sh
+
+---
+## Các file không có trong phần cài đặt chính
+- install_wpsila.sh: Nó được đẩy lên VPS làm file để tải toàn bộ script về.
+- generate_checksum.sh: Dùng để tạo checksum cho các file.
+- install_wpsila_no_check_sum.sh: Dùng để test bash script trước khi triển khai chính thức (nó không tải wpsila.conf về).
+- verify_wpsila.sh: Đang phát triển thêm, dùng để test nhanh trạng thái VPS sau khi cài.
