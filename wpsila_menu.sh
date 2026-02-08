@@ -61,31 +61,31 @@ run_script() {
 # Hiển thị Menu
 show_menu() {
     clear
-    echo -e "${BLUE}===========================================================${NC}"
-    echo -e "${GREEN}                  WPSILA WORDPRESS BLOG                  ${NC}"
-    echo -e "${BLUE}===========================================================${NC}"
+    echo -e "${BLUE}===============================================================${NC}"
+    echo -e "${GREEN}                   WPSILA WORDPRESS BLOG                   ${NC}"
+    echo -e "${BLUE}===============================================================${NC}"
     echo -e "  ${YELLOW}1.${NC} <Cai dat Caddy Web Server (mot lan la du)>"
     echo -e "  ${YELLOW}2.${NC} <Toi uu he thong (mot lan la du)>"
-    echo -e "${BLUE}-----------------------------------------------------------${NC}"
+    echo -e "${BLUE}---------------------------------------------------------------${NC}"
     echo -e "  ${YELLOW}3.${NC} >> Cai dat Website WordPress moi"
     echo -e "  4. >> Xem pass WordPress vua tao"
-    echo -e "${BLUE}-----------------------------------------------------------${NC}"
+    echo -e "${BLUE}---------------------------------------------------------------${NC}"
     echo -e "  ${YELLOW}5.${NC} >> Them tai khoan sFTP"
     echo -e "  6. >> Xem pass sFTP"
-    echo -e "${BLUE}-----------------------------------------------------------${NC}"
+    echo -e "${BLUE}---------------------------------------------------------------${NC}"
     echo -e "  ${YELLOW}7.${NC} >> Cai dat Subdomain WordPress"
-    echo -e "${BLUE}-----------------------------------------------------------${NC}"
+    echo -e "${BLUE}---------------------------------------------------------------${NC}"
     echo -e "  ${YELLOW}8.${NC} >> Xoa (delete) Website WordPress"
-    echo -e "${BLUE}-----------------------------------------------------------${NC}"
+    echo -e "${BLUE}---------------------------------------------------------------${NC}"
     echo -e "  ${YELLOW}9.${NC} >> Cai dat Adminer (Quan ly Database)"
     echo -e " 10. >> Xem pass Adminer"
-    echo -e "${BLUE}-----------------------------------------------------------${NC}"
+    echo -e "${BLUE}---------------------------------------------------------------${NC}"
     echo -e " ${YELLOW}11.${NC} >> Kiem tra cap nhat (update) wpsila"
-    echo -e "${BLUE}-----------------------------------------------------------${NC}"    
-    echo -e " ${YELLOW}12.${NC} >> Khoa/Mo khoa wp-config.php (Cho phep plugin hoac sFTP sua)"
-    echo -e "${BLUE}-----------------------------------------------------------${NC}"    
+    echo -e "${BLUE}---------------------------------------------------------------${NC}"    
+    echo -e " ${YELLOW}12.${NC} >> Khoa/Mo khoa wp-config.php (De plugin, sFTP sua)"
+    echo -e "${BLUE}---------------------------------------------------------------${NC}"    
     echo -e "  ${YELLOW}0.${NC} >> Exit (Thoat)"
-    echo -e "${BLUE}===========================================================${NC}"
+    echo -e "${BLUE}===============================================================${NC}"
     echo -n "Nhap lua chon (0-12): "
 }
 
@@ -145,6 +145,13 @@ while true; do
             # Chuan hoa ten mien (xoa khoang trang, chu thuong)
 			TEMP_DOMAIN=$(echo "$INPUT_DOMAIN" | tr '[:upper:]' '[:lower:]' | tr -d ' ')
 			DOMAIN=$(echo "$TEMP_DOMAIN" | sed -E 's|^https?://||' | sed -E 's|/.*$||' | sed -E 's|:[0-9]+$||')
+			
+			if [[ -z "$DOMAIN" ]]; then
+                 echo -e "${RED}Loi: Ten mien khong duoc de trong!${NC}"
+                 pause_screen
+                 continue # Quay lai menu chinh thay vi thoat script
+			fi 
+			
             CONFIG_FILE="/var/www/$DOMAIN/public_html/wp-config.php"
 
             if [[ -f "$CONFIG_FILE" ]]; then
