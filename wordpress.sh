@@ -153,10 +153,10 @@ WP_CONFIG="$WP_ROOT/wp-config.php"
 wp config set FS_METHOD direct --type=constant --allow-root --path="$WP_ROOT"
 
 # Phân quyền để quản lý chặt file wp-config
-# Giới hạn quyền của plugin chỉ đọc wp-config.php thay vì cho sửa
-# Muốn sửa cần phải điều chỉnh qua giao diện điều khiển (lựa chọn số 12)
+# Mặc định cho phép plugin & sFTP chỉnh sửa wp-config.php
+# Để tăng bảo mật chuyển 660 -> 640, có thể thực hiện tùy chọn nâng cao này qua menu điều khiển
 if [[ -f "$WP_CONFIG" ]]; then
-    chmod 640 "$WP_CONFIG"
+    chmod 660 "$WP_CONFIG"
 fi
 
 # Đảm bảo Caddy có thể "đi xuyên qua" thư mục /var/www để đọc file
