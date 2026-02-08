@@ -4,7 +4,7 @@
 set -euo pipefail
 
 # Phiên bản hiện tại của wpsila
-SILA_VERSION="v1.1.2"
+SILA_VERSION="v1.1.3"
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
@@ -19,7 +19,7 @@ SILA_VERSION="v1.1.2"
 # -------------------------------------------------------------------------
 # curl -sL https://vps.wpsila.com | sudo bash
 # -------------------------------------------------------------------------
-# Version 1.1.2 - 08/02/2026
+# Version 1.1.3 - 09/02/2026
 # -------------------------------------------------------------------------
 # Test trước khi đẩy lên link chính
 # curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/install_wpsila.sh | sudo bash
@@ -238,12 +238,12 @@ rm -f "$INSTALL_DIR/"*.sh
 # Sử dụng mã generate_checksum bên branches Dev chạy để lấy mã này về
 # Dev bắt buộc phải dùng trước khi công bố phiên bản mới
 # Có tác dụng ngăn chặn các vấn đề liên quan đến lỗi đường truyền
-# ----------------------------------------------------------------------------
-# Generated at: Sun Feb  8 21:13:46 +07 2026
-# Version: v1.1.2
+# --------------------------------------------------------------------------------
+# Generated at: Mon Feb  9 00:52:15 +07 2026
+# Version: v1.1.3
 declare -A CHECKSUMS=(
     ["wpsila.conf"]="662450e1a59c15843872c40e872a686e29adbc4371c259c13cc7ad54c0aaae27"
-    ["wpsila_menu.sh"]="b0e3389828a35f956ceb86441a387f2dd42b976e80b28abfa319779fded75a3b"
+    ["wpsila_menu.sh"]="3eb56c2d5f791a51d7572de7ff4106c44e486a17e4f55107bae3424c8e049dc4"
     ["install_lcmp.sh"]="a5bf28499cef47ef0999e768f234bdfe9aef2ad05111158312ee23be981419ff"
     ["anti_apt_lock.sh"]="4b90f4620011a96117954fdd12e50a751e647101b3d804c24969107cb9b8e5e9"
     ["install_caddyserver.sh"]="84724a1186c738331d2978a297405185f537ed871d03c4334d19f72f51e27c20"
@@ -264,7 +264,7 @@ declare -A CHECKSUMS=(
     ["setup_sftp.sh"]="c810290a609c56cabe7ecc9937605a3cebf972205347a78b06b80a5f7b79d2c7"
     ["setup_adminer.sh"]="fa01d68aea03acd1801f1bf006b296cc75f011f1a00122091a0346d5fbad8c2a"
     ["show_pass.sh"]="1cef0cde8bb5b444ba55b0be9cf676c4bd246f20221ad041d8f5c4aa5785e2e3"
-    ["check_for_update.sh"]="8b2cbe56367de0139cb05a2a448da0dd5088a103f9c1f85f508fa225cac3b55d"
+    ["check_for_update.sh"]="8004e33700a08d8ff5079d00dd8d792730cc0e3fb8d6c17b4e513f6c57efca62"
 )
 # --------------------------------------------------------------------------------
 
