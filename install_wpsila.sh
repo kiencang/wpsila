@@ -4,7 +4,7 @@
 set -euo pipefail
 
 # Phiên bản hiện tại của wpsila
-SILA_VERSION="v1.1.1"
+SILA_VERSION="v1.1.2"
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
@@ -239,11 +239,11 @@ rm -f "$INSTALL_DIR/"*.sh
 # Dev bắt buộc phải dùng trước khi công bố phiên bản mới
 # Có tác dụng ngăn chặn các vấn đề liên quan đến lỗi đường truyền
 # ----------------------------------------------------------------------------
-# Generated at: Wed Dec 31 20:03:43 +07 2025
-# Version: v1.1.1
+# Generated at: Sun Feb  8 21:13:46 +07 2026
+# Version: v1.1.2
 declare -A CHECKSUMS=(
     ["wpsila.conf"]="662450e1a59c15843872c40e872a686e29adbc4371c259c13cc7ad54c0aaae27"
-    ["wpsila_menu.sh"]="a8f7f06e0cbeacb7afbee1d602fbf6d8c762495f9a68e04c4a48456841189669"
+    ["wpsila_menu.sh"]="b0e3389828a35f956ceb86441a387f2dd42b976e80b28abfa319779fded75a3b"
     ["install_lcmp.sh"]="a5bf28499cef47ef0999e768f234bdfe9aef2ad05111158312ee23be981419ff"
     ["anti_apt_lock.sh"]="4b90f4620011a96117954fdd12e50a751e647101b3d804c24969107cb9b8e5e9"
     ["install_caddyserver.sh"]="84724a1186c738331d2978a297405185f537ed871d03c4334d19f72f51e27c20"
@@ -252,7 +252,7 @@ declare -A CHECKSUMS=(
     ["install_wp.sh"]="ff70421e91a332f98a9b1108b7cd8c930e6f9056e4565d5de6df48d2933623d5"
     ["domain_check.sh"]="39c29fdf6c6710040c04161bbf4d5797b0f358a71a296ee4a9277f514d7d06ca"
     ["database_user_wp.sh"]="9f11dc3c7426dc8fb0adcef3cdea9f5a09bf71b0c0529ebf8efeac9d2f730972"
-    ["wordpress.sh"]="65d8c6fde5cd9fdaf906a62424595178c33e4b9476ede5223ec74be6039a6e37"
+    ["wordpress.sh"]="0c9839262ef09b376dd2b713f909ecd24d69a4aa121f114035c5eec1a473fa43"
     ["caddyfile.sh"]="1dc3c517126f4fabca597e3d934b4a83d48a816a64a92dab4f03d2302ba81d00"
     ["caddyfile_subdomain.sh"]="2e88d32e2a265732b5712ea9682fedb9be4df3ba744191f9578700483dfaee0b"
     ["tune_mariadb.sh"]="a76ca6118bfbad12a86e2b049ca691efbc795b8cda964d85b2228825ee6ccb3b"
@@ -264,9 +264,9 @@ declare -A CHECKSUMS=(
     ["setup_sftp.sh"]="c810290a609c56cabe7ecc9937605a3cebf972205347a78b06b80a5f7b79d2c7"
     ["setup_adminer.sh"]="fa01d68aea03acd1801f1bf006b296cc75f011f1a00122091a0346d5fbad8c2a"
     ["show_pass.sh"]="1cef0cde8bb5b444ba55b0be9cf676c4bd246f20221ad041d8f5c4aa5785e2e3"
-    ["check_for_update.sh"]="0ab28a213c545ee530114c6cde4b6044360ea7e601d240c91412ac6e6b0356d7"
+    ["check_for_update.sh"]="8b2cbe56367de0139cb05a2a448da0dd5088a103f9c1f85f508fa225cac3b55d"
 )
-# -------------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 # +++
 
