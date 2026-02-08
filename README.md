@@ -80,6 +80,6 @@ l. Tăng cường bảo mật
 ---
 ## Các file không có trong phần cài đặt chính
 - install_wpsila.sh: Nó được đẩy lên VPS làm file để tải toàn bộ script về.
-- generate_checksum.sh: Dùng để tạo checksum cho các file.
+- generate_checksum.sh: Dùng để tạo checksum cho các file (Có thể dùng Visual Studio Code + WSL [Ubuntu] để làm việc này).
 - install_wpsila_no_check_sum.sh: Dùng để test bash script trước khi triển khai chính thức (nó không tải wpsila.conf về).
 - verify_wpsila.sh: Đang phát triển thêm, dùng để test nhanh trạng thái VPS sau khi cài.
