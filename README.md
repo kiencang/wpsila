@@ -5,7 +5,7 @@ Mỗi khi ra phiên bản mới cần làm như sau:
 - Trên GitHub, tạo phiên bản mới tương ứng với version vừa nhập trong check_for_update.sh
 - Sử dụng generate_checksum để tạo checksum cho các file của phiên bản mới (ví dụ dùng WSL trên Windows bash ./generate_checksum.sh)
 - Nhớ thay đổi version tương ứng trong generate_checksum để nó tạo chính xác các file theo version
-- Cập nhật các checksum này vào file install_wpsila.sh
+- Cập nhật các checksum này vào file install_wpsila.sh (nhớ điều chỉnh cả phiên bản)
 - Đẩy file install_wpsila.sh lên vps.wpsila.com
 - Cập nhật các thông báo vesion trên README của main và trên website chính wpsila.com
 
