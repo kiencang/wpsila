@@ -82,11 +82,13 @@ show_menu() {
     echo -e "${BLUE}---------------------------------------------------------------${NC}"
     echo -e " ${YELLOW}11.${NC} >> Kiem tra cap nhat (update) wpsila"
     echo -e "${BLUE}---------------------------------------------------------------${NC}"    
-    echo -e " ${YELLOW}12.${NC} >> Khoa/Mo khoa wp-config.php (De plugin, sFTP sua)"
-    echo -e "${BLUE}---------------------------------------------------------------${NC}"    
+    echo -e " ${YELLOW}12.${NC} >> Khoa/Mo khoa wp-config.php (De sua file/cai plugin)"
+    echo -e "${BLUE}-----------------------------------------------------------${NC}"
+    echo -e " ${YELLOW}13.${NC} >> Xem Log thoi gian thuc (Debug loi 500/502)"
+    echo -e "${BLUE}-----------------------------------------------------------${NC}"
     echo -e "  ${YELLOW}0.${NC} >> Exit (Thoat)"
-    echo -e "${BLUE}===============================================================${NC}"
-    echo -n "Nhap lua chon (0-12): "
+    echo -e "${BLUE}===========================================================${NC}"
+    echo -n "Nhap lua chon (0-13): "
 }
 
 # -------------------------------------------------------------------------------------------------------------------------------
@@ -184,7 +186,79 @@ while true; do
                 echo "Vui long kiem tra lai ten mien."
             fi
             pause_screen
-            ;;	
+            ;;
+			
+		13)
+            echo -e "${GREEN}=== XEM LOG THOI GIAN THUC (LIVE LOGS) ===${NC}"
+            echo -e "Cong cu nay giup ban xem loi Website hoac PHP ngay lap tuc."
+            echo "------------------------------------------------"
+            
+            # 1. Nhap ten mien
+            read -r -p "Nhap ten mien (VD: example.com): " INPUT_DOMAIN
+            
+            # 2. Chuan hoa ten mien (Input Sanitization - Code chuan)
+            TEMP_DOMAIN=$(echo "$INPUT_DOMAIN" | tr '[:upper:]' '[:lower:]' | tr -d ' ')
+            DOMAIN=$(echo "$TEMP_DOMAIN" | sed -E 's|^https?://||' | sed -E 's|/.*$||' | sed -E 's|:[0-9]+$||')
+            
+            if [[ -z "$DOMAIN" ]]; then
+                 echo -e "${RED}Loi: Ten mien khong duoc de trong!${NC}"
+                 pause_screen
+                 continue
+            fi
+            
+            # 3. Xac dinh cac file log quan trong
+            ACCESS_LOG="/var/www/$DOMAIN/logs/access.log"
+            
+            # Tu dong tim file log cua PHP-FPM (do phien ban co the khac nhau)
+            # Tim file co dang php*-fpm.log trong /var/log/
+            PHP_LOG=$(find /var/log -name "php*-fpm.log" | head -n 1)
+
+            echo "------------------------------------------------"
+            echo "Chon loai Log muon xem:"
+            echo "1. Xem Access/Error Log cua Website ($DOMAIN)"
+            echo "   -> Xem ai dang truy cap, loi 403, 404, 500 tu Web Server."
+            echo "2. Xem PHP System Log (Global)"
+            echo "   -> Xem loi he thong PHP, loi 502 Bad Gateway, PHP Crash."
+            echo "------------------------------------------------"
+            read -r -p "Nhap lua chon (1/2): " LOG_CHOICE
+
+            TARGET_LOG=""
+
+            if [[ "$LOG_CHOICE" == "1" ]]; then
+                TARGET_LOG="$ACCESS_LOG"
+            elif [[ "$LOG_CHOICE" == "2" ]]; then
+                if [[ -z "$PHP_LOG" ]]; then
+                    echo -e "${RED}Loi: Khong tim thay file log cua PHP-FPM!${NC}"
+                    pause_screen
+                    continue
+                fi
+                TARGET_LOG="$PHP_LOG"
+            else
+                echo -e "${YELLOW}Lua chon khong hop le.${NC}"
+                pause_screen
+                continue
+            fi
+
+            # 4. Thuc thi xem log
+            if [[ -f "$TARGET_LOG" ]]; then
+                echo -e "${GREEN}>> DANG MO LOG TAI: $TARGET_LOG${NC}"
+                echo -e "${YELLOW}!!! NHAN TO HOP PHIM [Ctrl + C] DE THOAT KHOI MAN HINH LOG !!!${NC}"
+                echo "..."
+                sleep 2
+                
+                # Lenh tail -f se giu man hinh luon mo
+                tail -f -n 50 "$TARGET_LOG"
+                
+                # Sau khi nguoi dung bam Ctrl+C, lenh tail dung lai, script chay tiep xuong duoi
+                echo -e "\n${GREEN}>> Da thoat che do xem Log.${NC}"
+            else
+                echo -e "${RED}Loi: Khong tim thay file log!${NC}"
+                echo "Duong dan: $TARGET_LOG"
+                echo "Co the Website chua duoc cai dat hoac chua co truy cap nao."
+            fi
+            
+            pause_screen
+            ;;			
         
         0) echo -e "${GREEN}Tam biet!${NC}"; exit 0 ;;
         
