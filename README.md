@@ -25,6 +25,9 @@ wpsila có thể dùng kèm với *bất kỳ theme & plugin nào*, tuy vậy ch
 - Plugin tăng tốc (cache): Cache Enabler (https://wordpress.org/plugins/cache-enabler/)
 - Plugin tối ưu máy tìm kiếm: The SEO Framework (https://wordpress.org/plugins/autodescription/)
 - Plugin backup: UpdraftPlus (https://wordpress.org/plugins/updraftplus/)
+- Plugin tạo mục lục cho bài dài: Easy Table of Contents (https://wordpress.org/plugins/easy-table-of-contents/)
+- Plugin giúp hạn chế spam cho khu vực bình luận: WP Armour (https://wordpress.org/plugins/honeypot/)
+- Plugin hỗ trợ tìm kiếm tốt hơn: WP Search with Algolia (https://wordpress.org/plugins/wp-search-with-algolia/)
 
 Ngoài ra các tính năng bảo mật miễn phí của Cloudflare (https://www.cloudflare.com/) cũng rất hợp với người dùng WordPress làm blog, nó dễ triển khai và có chất lượng cao.
 
