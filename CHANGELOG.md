@@ -9,6 +9,11 @@ và dự án này tuân thủ [Semantic Versioning](https://semver.org/spec/v2.0
 ### Added
 - Backup với Rclone.
 
+## [1.1.3] - 2025-02-09
+
+### Fixed
+- Bổ sung tính năng xem file log ngay qua giao diện.
+
 ## [1.1.2] - 2025-02-08
 
 ### Fixed
