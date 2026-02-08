@@ -4,7 +4,7 @@
 set -euo pipefail
 
 # Phiên bản của bash script
-VERSION="v0.2.3"
+VERSION="v1.1.2"
 
 # +++
 
@@ -97,7 +97,7 @@ rm -rf "$TEMP_DIR"
 # Xuất kết quả
 echo
 echo "=== KET QUA: Copy doan duoi day va thay vao script cai dat ==="
-echo "--------------------------------------------------------------------------------"
+echo "# --------------------------------------------------------------------------------"
 echo "# Generated at: $(date)"
 echo "# Version: $VERSION"
 echo "declare -A CHECKSUMS=("
@@ -112,4 +112,4 @@ for filename in "${FILE_LIST[@]}"; do
 done
 
 echo ")"
-echo "--------------------------------------------------------------------------------"
+echo "# --------------------------------------------------------------------------------"
