@@ -8,7 +8,11 @@ và dự án này tuân thủ [Semantic Versioning](https://semver.org/spec/v2.0
 ## [Unreleased]
 ### Added
 - Backup với Rclone.
-- Quản lý chặt hơn wp-config.php
+
+## [1.1.2] - 2025-02-08
+
+### Fixed
+- Cho phép quản lý chặt hơn wp-config.php.
 
 ## [1.1.1] - 2025-01-31
 
