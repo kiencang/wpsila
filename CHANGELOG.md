@@ -9,6 +9,11 @@ và dự án này tuân thủ [Semantic Versioning](https://semver.org/spec/v2.0
 ### Added
 - Có thể cần bổ sung Redis Object Cache, tuy nhiên hiện tại đã rất ổn.
 
+## [1.1.8] - 2025-02-09
+
+### Fixed
+- Khắc phục lỗi liên quan đến tắt cronjob mặc định trong WP.
+
 ## [1.1.7] - 2025-02-09
 
 ### Fixed
