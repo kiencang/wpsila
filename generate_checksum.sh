@@ -4,7 +4,7 @@
 set -euo pipefail
 
 # Phiên bản của bash script
-VERSION="v1.1.2"
+VERSION="v1.1.4"
 
 # +++
 
@@ -46,6 +46,8 @@ FILE_LIST=(
     "setup_adminer.sh"
     "show_pass.sh"
 	"check_for_update.sh"
+	"manage_wp_config.sh"
+	"view_logs.sh"
 )
 
 # Kiểm tra dependency
