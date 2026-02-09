@@ -86,6 +86,8 @@ show_menu() {
     echo -e "${BLUE}---------------------------------------------------------------${NC}"
     echo -e " ${YELLOW}13.${NC} >> Xem Log thoi gian thuc (Debug loi 500/502)"
     echo -e "${BLUE}---------------------------------------------------------------${NC}"
+    echo -e " ${YELLOW}14.${NC} >> Khoi phuc mat khau Admin (Reset Password)"
+    echo -e "${BLUE}---------------------------------------------------------------${NC}"	
     echo -e "  ${YELLOW}0.${NC} >> Exit (Thoat)"
     echo -e "${BLUE}===============================================================${NC}"
     echo -n "Nhap lua chon (0-13): "
@@ -142,9 +144,11 @@ while true; do
 		
         12) run_script "manage_wp_config.sh" ;;
         
-        13) run_script "view_logs.sh" ;;	
+        13) run_script "view_logs.sh" ;;
+		
+		14) run_script "wp_reset_pass.sh" ;;
         
-        0) echo -e "${GREEN}Tam biet!${NC}"; exit 0 ;;
+        0) echo -e "${GREEN}Tam biet! wpsila hen gap lai ban sau. Chuc website cua ban van hanh tot.${NC}"; exit 0 ;;
         
         *) echo -e "${RED}Lua chon khong hop le! Vui long chon lai.${NC}"; sleep 1 ;;
     esac
