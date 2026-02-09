@@ -260,6 +260,10 @@ download_file "$REPO_URL/manage_wp_config.sh" "$INSTALL_DIR/manage_wp_config.sh"
 # -------------------------
 # Xem file logs
 download_file "$REPO_URL/view_logs.sh" "$INSTALL_DIR/view_logs.sh"
+
+# -------------------------
+# Khôi phục lại mật khẩu
+download_file "$REPO_URL/wp_reset_pass.sh" "$INSTALL_DIR/wp_reset_pass.sh"
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
