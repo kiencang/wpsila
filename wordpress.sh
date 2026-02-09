@@ -169,14 +169,25 @@ systemctl reload "php${PHP_VER}-fpm"
 echo -e "${GREEN}>>> Dang chuyen doi WP-Cron sang System Cron...${NC}"
 
 # 1. Tắt Cron mặc định trong wp-config.php
+# --raw là bắt buộc để giá trị là boolean (true) chứ không phải string ('true')
 wp config set DISABLE_WP_CRON true --raw --allow-root --path="$WP_ROOT"
 
 # 2. Thêm Cronjob cho user www-data (chạy 5 phút/lần)
-# Kiểm tra xem cron đã tồn tại chưa để tránh trùng lặp
-CRON_CMD="*/5 * * * * php /var/www/$DOMAIN/public_html/wp-cron.php > /dev/null 2>&1"
+# [TỐI ƯU] Sử dụng đường dẫn tuyệt đối tới PHP theo phiên bản đã cài đặt
+# Đảm bảo cron chạy đúng phiên bản PHP với FPM (Ví dụ: php8.3)
+PHP_BIN="/usr/bin/php${PHP_VER}"
+
+# Kiểm tra nếu biến PHP_VER rỗng (phòng ngừa), fallback về php thường
+if [[ -z "${PHP_VER:-}" ]]; then
+    PHP_BIN="/usr/bin/php"
+fi
+
+CRON_CMD="*/5 * * * * $PHP_BIN /var/www/$DOMAIN/public_html/wp-cron.php > /dev/null 2>&1"
+
+# Logic thêm cron (Idempotent - Chạy nhiều lần không bị trùng)
 (crontab -u www-data -l 2>/dev/null | grep -F "$CRON_CMD") || (crontab -u www-data -l 2>/dev/null; echo "$CRON_CMD") | crontab -u www-data -
 
-echo -e "${GREEN}>>> Da thiet lap System Cron (5 phut/lan).${NC}"
+echo -e "${GREEN}>>> Da thiet lap System Cron (5 phut/lan) su dung $PHP_BIN.${NC}"
 
 # --- HOÀN TẤT ---
 echo -e "${GREEN}=============================================${NC}"
