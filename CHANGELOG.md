@@ -7,7 +7,12 @@ và dự án này tuân thủ [Semantic Versioning](https://semver.org/spec/v2.0
 
 ## [Unreleased]
 ### Added
-- Khôi phục pass WordPress thông qua CLI.
+- Có thể cần bổ sung Redis Object Cache, tuy nhiên hiện tại đã rất ổn.
+
+## [1.1.7] - 2025-02-09
+
+### Fixed
+- Thêm tính năng khôi phục lại mật khẩu WP.
 
 ## [1.1.6] - 2025-02-09
 
