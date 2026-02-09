@@ -9,6 +9,11 @@ và dự án này tuân thủ [Semantic Versioning](https://semver.org/spec/v2.0
 ### Added
 - Backup với Rclone.
 
+## [1.1.5] - 2025-02-09
+
+### Fixed
+- Khắc phục lỗi EOL Conversion.
+
 ## [1.1.4] - 2025-02-09
 
 ### Fixed
