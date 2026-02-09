@@ -9,6 +9,11 @@ và dự án này tuân thủ [Semantic Versioning](https://semver.org/spec/v2.0
 ### Added
 - Backup với Rclone.
 
+## [1.1.4] - 2025-02-09
+
+### Fixed
+- Tách code dài dòng ra khỏi menu.
+
 ## [1.1.3] - 2025-02-09
 
 ### Fixed
