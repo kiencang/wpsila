@@ -165,6 +165,19 @@ chmod +x /var/www
 # Khởi động lại để tránh phân quyền bị cache
 systemctl reload "php${PHP_VER}-fpm"
 
+# [NEW] CAI DAT SYSTEM CRON
+echo -e "${GREEN}>>> Dang chuyen doi WP-Cron sang System Cron...${NC}"
+
+# 1. Tắt Cron mặc định trong wp-config.php
+wp config set DISABLE_WP_CRON true --raw --allow-root --path="$WP_ROOT"
+
+# 2. Thêm Cronjob cho user www-data (chạy 5 phút/lần)
+# Kiểm tra xem cron đã tồn tại chưa để tránh trùng lặp
+CRON_CMD="*/5 * * * * php /var/www/$DOMAIN/public_html/wp-cron.php > /dev/null 2>&1"
+(crontab -u www-data -l 2>/dev/null | grep -F "$CRON_CMD") || (crontab -u www-data -l 2>/dev/null; echo "$CRON_CMD") | crontab -u www-data -
+
+echo -e "${GREEN}>>> Da thiet lap System Cron (5 phut/lan).${NC}"
+
 # --- HOÀN TẤT ---
 echo -e "${GREEN}=============================================${NC}"
 echo -e "${GREEN}   Cai Dat Ma Nguon WordPress Hoan Tat!   ${NC}"
