@@ -252,6 +252,14 @@ download_file "$REPO_URL/check_for_update.sh" "$INSTALL_DIR/check_for_update.sh"
 # File Fail2Ban
 download_file "$REPO_URL/setup_fail2ban_core.sh" "$INSTALL_DIR/setup_fail2ban_core.sh"
 #Chỉ dùng cho SSH
+
+# -------------------------
+# Quản lý wp-config
+download_file "$REPO_URL/manage_wp_config.sh" "$INSTALL_DIR/manage_wp_config.sh"
+
+# -------------------------
+# Xem file logs
+download_file "$REPO_URL/view_logs.sh" "$INSTALL_DIR/view_logs.sh"
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
