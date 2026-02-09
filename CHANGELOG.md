@@ -9,6 +9,11 @@ và dự án này tuân thủ [Semantic Versioning](https://semver.org/spec/v2.0
 ### Added
 - Backup với Rclone.
 
+## [1.1.6] - 2025-02-09
+
+### Fixed
+- Dùng cronjob hệ thống thay vì cronjob mặc định của WordPress.
+
 ## [1.1.5] - 2025-02-09
 
 ### Fixed
