@@ -7,7 +7,7 @@ và dự án này tuân thủ [Semantic Versioning](https://semver.org/spec/v2.0
 
 ## [Unreleased]
 ### Added
-- Backup với Rclone.
+- Khôi phục pass WordPress thông qua CLI.
 
 ## [1.1.6] - 2025-02-09
 
