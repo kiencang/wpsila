@@ -4,7 +4,7 @@
 set -euo pipefail
 
 # Phiên bản hiện tại của wpsila
-SILA_VERSION="v1.1.4"
+SILA_VERSION="v1.1.5"
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
@@ -19,7 +19,7 @@ SILA_VERSION="v1.1.4"
 # -------------------------------------------------------------------------
 # curl -sL https://vps.wpsila.com | sudo bash
 # -------------------------------------------------------------------------
-# Version 1.1.4 - 09/02/2026
+# Version 1.1.5 - 09/02/2026
 # -------------------------------------------------------------------------
 # Test trước khi đẩy lên link chính
 # curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/install_wpsila.sh | sudo bash
@@ -239,8 +239,8 @@ rm -f "$INSTALL_DIR/"*.sh
 # Dev bắt buộc phải dùng trước khi công bố phiên bản mới
 # Có tác dụng ngăn chặn các vấn đề liên quan đến lỗi đường truyền
 # --------------------------------------------------------------------------------
-# Generated at: Mon Feb  9 13:52:20 +07 2026
-# Version: v1.1.4
+# Generated at: Mon Feb  9 14:26:29 +07 2026
+# Version: v1.1.5
 declare -A CHECKSUMS=(
     ["wpsila.conf"]="662450e1a59c15843872c40e872a686e29adbc4371c259c13cc7ad54c0aaae27"
     ["wpsila_menu.sh"]="766737d9b13136e93876eb3c116adca5d442d7b5c6a26b250817d22b2f0c1773"
@@ -264,9 +264,9 @@ declare -A CHECKSUMS=(
     ["setup_sftp.sh"]="c810290a609c56cabe7ecc9937605a3cebf972205347a78b06b80a5f7b79d2c7"
     ["setup_adminer.sh"]="fa01d68aea03acd1801f1bf006b296cc75f011f1a00122091a0346d5fbad8c2a"
     ["show_pass.sh"]="1cef0cde8bb5b444ba55b0be9cf676c4bd246f20221ad041d8f5c4aa5785e2e3"
-    ["check_for_update.sh"]="80283abefcacff9112fffa5ec082bc290e793ec78f7deac18184cc6dd533db32"
-    ["manage_wp_config.sh"]="4f885ea0ba81ed08cb0fca8544220f44549da309cde8ae4dd724ef95da8910e9"
-    ["view_logs.sh"]="06ba526978d586f41264d469582977ca428ac72ae290b716aed6d113d8b06520"
+    ["check_for_update.sh"]="15c8406f6e0160689d55f44d2fc4c9d0a1d980463fbf733dbc25ecf21e5b6587"
+    ["manage_wp_config.sh"]="0f94f8bdf3d2b9a296eb09a5befd91972497c7654ecb241be36e5d1088f51092"
+    ["view_logs.sh"]="9cf0ce126cee7655219b10f6d59da14507a3f38d04e9d3bb45f3544c269ff4cc"
 )
 # --------------------------------------------------------------------------------
 
