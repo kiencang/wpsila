@@ -185,7 +185,7 @@ fi
 CRON_CMD="*/5 * * * * $PHP_BIN /var/www/$DOMAIN/public_html/wp-cron.php > /dev/null 2>&1"
 
 # Logic thêm cron (Idempotent - Chạy nhiều lần không bị trùng)
-(crontab -u www-data -l 2>/dev/null | grep -F "$CRON_CMD") || (crontab -u www-data -l 2>/dev/null; echo "$CRON_CMD") | crontab -u www-data -
+(crontab -u www-data -l 2>/dev/null | grep -F "$CRON_CMD") || (crontab -u www-data -l 2>/dev/null || true; echo "$CRON_CMD") | crontab -u www-data -
 
 echo -e "${GREEN}>>> Da thiet lap System Cron (5 phut/lan) su dung $PHP_BIN.${NC}"
 
