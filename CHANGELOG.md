@@ -9,6 +9,11 @@ và dự án này tuân thủ [Semantic Versioning](https://semver.org/spec/v2.0
 ### Added
 - Có thể cần bổ sung Redis Object Cache, tuy nhiên hiện tại đã rất ổn.
 
+## [1.1.9] - 2025-02-09
+
+### Fixed
+- Xóa cronjob hệ thống khi xóa website.
+
 ## [1.1.8] - 2025-02-09
 
 ### Fixed
