@@ -268,6 +268,10 @@ download_file "$REPO_URL/wp_reset_pass.sh" "$INSTALL_DIR/wp_reset_pass.sh"
 # -------------------------
 # Lấy thông tin database của website
 download_file "$REPO_URL/get_db_info.sh" "$INSTALL_DIR/get_db_info.sh"
+
+# -------------------------
+# Thử nghiệm Redis cache
+download_file "$REPO_URL/install_redis_cache.sh" "$INSTALL_DIR/install_redis_cache.sh"
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
