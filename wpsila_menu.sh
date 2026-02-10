@@ -89,6 +89,8 @@ show_menu() {
     echo -e " ${YELLOW}14.${NC} >> Khoi phuc mat khau Admin WordPress (Do ban quen pass)"
 	echo -e "${BLUE}---------------------------------------------------------------${NC}"
     echo -e " ${YELLOW}15.${NC} >> Lay thong tin Database cua mot website cu the"
+	echo -e "${BLUE}---------------------------------------------------------------${NC}"
+    echo -e " ${YELLOW}16.${NC} >> Cai dat Redis cache (chi can cho website traffic cao)"	
     echo -e "${BLUE}---------------------------------------------------------------${NC}"	
     echo -e "  ${YELLOW}0.${NC} >> Exit (Thoat)"
     echo -e "${BLUE}===============================================================${NC}"
@@ -150,7 +152,9 @@ while true; do
 		
 		14) run_script "wp_reset_pass.sh" ;;
 		
-		15) run_script "get_db_info.sh" ;;		
+		15) run_script "get_db_info.sh" ;;
+
+		16) run_script "install_redis_cache.sh" ;;
         
         0) echo -e "${GREEN}Tam biet! wpsila hen gap lai ban sau. Chuc website cua ban van hanh tot.${NC}"; exit 0 ;;
         
