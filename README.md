@@ -1,5 +1,11 @@
 Phần này chỉ dành cho dev, không liên quan đến người dùng cuối.
+## Cơ chế test
+- Sử dụng install_wpsila_no_check_sum.sh để tải các file về mà không cần checksum và các giới hạn khác, nó sẽ ghi đè lên file cũ.
+- Kiểm tra mọi thứ hoạt động ổn thỏa mới ra phiên bản mới phụ thuộc version.
+- Sử dụng checksum phức tạp hơn nhưng nó là rào cản cần thiết cho chính dev tránh ra các phiên bản vội vàng (nó là gờ giảm tốc).
+- Ngoài ra việc phải up lên install_wpsila lên Cloudflare page thay vì trỏ thẳng về địa chỉ trên GitHub cũng là cái phanh để giảm thiểu tốc độ ra phiên bản.
 
+## Ra phiên bản mới
 Mỗi khi ra phiên bản mới cần làm như sau:
 - Cập nhật version mới cho check_for_update.sh trong main (ví dụ v0.3.1)
 - Trên GitHub, tạo phiên bản mới tương ứng với version vừa nhập trong check_for_update.sh
