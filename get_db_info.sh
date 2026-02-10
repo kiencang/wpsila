@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # -----------------------------------------------------------
-# Lay thong tin Database (Su dung WP-CLI)
+# Lấy thông tin Database của website cụ thể 
+# Sử dụng WP-CLI để lấy chính xác
 # File: get_db_info.sh
 # -----------------------------------------------------------
 
