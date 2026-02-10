@@ -4,7 +4,7 @@
 set -euo pipefail
 
 # Phiên bản hiện tại của wpsila
-SILA_VERSION="v1.1.9"
+SILA_VERSION="v1.1.10"
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
@@ -19,7 +19,7 @@ SILA_VERSION="v1.1.9"
 # -------------------------------------------------------------------------
 # curl -sL https://vps.wpsila.com | sudo bash
 # -------------------------------------------------------------------------
-# Version 1.1.9 - 09/02/2026
+# Version 1.1.10 - 10/02/2026
 # -------------------------------------------------------------------------
 # Test trước khi đẩy lên link chính
 # curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/install_wpsila.sh | sudo bash
@@ -239,11 +239,11 @@ rm -f "$INSTALL_DIR/"*.sh
 # Dev bắt buộc phải dùng trước khi công bố phiên bản mới
 # Có tác dụng ngăn chặn các vấn đề liên quan đến lỗi đường truyền
 # --------------------------------------------------------------------------------
-# Generated at: Mon Feb  9 22:59:52 +07 2026
-# Version: v1.1.9
+# Generated at: Tue Feb 10 07:44:50 +07 2026
+# Version: v1.1.10
 declare -A CHECKSUMS=(
     ["wpsila.conf"]="662450e1a59c15843872c40e872a686e29adbc4371c259c13cc7ad54c0aaae27"
-    ["wpsila_menu.sh"]="e8dfd702d3e2e4b2cb61784fa643a4e9c299491a45b33752811ef15fddf6d615"
+    ["wpsila_menu.sh"]="79b508dd4c4590604945a0eed7f26d8dd5b5ce7a3c9e078cc38f18d0152e4288"
     ["install_lcmp.sh"]="a5bf28499cef47ef0999e768f234bdfe9aef2ad05111158312ee23be981419ff"
     ["anti_apt_lock.sh"]="4b90f4620011a96117954fdd12e50a751e647101b3d804c24969107cb9b8e5e9"
     ["install_caddyserver.sh"]="84724a1186c738331d2978a297405185f537ed871d03c4334d19f72f51e27c20"
@@ -264,10 +264,11 @@ declare -A CHECKSUMS=(
     ["setup_sftp.sh"]="c810290a609c56cabe7ecc9937605a3cebf972205347a78b06b80a5f7b79d2c7"
     ["setup_adminer.sh"]="fa01d68aea03acd1801f1bf006b296cc75f011f1a00122091a0346d5fbad8c2a"
     ["show_pass.sh"]="1cef0cde8bb5b444ba55b0be9cf676c4bd246f20221ad041d8f5c4aa5785e2e3"
-    ["check_for_update.sh"]="4fe7a26cfe18b5e33059b6891a128f54154b70d1e3ec64f0009c1a145aa5a54d"
+    ["check_for_update.sh"]="a644b69d96c94c7eec652520c792572098a86f4a89f483a011ddd00375206d6b"
     ["manage_wp_config.sh"]="0f94f8bdf3d2b9a296eb09a5befd91972497c7654ecb241be36e5d1088f51092"
     ["view_logs.sh"]="9cf0ce126cee7655219b10f6d59da14507a3f38d04e9d3bb45f3544c269ff4cc"
     ["wp_reset_pass.sh"]="3dd056dc2c3d4a41835dcde3873498ef8bcabdd40ac40d78f012f71d6413c5e1"
+    ["get_db_info.sh"]="1b739f23c04f7e04a29c09ebbfe4de95fdbc4e6b07eb6ed9f4870e9cd5070b33"
 )
 # --------------------------------------------------------------------------------
 
