@@ -8,7 +8,7 @@ và dự án này tuân thủ [Semantic Versioning](https://semver.org/spec/v2.0
 ## [Unreleased]
 ### Added
 - Backup ở cấp độ local, như một dự phòng, nhưng không thay thế UpdraftPlus.
-- Có thể cần bổ sung Redis Object Cache, tuy nhiên hiện tại đã rất ổn.
+- Bổ sung Redis Object Cache cho các website có traffic lớn cần dùng.
 
 ## [1.1.10] - 2025-02-10
 
