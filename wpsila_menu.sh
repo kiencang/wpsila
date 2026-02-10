@@ -88,7 +88,7 @@ show_menu() {
     echo -e "${BLUE}---------------------------------------------------------------${NC}"
     echo -e " ${YELLOW}14.${NC} >> Khoi phuc mat khau Admin WordPress (Do ban quen pass)"
 	echo -e "${BLUE}---------------------------------------------------------------${NC}"
-    echo -e " ${YELLOW}15.${NC} >> Lay thong tin Database cua website"
+    echo -e " ${YELLOW}15.${NC} >> Lay thong tin Database cua mot website cu the"
     echo -e "${BLUE}---------------------------------------------------------------${NC}"	
     echo -e "  ${YELLOW}0.${NC} >> Exit (Thoat)"
     echo -e "${BLUE}===============================================================${NC}"
