@@ -28,14 +28,17 @@ read -r -p "Nhap ten mien website (VD: example.com): " INPUT_DOMAIN
 
 # 2. Chuẩn hóa tên miền
 TEMP_DOMAIN=$(echo "$INPUT_DOMAIN" | tr '[:upper:]' '[:lower:]' | tr -d ' ')
-DOMAIN=$(echo "$TEMP_DOMAIN" | sed -E 's|^https?://||' | sed -E 's|/.*$||')
+DOMAIN=$(echo "$TEMP_DOMAIN" | sed -E 's|^https?://||' | sed -E 's|/.*$||' | sed -E 's|:[0-9]+$||')
 
 if [[ -z "$DOMAIN" ]]; then
      echo -e "${RED}Loi: Ten mien khong duoc de trong!${NC}"
      exit 1
 fi
 
+# Thư mục tên miền
 WP_PATH="/var/www/$DOMAIN/public_html"
+
+# File wp-config.php
 CONFIG_FILE="$WP_PATH/wp-config.php"
 
 # 3. Kiểm tra sự tồn tại của website
