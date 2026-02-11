@@ -37,6 +37,15 @@ fi
 echo -e "${GREEN}=== CAI DAT REDIS OBJECT CACHE (AUTO) ===${NC}"
 echo -e "${YELLOW}Chi can thiet neu website cua ban co traffic rat cao (tren 3K view/ngay)${NC}"
 
+echo -e "${GREEN}Ban co muon cai dat Redis cache khong?${NC}"
+# Hỏi xác nhận
+read -r -p "Nhap 'y' de bat dau qua trinh cai dat, hoac nhan Enter de thoat: " START_INSTALL_REDIS
+    
+if [[ "$START_INSTALL_REDIS" != "y" && "$START_INSTALL_REDIS" != "Y" ]]; then
+    echo -e "${GREEN}Da huy thao tac. He thong cua ban van nhu ban dau.${NC}"
+    exit 0 # Thoát script an toàn
+fi
+
 # ==============================================================================
 # [NEW] 0. NẠP CẤU HÌNH ĐỂ LẤY PHP VERSION
 # ==============================================================================
