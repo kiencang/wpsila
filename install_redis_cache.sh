@@ -135,7 +135,7 @@ if [[ -f "$REDIS_MAIN_CONF" ]]; then
 maxmemory ${REDIS_RAM_LIMIT}
 
 # 2. Chinh sach xa thai (Eviction Policy):
-# Khi day RAM (256MB), tu dong xoa cac key it duoc dung nhat gan day (LRU).
+# Khi day RAM (REDIS_RAM_LIMIT), tu dong xoa cac key it duoc dung nhat gan day (LRU).
 # Day la policy an toan nhat cho Cache.
 maxmemory-policy allkeys-lru
 
