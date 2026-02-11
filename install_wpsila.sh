@@ -4,7 +4,7 @@
 set -euo pipefail
 
 # Phiên bản hiện tại của wpsila
-SILA_VERSION="v1.2.0"
+SILA_VERSION="v1.2.1"
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
@@ -19,7 +19,7 @@ SILA_VERSION="v1.2.0"
 # -------------------------------------------------------------------------
 # curl -sL https://vps.wpsila.com | sudo bash
 # -------------------------------------------------------------------------
-# Version 1.2.0 - 11/02/2026
+# Version 1.2.1 - 11/02/2026
 # -------------------------------------------------------------------------
 # Test trước khi đẩy lên link chính
 # curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/install_wpsila.sh | sudo bash
@@ -239,8 +239,8 @@ rm -f "$INSTALL_DIR/"*.sh
 # Dev bắt buộc phải dùng trước khi công bố phiên bản mới
 # Có tác dụng ngăn chặn các vấn đề liên quan đến lỗi đường truyền
 # --------------------------------------------------------------------------------
-# Generated at: Wed Feb 11 10:15:08 +07 2026
-# Version: v1.2.0
+# Generated at: Wed Feb 11 11:00:57 +07 2026
+# Version: v1.2.1
 declare -A CHECKSUMS=(
     ["wpsila.conf"]="662450e1a59c15843872c40e872a686e29adbc4371c259c13cc7ad54c0aaae27"
     ["wpsila_menu.sh"]="e692fa7bce06730adc646e996007cd094e12092db0788d2a5e00a7dea11827c6"
@@ -264,12 +264,12 @@ declare -A CHECKSUMS=(
     ["setup_sftp.sh"]="c810290a609c56cabe7ecc9937605a3cebf972205347a78b06b80a5f7b79d2c7"
     ["setup_adminer.sh"]="fa01d68aea03acd1801f1bf006b296cc75f011f1a00122091a0346d5fbad8c2a"
     ["show_pass.sh"]="1cef0cde8bb5b444ba55b0be9cf676c4bd246f20221ad041d8f5c4aa5785e2e3"
-    ["check_for_update.sh"]="203d174fa927ba77bf322680713aa7019f3d960e84d4f2e9265ed90eb6887346"
+    ["check_for_update.sh"]="206367864696d92c062261a6932f263618024f1181c23d0878be971b2e5b613f"
     ["manage_wp_config.sh"]="0f94f8bdf3d2b9a296eb09a5befd91972497c7654ecb241be36e5d1088f51092"
     ["view_logs.sh"]="9cf0ce126cee7655219b10f6d59da14507a3f38d04e9d3bb45f3544c269ff4cc"
     ["wp_reset_pass.sh"]="3dd056dc2c3d4a41835dcde3873498ef8bcabdd40ac40d78f012f71d6413c5e1"
     ["get_db_info.sh"]="1b739f23c04f7e04a29c09ebbfe4de95fdbc4e6b07eb6ed9f4870e9cd5070b33"
-    ["install_redis_cache.sh"]="9efc9e792524b0166c08e56a680f4aaff312a023be9d945793d64ef6caec7166"
+    ["install_redis_cache.sh"]="b993d54f4a5c70d440c8d8770f94fd37370afbd325d40c5ef06027fe351ff32f"
 )
 # --------------------------------------------------------------------------------
 
