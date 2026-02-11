@@ -4,7 +4,7 @@
 set -euo pipefail
 
 # Phiên bản của bash script
-VERSION="v1.1.10"
+VERSION="v1.2.0"
 
 # +++
 
@@ -50,6 +50,7 @@ FILE_LIST=(
 	"view_logs.sh"
 	"wp_reset_pass.sh"
 	"get_db_info.sh"
+	"install_redis_cache.sh"
 )
 
 # Kiểm tra dependency
