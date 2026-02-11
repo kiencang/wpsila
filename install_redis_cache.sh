@@ -288,20 +288,20 @@ wp redis enable --allow-root --path="$WP_PATH"
 # 6.5. Xóa sạch cache cũ để đón cache mới
 wp cache flush --allow-root --path="$WP_PATH"
 
-# --- [BO SUNG] PHAN QUYEN CHUAN ---
+# --- [BỔ SUNG] PHÂN QUYỀN CHUẨN ---
 echo "Dang chuan hoa quyen han (Fix Permissions)..."
 
-# 1. Fix file drop-in (Quan trong)
+# 1. Fix file drop-in (quan trọng)
 if [[ -f "$WP_PATH/wp-content/object-cache.php" ]]; then
     chown root:www-data "$WP_PATH/wp-content/object-cache.php"
     chmod 664 "$WP_PATH/wp-content/object-cache.php"
 fi
 
-# 2. Fix thu muc plugin
+# 2. Fix thư mục plugin
 PLUGIN_DIR="$WP_PATH/wp-content/plugins/redis-cache"
 if [[ -d "$PLUGIN_DIR" ]]; then
     chown -R root:www-data "$PLUGIN_DIR"
-    # Set quyen ghi cho group www-data (de update duoc tu Admin)
+    # Set quyền ghi cho group www-data (để update được từ Admin)
     find "$PLUGIN_DIR" -type d -exec chmod 2775 {} +
     find "$PLUGIN_DIR" -type f -exec chmod 664 {} +
 fi
