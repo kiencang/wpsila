@@ -3,7 +3,6 @@
 # ------------------------------------------------------------------------------------------------
 # MODULE: Cài đặt & Cấu hình Redis Object Cache (Full Auto)
 # File: install_redis_cache.sh
-# Chưa chính thức đưa vào phiên bản của wpsila, đang thử nghiệm.
 # Chức năng:
 #   1. Cài đặt Redis Server hệ thống (nếu chưa có).
 #   2. Tối ưu hóa cấu hình Redis theo phương pháp Modular (An toàn khi update).
@@ -36,6 +35,7 @@ if ! command -v wp &> /dev/null; then
 fi
 
 echo -e "${GREEN}=== CAI DAT REDIS OBJECT CACHE (AUTO) ===${NC}"
+echo -e "${YELLOW}Chi can thiet neu website cua ban co traffic rat cao (tren 3K view/ngay)${NC}"
 
 # ==============================================================================
 # [NEW] 0. NẠP CẤU HÌNH ĐỂ LẤY PHP VERSION
@@ -80,6 +80,33 @@ fi
 # ==============================================================================
 echo -e "${YELLOW}[2/5] Kiem tra cau hinh toi uu cho Redis...${NC}"
 
+# --- LOGIC TÍNH RAM ---
+# Lấy tổng RAM theo KB từ Kernel (Chính xác tuyệt đối, không phụ thuộc ngôn ngữ)
+total_ram_kb=$(grep -i 'MemTotal' /proc/meminfo | awk '{print $2}')
+
+# Chuyển đổi sang MB để hiển thị hoặc tính toán đơn giản (chia 1024)
+# Dùng phép tính số học của bash $((...)) nhanh hơn dùng lệnh bên ngoài
+TOTAL_RAM_MB=$((total_ram_kb / 1024))
+
+REDIS_RAM_LIMIT="64mb" # Mặc định an toàn nhất
+
+if [[ "$TOTAL_RAM_MB" -le 1100 ]]; then
+    # VPS 1GB -> 64MB (An toàn tuyệt đối)
+    REDIS_RAM_LIMIT="64mb"
+elif [[ "$TOTAL_RAM_MB" -le 2500 ]]; then
+    # VPS 2GB -> 128MB
+    REDIS_RAM_LIMIT="128mb"
+elif [[ "$TOTAL_RAM_MB" -le 4500 ]]; then
+    # VPS 4GB -> 512MB
+    REDIS_RAM_LIMIT="256mb"
+else
+    # VPS > 4GB -> 1GB Cache
+    REDIS_RAM_LIMIT="512mb"
+fi
+
+echo -e "   - Tong RAM VPS: ${BLUE}${TOTAL_RAM_MB} MB${NC}"
+echo -e "   - Gioi han Redis: ${BLUE}${REDIS_RAM_LIMIT}${NC} (Muc an toan)"
+
 REDIS_MAIN_CONF="/etc/redis/redis.conf"
 WPSILA_REDIS_CONF="/etc/redis/wpsila-redis.conf"
 
@@ -90,12 +117,13 @@ if [[ -f "$REDIS_MAIN_CONF" ]]; then
         
         # Ghi nội dung cấu hình tối ưu
         cat > "$WPSILA_REDIS_CONF" <<EOF
-# --- WPSILA REDIS OPTIMIZATION ---
+# --- WPSILA REDIS OPTIMIZATION (Dynamic RAM) ---
 # File cau hinh bo sung, duoc include vao redis.conf chinh.
+# Auto-generated based on System RAM: ${TOTAL_RAM_MB} MB
 
-# 1. Gioi han RAM: Chi cho Redis dung toi da 256MB.
+# 1. Gioi han RAM
 # Ly do: De tranh Redis an het RAM lam sap MySQL/PHP (OOM Killer).
-maxmemory 256mb
+maxmemory ${REDIS_RAM_LIMIT}
 
 # 2. Chinh sach xa thai (Eviction Policy):
 # Khi day RAM (256MB), tu dong xoa cac key it duoc dung nhat gan day (LRU).
@@ -259,6 +287,24 @@ wp redis enable --allow-root --path="$WP_PATH"
 
 # 6.5. Xóa sạch cache cũ để đón cache mới
 wp cache flush --allow-root --path="$WP_PATH"
+
+# --- [BO SUNG] PHAN QUYEN CHUAN ---
+echo "Dang chuan hoa quyen han (Fix Permissions)..."
+
+# 1. Fix file drop-in (Quan trong)
+if [[ -f "$WP_PATH/wp-content/object-cache.php" ]]; then
+    chown root:www-data "$WP_PATH/wp-content/object-cache.php"
+    chmod 664 "$WP_PATH/wp-content/object-cache.php"
+fi
+
+# 2. Fix thu muc plugin
+PLUGIN_DIR="$WP_PATH/wp-content/plugins/redis-cache"
+if [[ -d "$PLUGIN_DIR" ]]; then
+    chown -R root:www-data "$PLUGIN_DIR"
+    # Set quyen ghi cho group www-data (de update duoc tu Admin)
+    find "$PLUGIN_DIR" -type d -exec chmod 2775 {} +
+    find "$PLUGIN_DIR" -type f -exec chmod 664 {} +
+fi
 
 # ==============================================================================
 # PHẦN 7: KHÔI PHỤC QUYỀN FILE (QUAN TRỌNG)
