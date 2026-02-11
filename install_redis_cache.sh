@@ -3,6 +3,8 @@
 # ------------------------------------------------------------------------------------------------
 # MODULE: Cài đặt & Cấu hình Redis Object Cache (Full Auto)
 # File: install_redis_cache.sh
+# Kiểm tra Redis cache có hoạt động không?
+# redis-cli monitor
 # Chức năng:
 #   1. Cài đặt Redis Server hệ thống (nếu chưa có).
 #   2. Tối ưu hóa cấu hình Redis theo phương pháp Modular (An toàn khi update).
