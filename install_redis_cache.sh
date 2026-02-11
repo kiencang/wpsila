@@ -37,7 +37,7 @@ if ! command -v wp &> /dev/null; then
 fi
 
 echo -e "${GREEN}=== CAI DAT REDIS OBJECT CACHE (AUTO) ===${NC}"
-echo -e "${YELLOW}Chi can thiet neu website cua ban co traffic rat cao (tren 3K view/ngay)${NC}"
+echo -e "${YELLOW}Chi can thiet neu website cua ban co traffic rat cao (tren 3K view/ngay).${NC}"
 
 echo -e "${GREEN}Ban co muon cai dat Redis cache khong?${NC}"
 # Hỏi xác nhận
@@ -115,10 +115,10 @@ elif [[ "$TOTAL_RAM_MB" -le 2500 ]]; then
     # VPS 2GB -> 128MB
     REDIS_RAM_LIMIT="128mb"
 elif [[ "$TOTAL_RAM_MB" -le 4500 ]]; then
-    # VPS 4GB -> 512MB
+    # VPS 4GB -> 256MB
     REDIS_RAM_LIMIT="256mb"
 else
-    # VPS > 4GB -> 1GB Cache
+    # VPS > 4GB -> 512MB Cache
     REDIS_RAM_LIMIT="512mb"
 fi
 
