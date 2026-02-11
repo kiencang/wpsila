@@ -78,7 +78,14 @@ if ! command -v redis-server &> /dev/null || ! dpkg -s "php${PHP_VER}-redis" &> 
     # Ví dụ: php8.3-redis. Nó sẽ khớp hoàn toàn với hệ thống hiện tại.
     apt-get install -y redis-server "php${PHP_VER}-redis"
     
+    # Khởi động Redis Server
     systemctl enable --now redis-server
+
+    # [BẮT BUỘC] Reload PHP-FPM để nhận diện extension mới vừa cài
+    # Nếu không có dòng này, WP-CLI ở dưới sẽ báo lỗi thiếu extension
+    systemctl reload "php${PHP_VER}-fpm"
+    
+    echo -e "${GREEN}Da cai dat xong va Reload PHP.${NC}"
 else
     echo -e "${GREEN}Redis Server va PHP Extension da duoc cai dat.${NC}"
 fi
