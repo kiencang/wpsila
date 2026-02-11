@@ -163,7 +163,7 @@ EOF
         
         # Khởi động lại để áp dụng thay đổi
         systemctl restart redis-server
-        echo -e "${GREEN}Da kich hoat cau hinh toi uu (Max 256MB).${NC}"
+        echo -e "${GREEN}Da kich hoat cau hinh toi uu.${NC}"
     else
         echo "Cau hinh da duoc toi uu tu truoc."
     fi
