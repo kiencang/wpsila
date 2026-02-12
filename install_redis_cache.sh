@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # -------------------------------------------------------------------------------------------------------------------------------
-# MODULE: Cài đặt & Cấu hình Redis Object Cache (Full Auto)
+# MODULE: Cài đặt & Cấu hình Redis Object Cache (Full Auto - Socket Fixed)
 # File: install_redis_cache.sh
 # -------------------------------------------------------------------------------------------------------------------------------
 
@@ -9,7 +9,7 @@
 
 # -------------------------------------------------------------------------------------------------------------------------------
 # Kiểm tra Redis cache có hoạt động không?
-# redis-cli monitor
+# redis-cli -s /var/run/redis/redis-server.sock monitor
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
@@ -49,7 +49,6 @@ NC='\033[0m' # No Color (Ngắt màu)
 
 # -------------------------------------------------------------------------------------------------------------------------------
 # --- KIỂM TRA QUYỀN ROOT ---
-# Script này can thiệp vào hệ thống (apt, etc) nên bắt buộc phải là root
 if [[ $EUID -ne 0 ]]; then
    sudo -E "$0" "$@"
    exit $?
@@ -59,7 +58,7 @@ fi
 # +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
-# Kiểm tra WP-CLI, mặc dù wpsila có cài rồi, nhưng phòng người dùng gỡ
+# Kiểm tra WP-CLI
 if ! command -v wp &> /dev/null; then
     echo "Loi: WP-CLI chua duoc cai dat. Vui long cai dat WP-CLI truoc."
     exit 1
@@ -73,12 +72,11 @@ echo -e "${GREEN}=== CAI DAT REDIS OBJECT CACHE (AUTO) ===${NC}"
 echo -e "${YELLOW}Chi can thiet neu website cua ban co traffic rat cao (tren 3K view/ngay) hoac co rat nhieu binh luan (tren 50 comment moi ngay).${NC}"
 
 echo -e "${GREEN}Ban co muon cai dat Redis cache khong?${NC}"
-# Hỏi xác nhận
 read -r -p "Nhap 'y' de bat dau qua trinh cai dat, hoac nhan Enter de thoat: " START_INSTALL_REDIS
     
 if [[ "$START_INSTALL_REDIS" != "y" && "$START_INSTALL_REDIS" != "Y" ]]; then
     echo -e "${GREEN}Da huy thao tac. He thong cua ban van nhu ban dau.${NC}"
-    exit 0 # Thoát script an toàn
+    exit 0
 fi
 # -------------------------------------------------------------------------------------------------------------------------------
 
@@ -88,15 +86,12 @@ fi
 # ========================================================================
 # [NEW] 0. NẠP CẤU HÌNH ĐỂ LẤY PHP VERSION
 # ========================================================================
-# Xác định thư mục chứa script
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 CONF_FILE="$SCRIPT_DIR/wpsila.conf"
 
-# Nạp file cấu hình nếu tồn tại
 if [[ -f "$CONF_FILE" ]]; then
     source "$CONF_FILE"
 else
-    # Fallback nếu mất file config (Mặc định 8.3 cho an toàn)
     PHP_VER="8.3"
 fi
 # -------------------------------------------------------------------------------------------------------------------------------
@@ -111,23 +106,12 @@ echo -e "${GREEN}=== CAI DAT REDIS OBJECT CACHE (PHP ${PHP_VER}) ===${NC}"
 # ========================================================================
 echo -e "${YELLOW}[1/5] Kiem tra Redis Server he thong...${NC}"
 
-# Logic: Kiểm tra cả Redis Server VÀ Extension PHP tương ứng
-# Nếu thiếu 1 trong 2 thì cài lại cho chắc
 if ! command -v redis-server &> /dev/null || ! dpkg -s "php${PHP_VER}-redis" &> /dev/null; then
     echo "Dang cai dat Redis Server va Extension PHP ${PHP_VER}..."
     apt-get update -qq
-    
-    # [QUAN TRỌNG] Chỉ định rõ phiên bản: php${PHP_VER}-redis
-    # Ví dụ: php8.3-redis. Nó sẽ khớp hoàn toàn với hệ thống hiện tại.
     apt-get install -y redis-server "php${PHP_VER}-redis"
-    
-    # Khởi động Redis Server
     systemctl enable --now redis-server
-
-    # [BẮT BUỘC] Reload PHP-FPM để nhận diện extension mới vừa cài
-    # Nếu không có dòng này & redis php là cài mới thì WP-CLI ở dưới sẽ báo lỗi thiếu extension
-    systemctl reload "php${PHP_VER}-fpm"
-    
+    systemctl restart "php${PHP_VER}-fpm"
     echo -e "${GREEN}Da cai dat xong va Reload PHP.${NC}"
 else
     echo -e "${GREEN}Redis Server va PHP Extension da duoc cai dat.${NC}"
@@ -139,33 +123,17 @@ fi
 # -------------------------------------------------------------------------------------------------------------------------------
 # ========================================================================
 # PHẦN 2: TỐI ƯU HÓA CẤU HÌNH REDIS (CƠ CHẾ MODULAR)
-# Mục đích: Tách file cấu hình riêng để không bị mất khi chạy 'apt upgrade'
 # ========================================================================
 echo -e "${YELLOW}[2/5] Kiem tra cau hinh toi uu cho Redis...${NC}"
 
-# --- LOGIC TÍNH RAM ---
-# Lấy tổng RAM theo KB từ Kernel (Chính xác tuyệt đối, không phụ thuộc ngôn ngữ)
 total_ram_kb=$(grep -i 'MemTotal' /proc/meminfo | awk '{print $2}')
-
-# Chuyển đổi sang MB để hiển thị hoặc tính toán đơn giản (chia 1024)
-# Dùng phép tính số học của bash $((...)) nhanh hơn dùng lệnh bên ngoài
 TOTAL_RAM_MB=$((total_ram_kb / 1024))
+REDIS_RAM_LIMIT="64mb"
 
-REDIS_RAM_LIMIT="64mb" # Mặc định an toàn nhất
-
-if [[ "$TOTAL_RAM_MB" -le 1100 ]]; then
-    # VPS 1GB -> 64MB (An toàn tuyệt đối)
-    REDIS_RAM_LIMIT="64mb"
-elif [[ "$TOTAL_RAM_MB" -le 2500 ]]; then
-    # VPS 2GB -> 128MB
-    REDIS_RAM_LIMIT="128mb"
-elif [[ "$TOTAL_RAM_MB" -le 4500 ]]; then
-    # VPS 4GB -> 256MB
-    REDIS_RAM_LIMIT="256mb"
-else
-    # VPS > 4GB -> 512MB Cache
-    REDIS_RAM_LIMIT="512mb"
-fi
+if [[ "$TOTAL_RAM_MB" -le 1100 ]]; then REDIS_RAM_LIMIT="64mb"
+elif [[ "$TOTAL_RAM_MB" -le 2500 ]]; then REDIS_RAM_LIMIT="128mb"
+elif [[ "$TOTAL_RAM_MB" -le 4500 ]]; then REDIS_RAM_LIMIT="256mb"
+else REDIS_RAM_LIMIT="512mb"; fi
 
 echo -e "   - Tong RAM VPS: ${BLUE}${TOTAL_RAM_MB} MB${NC}"
 echo -e "   - Gioi han Redis: ${BLUE}${REDIS_RAM_LIMIT}${NC} (Muc an toan)"
@@ -174,87 +142,42 @@ REDIS_MAIN_CONF="/etc/redis/redis.conf"
 WPSILA_REDIS_CONF="/etc/redis/wpsila-redis.conf"
 
 if [[ -f "$REDIS_MAIN_CONF" ]]; then
-    # Bước 2.1: Tạo file cấu hình riêng của wpsila (nếu chưa có)
     if [[ ! -f "$WPSILA_REDIS_CONF" ]]; then
         echo "Dang tao file cau hinh rieng biet (wpsila-redis.conf)..."
-        
-        # Ghi nội dung cấu hình tối ưu
         cat > "$WPSILA_REDIS_CONF" <<EOF
-# --- WPSILA REDIS OPTIMIZATION (Dynamic RAM) ---
-# File cau hinh bo sung, duoc include vao redis.conf chinh.
-# Auto-generated based on System RAM: ${TOTAL_RAM_MB} MB
-
-# 1. Gioi han RAM
-# Ly do: De tranh Redis an het RAM lam sap MySQL/PHP (OOM Killer).
+# --- WPSILA REDIS OPTIMIZATION ---
 maxmemory ${REDIS_RAM_LIMIT}
-
-# 2. Chinh sach xa thai (Eviction Policy):
-# Khi day RAM (cham nguong REDIS_RAM_LIMIT), tu dong xoa cac key it duoc dung nhat gan day (LRU).
-# Day la policy an toan nhat cho Cache.
 maxmemory-policy allkeys-lru
-
-# 3. Bao mat mang & Hieu suat (Unix Socket)
-# Tat TCP (bind 0) hoac giu localhost, nhung uu tien Socket
 bind 127.0.0.1 ::1
 protected-mode yes
-
-# [QUAN TRONG] Cau hinh Unix Socket
 unixsocket /var/run/redis/redis-server.sock
 unixsocketperm 770
-# ---------------------------------
 EOF
-        # Phân quyền chuẩn: User redis sở hữu, quyền 640 (chỉ owner đọc ghi, group đọc)
         chown redis:redis "$WPSILA_REDIS_CONF"
         chmod 640 "$WPSILA_REDIS_CONF"
-        
-        echo "Da tao file cau hinh toi uu."
     fi
 
-    # Bước 2.2: Nhúng (Include) file riêng vào file chính
-    # Kiểm tra xem file chính đã có dòng include chưa
     if ! grep -q "include $WPSILA_REDIS_CONF" "$REDIS_MAIN_CONF"; then
         echo "Dang lien ket file cau hinh vao Redis..."
         echo "" >> "$REDIS_MAIN_CONF"
-        echo "# WPSILA MODULAR CONFIG INCLUDE" >> "$REDIS_MAIN_CONF"
-        # Dòng include nằm cuối file sẽ ghi đè các setting mặc định ở trên
         echo "include $WPSILA_REDIS_CONF" >> "$REDIS_MAIN_CONF"
-        
-		# [QUAN TRỌNG] Thêm user www-data vào group redis để PHP đọc được Socket
-        usermod -aG redis www-data
-
-        # Khởi động lại để áp dụng thay đổi và tao file socket
-        systemctl restart redis-server
-		
-		echo "Dang doi Redis Socket khoi tao..."
-		# Đợi tối đa 10 giây
-		for i in {1..10}; do
-			if [[ -S "/var/run/redis/redis-server.sock" ]]; then
-				echo "Socket da san sang."
-				break
-			fi
-			sleep 1
-		done	
-
-        # --- [NEW] Bổ sung ---
-        # Kiểm tra lần cuối, nếu vẫn không thấy socket thì báo lỗi và dừng ngay
-        if [[ ! -S "/var/run/redis/redis-server.sock" ]]; then
-            echo -e "${RED}LOI NGHIEM TRONG: Redis khong khoi dong duoc!${NC}"
-            echo "Chuong trinh se thoat de tranh lam hong website."
-            
-            # In ra nguyên nhân lỗi để biết đường sửa
-            echo "--- Chi tiet loi he thong ---"
-            systemctl status redis-server --no-pager -l
-            
-            exit 1
-        fi
-        
-        # Reload PHP-FPM để cập nhật group permission mới (bắt buộc)
-		systemctl restart "php${PHP_VER}-fpm"
-
-        echo -e "${GREEN}Da kich hoat cau hinh toi uu (Unix Socket Enabled).${NC}"
-    else
-        echo "Cau hinh da duoc toi uu tu truoc."
     fi
+
+    # [FIX] Đảm bảo thư mục Socket tồn tại (vì /var/run thường là tmpfs)
+    mkdir -p /var/run/redis
+    chown redis:redis /var/run/redis
+    chmod 755 /var/run/redis
+
+    # [FIX] Luôn kiểm tra Socket, nếu thiếu phải Restart ngay
+    if [[ ! -S "/var/run/redis/redis-server.sock" ]]; then
+        echo "Socket chua ton tai hoặc cấu hình mới. Dang Restart Redis..."
+        usermod -aG redis www-data
+        systemctl restart redis-server
+        sleep 2
+    fi
+
+    systemctl restart "php${PHP_VER}-fpm"
+    echo -e "${GREEN}Da kich hoat cau hinh toi uu (Unix Socket Enabled).${NC}"
 fi
 # -------------------------------------------------------------------------------------------------------------------------------
 
@@ -266,22 +189,13 @@ fi
 # ========================================================================
 echo "--------------------------------------------------------"
 read -r -p "Nhap ten mien website muon cai Redis (VD: example.com): " INPUT_DOMAIN
+DOMAIN=$(echo "$INPUT_DOMAIN" | tr '[:upper:]' '[:lower:]' | tr -d ' ' | sed -E 's|^https?://||' | sed -E 's|/.*$||' | sed -E 's|:[0-9]+$||')
 
-# Chuẩn hóa tên miền (Chữ thường, bỏ khoảng trắng, bỏ http/https, bỏ port)
-TEMP_DOMAIN=$(echo "$INPUT_DOMAIN" | tr '[:upper:]' '[:lower:]' | tr -d ' ')
-DOMAIN=$(echo "$TEMP_DOMAIN" | sed -E 's|^https?://||' | sed -E 's|/.*$||' | sed -E 's|:[0-9]+$||')
+if [[ -z "$DOMAIN" ]]; then echo -e "${RED}Loi: Ten mien khong duoc de trong!${NC}"; exit 1; fi
 
-# Kiểm tra rỗng
-if [[ -z "$DOMAIN" ]]; then
-     echo -e "${RED}Loi: Ten mien khong duoc de trong!${NC}"
-     exit 1
-fi
-
-# Định nghĩa đường dẫn
 WP_PATH="/var/www/$DOMAIN/public_html"
 CONFIG_FILE="$WP_PATH/wp-config.php"
 
-# Kiểm tra sự tồn tại của mã nguồn WordPress
 if [[ ! -d "$WP_PATH" ]] || [[ ! -f "$CONFIG_FILE" ]]; then
     echo -e "${RED}Loi: Khong tim thay ma nguon WordPress tai: $WP_PATH${NC}"
     exit 1
@@ -293,45 +207,30 @@ fi
 # -------------------------------------------------------------------------------------------------------------------------------
 # ========================================================================
 # PHẦN 4: KIỂM TRA ĐÃ CÀI ĐẶT CHƯA (SAFETY CHECK)
-# Mục đích: Tránh ghi đè cấu hình của website đang chạy ổn định
 # ========================================================================
 echo -e "${YELLOW}[3/5] Kiem tra trang thai hien tai cua Website...${NC}"
 
-# --- [FIX] ĐẢM BẢO WP-CLI CHẠY ĐƯỢC ---
-# Nếu đã có object-cache.php, ta tạm thời đổi tên nó để WP-CLI không load Redis lỗi
+# [FIX] Vô hiệu hóa file lỗi NGAY LẬP TỨC để WP-CLI không bị văng Exception
 if [[ -f "$WP_PATH/wp-content/object-cache.php" ]]; then
     mv "$WP_PATH/wp-content/object-cache.php" "$WP_PATH/wp-content/object-cache.php.bak"
-    echo "Tam thoi vo hieu hoa Object Cache de cap nhat cau hinh..."
+    echo "Tam thoi vo hieu hoa Object Cache de kiem tra..."
 fi
 
-# Sử dụng WP-CLI để kiểm tra xem hằng số WP_REDIS_PREFIX đã có chưa
 if wp config has WP_REDIS_PREFIX --allow-root --path="$WP_PATH" 2>/dev/null; then
-    
-    # Nếu đã có, lấy thông tin ra cho người dùng xem
     CURRENT_PREFIX=$(wp config get WP_REDIS_PREFIX --allow-root --path="$WP_PATH" 2>/dev/null)
-    # Lấy trạng thái kết nối (Connected/Not Connected)
-    CURRENT_STATUS=$(wp redis status --allow-root --path="$WP_PATH" | grep "Status" || echo "Status: Unknown")
-    
+    # Vì file đã bị đổi tên thành .bak, status lúc này sẽ luôn là Not enabled hoặc Unknown
     echo ""
     echo -e "${GREEN}>>> WEBSITE NAY DA DUOC CAU HINH REDIS TU TRUOC!${NC}"
     echo "--------------------------------------------------"
     echo -e "Prefix hien tai: ${YELLOW}$CURRENT_PREFIX${NC}"
-    echo -e "Trang thai:      ${BLUE}$CURRENT_STATUS${NC}"
     echo "--------------------------------------------------"
-    echo -e "Ban co muon CAI DAT LAI (Re-install) khong?"
-    echo -e "${RED}Luu y: Viec nay se tao Prefix moi va lam vo hieu hoa cache cu.${NC}"
-    
-    # Hỏi xác nhận
-    read -r -p "Nhap 'y' de cai lai, hoac nhan Enter de thoat: " CHOICE
-    
+    read -r -p "Nhap 'y' de cai lai (Re-install), hoac nhan Enter de thoat: " CHOICE
     if [[ "$CHOICE" != "y" && "$CHOICE" != "Y" ]]; then
-        echo -e "${GREEN}Da huy thao tac. Giu nguyen cau hinh cu.${NC}"
-        exit 0 # Thoát script an toàn
+        # Khôi phục lại nếu người dùng hủy
+        mv "$WP_PATH/wp-content/object-cache.php.bak" "$WP_PATH/wp-content/object-cache.php" 2>/dev/null || true
+        echo -e "${GREEN}Da huy thao tac.${NC}"
+        exit 0
     fi
-    
-    echo -e "${YELLOW}>> Nguoi dung xac nhan cai lai. Dang tien hanh...${NC}"
-else
-    echo -e "${GREEN}Chua phat hien cau hinh Redis. Tiep tuc cai dat...${NC}"
 fi
 # -------------------------------------------------------------------------------------------------------------------------------
 
@@ -340,24 +239,15 @@ fi
 # -------------------------------------------------------------------------------------------------------------------------------
 # ========================================================================
 # PHẦN 5: XỬ LÝ QUYỀN FILE WP-CONFIG.PHP (SMART LOCK/UNLOCK)
-# Mục đích: Mở khóa file config nếu nó đang bị chmod 640/440
 # ========================================================================
 echo -e "${YELLOW}[4/5] Kiem tra quyen ghi file wp-config.php...${NC}"
-
-# Lấy quyền hiện tại dưới dạng số (VD: 640, 644)
 CURRENT_PERM=$(stat -c '%a' "$CONFIG_FILE")
 IS_LOCKED=false
 
-# Nếu quyền là 640 (Owner đọc ghi, Group đọc) hoặc 440 (Chỉ đọc) -> Cần mở khóa
 if [[ "$CURRENT_PERM" == "640" ]] || [[ "$CURRENT_PERM" == "440" ]]; then
-    echo "Phat hien file dang bi khoa (Chmod $CURRENT_PERM)."
-    echo "Dang mo khoa tam thoi (Chmod 660) de ghi cau hinh..."
     chmod 660 "$CONFIG_FILE"
-    # Đánh dấu cờ là đã mở khóa, để lát nữa còn khóa lại
     IS_LOCKED=true
 fi
-
-# Đảm bảo chủ sở hữu đúng là root:www-data trước khi thao tác
 chown root:www-data "$CONFIG_FILE"
 # -------------------------------------------------------------------------------------------------------------------------------
 
@@ -369,77 +259,41 @@ chown root:www-data "$CONFIG_FILE"
 # ========================================================================
 echo -e "${YELLOW}[5/5] Dang thiet lap Redis Object Cache...${NC}"
 
-# 6.1. Tạo Prefix thông minh
-# Thay dấu chấm bằng gạch dưới: example.com -> example_com
 SAFE_DOMAIN=$(echo "$DOMAIN" | tr '.' '_')
-
-# Tạo chuỗi ngẫu nhiên 3 byte (6 ký tự hex) -> VD: a1b2c3
 RANDOM_SUFFIX=$(openssl rand -hex 3)
-
-# Kết hợp lại: example_com_a1b2c3_
 SMART_PREFIX="${SAFE_DOMAIN}_${RANDOM_SUFFIX}_"
 
-echo "Generated New Prefix (de tranh cache nham giua cac website): $SMART_PREFIX"
+echo "Generated New Prefix: $SMART_PREFIX"
 
-# 6.2. Cài đặt Plugin (Nếu chưa có)
-# --force: Bỏ qua lỗi nếu plugin đã được cài rồi
-# Đây là plugin Redis Object Cache (https://wordpress.org/plugins/redis-cache/) của Till Krüss
 wp plugin install redis-cache --activate --allow-root --path="$WP_PATH" --quiet || true
 
-# 6.3. Bơm cấu hình vào wp-config.php
 echo "Dang ghi cau hinh vao wp-config.php..."
 
-# --type=constant: Báo cho WP-CLI biết đây là hằng số PHP (không phải chuỗi thông thường)
-# --raw: Giá trị không được bao trong dấu ngoặc kép (dùng cho số nguyên)
-
-# Set Prefix độc nhất
+# [FIX] Ép sử dụng phpredis extension để tránh lỗi Predis thư viện
+wp config set WP_REDIS_CLIENT "phpredis" --allow-root --path="$WP_PATH" --type=constant
 wp config set WP_REDIS_PREFIX "$SMART_PREFIX" --allow-root --path="$WP_PATH" --type=constant
-
-# Set Salt (Bổ trợ bảo mật)
 wp config set WP_CACHE_KEY_SALT "$SMART_PREFIX" --allow-root --path="$WP_PATH" --type=constant
-
-# [FIX] Cấu hình Socket chuẩn cho Redis Object Cache
-# 1. Định nghĩa giao thức UNIX (bắt buộc)
 wp config set WP_REDIS_SCHEME "unix" --allow-root --path="$WP_PATH" --type=constant
-
-# 2. Dùng WP_REDIS_PATH thay cho WP_REDIS_HOST
 wp config set WP_REDIS_PATH "/var/run/redis/redis-server.sock" --allow-root --path="$WP_PATH" --type=constant
 
-# Xóa các biến HOST/PORT cũ nếu có (để tránh xung đột)
 wp config delete WP_REDIS_HOST --allow-root --path="$WP_PATH" 2>/dev/null || true
 wp config delete WP_REDIS_PORT --allow-root --path="$WP_PATH" 2>/dev/null || true
-
-# Timeout an toàn (1 giây): Nếu Redis chết, Web vẫn sống (chỉ chậm đi chút) thay vì báo lỗi 500
 wp config set WP_REDIS_TIMEOUT 1 --allow-root --path="$WP_PATH" --raw --type=constant
 wp config set WP_REDIS_READ_TIMEOUT 1 --allow-root --path="$WP_PATH" --raw --type=constant
 
-# 6.4. Kích hoạt Object Cache
 echo "Dang kich hoat Object Cache..."
 wp redis enable --allow-root --path="$WP_PATH"
-
-# 6.5. Xóa sạch cache cũ để đón cache mới
 wp cache flush --allow-root --path="$WP_PATH"
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
-# --- [BỔ SUNG] PHÂN QUYỀN CHUẨN ---
+# --- PHÂN QUYỀN CHUẨN ---
 echo "Dang chuan hoa quyen han (Fix Permissions)..."
-
-# 1. Fix file drop-in (quan trọng)
 if [[ -f "$WP_PATH/wp-content/object-cache.php" ]]; then
     chown root:www-data "$WP_PATH/wp-content/object-cache.php"
     chmod 664 "$WP_PATH/wp-content/object-cache.php"
-fi
-
-# 2. Fix thư mục plugin
-PLUGIN_DIR="$WP_PATH/wp-content/plugins/redis-cache"
-if [[ -d "$PLUGIN_DIR" ]]; then
-    chown -R root:www-data "$PLUGIN_DIR"
-    # Set quyền ghi cho group www-data (để update được từ Admin)
-    find "$PLUGIN_DIR" -type d -exec chmod 2775 {} +
-    find "$PLUGIN_DIR" -type f -exec chmod 664 {} +
 fi
 # -------------------------------------------------------------------------------------------------------------------------------
 
@@ -447,11 +301,9 @@ fi
 
 # -------------------------------------------------------------------------------------------------------------------------------
 # ========================================================================
-# PHẦN 7: KHÔI PHỤC QUYỀN FILE (QUAN TRỌNG)
+# PHẦN 7: KHÔI PHỤC QUYỀN FILE
 # ========================================================================
-# Nếu lúc nãy chúng ta đã mở khóa, thì giờ phải khóa lại để bảo mật
 if [[ "$IS_LOCKED" = true ]]; then
-    echo "Dang khoa lai file wp-config.php (Ve trang thai 640)..."
     chmod 640 "$CONFIG_FILE"
 fi
 # -------------------------------------------------------------------------------------------------------------------------------
@@ -463,23 +315,16 @@ fi
 # PHẦN 8: HOÀN TẤT VÀ BÁO CÁO
 # ========================================================================
 echo "--------------------------------------------------"
-
-# Xóa file rác
 rm -f "$WP_PATH/wp-content/object-cache.php.bak"
 
-# Kiểm tra lại trạng thái lần cuối
 STATUS=$(wp redis status --allow-root --path="$WP_PATH" | grep "Status" || true)
 
 if [[ "$STATUS" == *"Connected"* ]]; then
-    echo -e "${GREEN}SUCCESS! Redis da ket noi thanh cong.${NC}"
+    echo -e "${GREEN}SUCCESS! Redis da ket noi thanh cong qua UNIX SOCKET.${NC}"
     echo -e "Website:    ${YELLOW}$DOMAIN${NC}"
-    echo -e "New Prefix: ${YELLOW}$SMART_PREFIX${NC}"
     echo -e "Status:     ${GREEN}Connected${NC}"
-    echo "--------------------------------------------------"
-    echo "He thong da tu dong cai dat plugin va cau hinh Prefix chong trung lap."
 else
-    echo -e "${RED}CANH BAO: Redis chua ket noi duoc. Vui long kiem tra lai.${NC}"
-    # In ra lỗi chi tiết nếu có
+    echo -e "${RED}CANH BAO: Redis chua ket noi duoc.${NC}"
     wp redis status --allow-root --path="$WP_PATH"
 fi
 # -------------------------------------------------------------------------------------------------------------------------------
