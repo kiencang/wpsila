@@ -6,20 +6,46 @@
 # File: get_db_info.sh
 # -----------------------------------------------------------
 
-set -euo pipefail
+# +++
 
-# Mau sac
+# -------------------------------------------------------------------------------------------------------------------------------
+set -euo pipefail
+# -------------------------------------------------------------------------------------------------------------------------------
+
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
+# Màu sắc
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m'
+# -------------------------------------------------------------------------------------------------------------------------------
 
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
 # Kiểm tra và nâng quyền
 if [[ $EUID -ne 0 ]]; then
    sudo -E "$0" "$@"
    exit $?
 fi
+# -------------------------------------------------------------------------------------------------------------------------------
 
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
+# 0. Kiểm tra WP-CLI
+# Kiểm tra sớm để thoát ngay nếu không có WP-CLI
+if ! command -v wp &> /dev/null; then
+    echo -e "${RED}Loi: WP-CLI chua duoc cai dat.${NC}"
+    exit 1
+fi
+# -------------------------------------------------------------------------------------------------------------------------------
+
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
 echo -e "${GREEN}=== LAY THONG TIN DATABASE (WP-CLI) ===${NC}"
 echo "Cong cu nay trich xuat thong tin ket noi DB chinh xac tu wp-config.php"
 echo "------------------------------------------------"
@@ -35,7 +61,11 @@ if [[ -z "$DOMAIN" ]]; then
      echo -e "${RED}Loi: Ten mien khong duoc de trong!${NC}"
      exit 1
 fi
+# -------------------------------------------------------------------------------------------------------------------------------
 
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
 # Thư mục tên miền
 WP_PATH="/var/www/$DOMAIN/public_html"
 
@@ -47,30 +77,33 @@ if [[ ! -d "$WP_PATH" ]] || [[ ! -f "$CONFIG_FILE" ]]; then
     echo -e "${RED}Loi: Khong tim thay ma nguon WordPress tai: $WP_PATH${NC}"
     exit 1
 fi
+# -------------------------------------------------------------------------------------------------------------------------------
 
-# 4. Kiểm tra WP-CLI
-if ! command -v wp &> /dev/null; then
-    echo -e "${RED}Loi: WP-CLI chua duoc cai dat.${NC}"
-    exit 1
-fi
+# +++
 
+# -------------------------------------------------------------------------------------------------------------------------------
 echo -e "${YELLOW}Dang doc cau hinh...${NC}"
 
-# 5. Lấy thông tin (sử dụng WP-CLI)
+# 4. Lấy thông tin (sử dụng WP-CLI)
 # --skip-plugins --skip-themes: Quan trọng để tránh lỗi từ plugin hoặc theme làm hỏng lệnh
 # || true: Để script không bị dừng nếu giá trị nào đó thiếu
 DB_NAME=$(wp config get DB_NAME --path="$WP_PATH" --allow-root --quiet --skip-plugins --skip-themes 2>/dev/null || echo "Khong tim thay")
 DB_USER=$(wp config get DB_USER --path="$WP_PATH" --allow-root --quiet --skip-plugins --skip-themes 2>/dev/null || echo "Khong tim thay")
 DB_PASS=$(wp config get DB_PASSWORD --path="$WP_PATH" --allow-root --quiet --skip-plugins --skip-themes 2>/dev/null || echo "Khong tim thay")
 DB_HOST=$(wp config get DB_HOST --path="$WP_PATH" --allow-root --quiet --skip-plugins --skip-themes 2>/dev/null || echo "localhost")
+# -------------------------------------------------------------------------------------------------------------------------------
 
-# 6. Hiển thị kết quả cho người dùng
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
+# 5. Hiển thị kết quả cho người dùng
 echo ""
 echo "------------------------------------------------"
-echo -e "Website:   ${GREEN}$DOMAIN${NC}"
+echo -e "Website: ${GREEN}$DOMAIN${NC}" # Tên miền
 echo "------------------------------------------------"
-echo -e "Database:  ${YELLOW}$DB_NAME${NC}"
-echo -e "Username:  ${YELLOW}$DB_USER${NC}"
-echo -e "Password:  ${YELLOW}$DB_PASS${NC}"
-echo -e "Host:      ${YELLOW}$DB_HOST${NC}"
+echo -e "Database: ${YELLOW}$DB_NAME${NC}" # Tên database
+echo -e "Username: ${YELLOW}$DB_USER${NC}" # Tên user
+echo -e "Password: ${YELLOW}$DB_PASS${NC}" # Pass
+echo -e "Host: ${YELLOW}$DB_HOST${NC}" # host, localhost hoặc 127.0.0.1
 echo "------------------------------------------------"
+# -------------------------------------------------------------------------------------------------------------------------------
