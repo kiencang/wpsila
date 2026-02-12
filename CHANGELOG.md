@@ -10,6 +10,12 @@ và dự án này tuân thủ [Semantic Versioning](https://semver.org/spec/v2.0
 - Backup ở cấp độ local, như một dự phòng, nhưng không thay thế UpdraftPlus.
 - Tạo file /etc/caddy/snippets/wp_common.conf chứa các cấu hình chung cho toàn bộ website. Chỉ cần sửa ở đây sẽ cập nhật cho toàn bộ (ví dụ như chặn file, cách cache dữ liệu).
 
+## [1.2.6] - 2025-02-13
+
+### Fixed
+- Quay về sử dụng TCP, vì việc chuyển từ TCP lên Unix có vấn đề, mặc dù mỗi cái cài mới thì không sao.
+- Ưu tiên ổn định, quay về bản cũ.
+
 ## [1.2.5] - 2025-02-13
 
 ### Fixed
