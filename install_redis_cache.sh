@@ -249,7 +249,7 @@ EOF
         fi
         
         # Reload PHP-FPM để cập nhật group permission mới (bắt buộc)
-        systemctl reload "php${PHP_VER}-fpm"
+		systemctl restart "php${PHP_VER}-fpm"
 
         echo -e "${GREEN}Da kich hoat cau hinh toi uu (Unix Socket Enabled).${NC}"
     else
@@ -296,6 +296,13 @@ fi
 # Mục đích: Tránh ghi đè cấu hình của website đang chạy ổn định
 # ========================================================================
 echo -e "${YELLOW}[3/5] Kiem tra trang thai hien tai cua Website...${NC}"
+
+# --- [FIX] ĐẢM BẢO WP-CLI CHẠY ĐƯỢC ---
+# Nếu đã có object-cache.php, ta tạm thời đổi tên nó để WP-CLI không load Redis lỗi
+if [[ -f "$WP_PATH/wp-content/object-cache.php" ]]; then
+    mv "$WP_PATH/wp-content/object-cache.php" "$WP_PATH/wp-content/object-cache.php.bak"
+    echo "Tam thoi vo hieu hoa Object Cache de cap nhat cau hinh..."
+fi
 
 # Sử dụng WP-CLI để kiểm tra xem hằng số WP_REDIS_PREFIX đã có chưa
 if wp config has WP_REDIS_PREFIX --allow-root --path="$WP_PATH" 2>/dev/null; then
@@ -456,6 +463,10 @@ fi
 # PHẦN 8: HOÀN TẤT VÀ BÁO CÁO
 # ========================================================================
 echo "--------------------------------------------------"
+
+# Xóa file rác
+rm -f "$WP_PATH/wp-content/object-cache.php.bak"
+
 # Kiểm tra lại trạng thái lần cuối
 STATUS=$(wp redis status --allow-root --path="$WP_PATH" | grep "Status" || true)
 
