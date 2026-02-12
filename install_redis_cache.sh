@@ -391,11 +391,16 @@ wp config set WP_REDIS_PREFIX "$SMART_PREFIX" --allow-root --path="$WP_PATH" --t
 # Set Salt (Bổ trợ bảo mật)
 wp config set WP_CACHE_KEY_SALT "$SMART_PREFIX" --allow-root --path="$WP_PATH" --type=constant
 
-# Host & Port (Sử dụng Unix Socket)
-wp config set WP_REDIS_HOST "/var/run/redis/redis-server.sock" --allow-root --path="$WP_PATH" --type=constant
+# [FIX] Cấu hình Socket chuẩn cho Redis Object Cache
+# 1. Định nghĩa giao thức UNIX (bắt buộc)
+wp config set WP_REDIS_SCHEME "unix" --allow-root --path="$WP_PATH" --type=constant
 
-# Port set về 0 để báo hiệu không dùng TCP
-wp config set WP_REDIS_PORT "0" --allow-root --path="$WP_PATH" --type=constant
+# 2. Dùng WP_REDIS_PATH thay cho WP_REDIS_HOST
+wp config set WP_REDIS_PATH "/var/run/redis/redis-server.sock" --allow-root --path="$WP_PATH" --type=constant
+
+# Xóa các biến HOST/PORT cũ nếu có (để tránh xung đột)
+wp config delete WP_REDIS_HOST --allow-root --path="$WP_PATH" 2>/dev/null || true
+wp config delete WP_REDIS_PORT --allow-root --path="$WP_PATH" 2>/dev/null || true
 
 # Timeout an toàn (1 giây): Nếu Redis chết, Web vẫn sống (chỉ chậm đi chút) thay vì báo lỗi 500
 wp config set WP_REDIS_TIMEOUT 1 --allow-root --path="$WP_PATH" --raw --type=constant
