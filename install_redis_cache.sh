@@ -224,6 +224,29 @@ EOF
 
         # Khởi động lại để áp dụng thay đổi và tao file socket
         systemctl restart redis-server
+		
+		echo "Dang doi Redis Socket khoi tao..."
+		# Đợi tối đa 10 giây
+		for i in {1..10}; do
+			if [[ -S "/var/run/redis/redis-server.sock" ]]; then
+				echo "Socket da san sang."
+				break
+			fi
+			sleep 1
+		done	
+
+        # --- [NEW] Bổ sung ---
+        # Kiểm tra lần cuối, nếu vẫn không thấy socket thì báo lỗi và dừng ngay
+        if [[ ! -S "/var/run/redis/redis-server.sock" ]]; then
+            echo -e "${RED}LOI NGHIEM TRONG: Redis khong khoi dong duoc!${NC}"
+            echo "Chuong trinh se thoat de tranh lam hong website."
+            
+            # In ra nguyên nhân lỗi để biết đường sửa
+            echo "--- Chi tiet loi he thong ---"
+            systemctl status redis-server --no-pager -l
+            
+            exit 1
+        fi
         
         # Reload PHP-FPM để cập nhật group permission mới (bắt buộc)
         systemctl reload "php${PHP_VER}-fpm"
