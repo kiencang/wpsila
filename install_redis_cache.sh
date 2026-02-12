@@ -193,10 +193,14 @@ maxmemory ${REDIS_RAM_LIMIT}
 # Day la policy an toan nhat cho Cache.
 maxmemory-policy allkeys-lru
 
-# 3. Bao mat mang:
-# Chi cho phep ket noi tu noi bo (localhost), chan ket noi tu Internet.
+# 3. Bao mat mang & Hieu suat (Unix Socket)
+# Tat TCP (bind 0) hoac giu localhost, nhung uu tien Socket
 bind 127.0.0.1 ::1
 protected-mode yes
+
+# [QUAN TRONG] Cau hinh Unix Socket
+unixsocket /var/run/redis/redis-server.sock
+unixsocketperm 770
 # ---------------------------------
 EOF
         # Phân quyền chuẩn: User redis sở hữu, quyền 640 (chỉ owner đọc ghi, group đọc)
@@ -215,9 +219,16 @@ EOF
         # Dòng include nằm cuối file sẽ ghi đè các setting mặc định ở trên
         echo "include $WPSILA_REDIS_CONF" >> "$REDIS_MAIN_CONF"
         
-        # Khởi động lại để áp dụng thay đổi
+		# [QUAN TRỌNG] Thêm user www-data vào group redis để PHP đọc được Socket
+        usermod -aG redis www-data
+
+        # Khởi động lại để áp dụng thay đổi và tao file socket
         systemctl restart redis-server
-        echo -e "${GREEN}Da kich hoat cau hinh toi uu.${NC}"
+        
+        # Reload PHP-FPM để cập nhật group permission mới (bắt buộc)
+        systemctl reload "php${PHP_VER}-fpm"
+
+        echo -e "${GREEN}Da kich hoat cau hinh toi uu (Unix Socket Enabled).${NC}"
     else
         echo "Cau hinh da duoc toi uu tu truoc."
     fi
@@ -357,9 +368,11 @@ wp config set WP_REDIS_PREFIX "$SMART_PREFIX" --allow-root --path="$WP_PATH" --t
 # Set Salt (Bổ trợ bảo mật)
 wp config set WP_CACHE_KEY_SALT "$SMART_PREFIX" --allow-root --path="$WP_PATH" --type=constant
 
-# Host & Port
-wp config set WP_REDIS_HOST "127.0.0.1" --allow-root --path="$WP_PATH" --type=constant
-wp config set WP_REDIS_PORT "6379" --allow-root --path="$WP_PATH" --type=constant
+# Host & Port (Sử dụng Unix Socket)
+wp config set WP_REDIS_HOST "/var/run/redis/redis-server.sock" --allow-root --path="$WP_PATH" --type=constant
+
+# Port set về 0 để báo hiệu không dùng TCP
+wp config set WP_REDIS_PORT "0" --allow-root --path="$WP_PATH" --type=constant
 
 # Timeout an toàn (1 giây): Nếu Redis chết, Web vẫn sống (chỉ chậm đi chút) thay vì báo lỗi 500
 wp config set WP_REDIS_TIMEOUT 1 --allow-root --path="$WP_PATH" --raw --type=constant
