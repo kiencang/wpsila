@@ -272,6 +272,10 @@ download_file "$REPO_URL/get_db_info.sh" "$INSTALL_DIR/get_db_info.sh"
 # -------------------------
 # Thử nghiệm Redis cache
 download_file "$REPO_URL/install_redis_cache.sh" "$INSTALL_DIR/install_redis_cache.sh"
+
+# -------------------------
+# Gỡ cài đặt Redis cache
+download_file "$REPO_URL/uninstall_redis_cache.sh" "$INSTALL_DIR/uninstall_redis_cache.sh"
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
