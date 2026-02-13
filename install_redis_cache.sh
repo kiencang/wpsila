@@ -174,11 +174,9 @@ REDIS_MAIN_CONF="/etc/redis/redis.conf"
 WPSILA_REDIS_CONF="/etc/redis/wpsila-redis.conf"
 
 if [[ -f "$REDIS_MAIN_CONF" ]]; then
-    # Bước 2.1: Tạo file cấu hình riêng của wpsila (nếu chưa có)
-    if [[ ! -f "$WPSILA_REDIS_CONF" ]]; then
-        echo "Dang tao file cau hinh rieng biet (wpsila-redis.conf)..."
+    # Bước 2.1: Tạo file cấu hình riêng của wpsila (luôn luôn tạo)
+    echo "Dang tao file cau hinh rieng biet (wpsila-redis.conf)..."
         
-        # Ghi nội dung cấu hình tối ưu
         cat > "$WPSILA_REDIS_CONF" <<EOF
 # --- WPSILA REDIS OPTIMIZATION (Dynamic RAM) ---
 # File cau hinh bo sung, duoc include vao redis.conf chinh.
@@ -193,18 +191,22 @@ maxmemory ${REDIS_RAM_LIMIT}
 # Day la policy an toan nhat cho Cache.
 maxmemory-policy allkeys-lru
 
-# 3. Bao mat mang:
-# Chi cho phep ket noi tu noi bo (localhost), chan ket noi tu Internet.
+# 3. Bao mat mang & Hieu suat (Unix Socket)
+# Tat TCP (bind 0) hoac giu localhost, nhung uu tien Socket
 bind 127.0.0.1 ::1
 protected-mode yes
+
+# [QUAN TRONG] Cau hinh Unix Socket
+unixsocket /var/run/redis/redis-server.sock
+unixsocketperm 770
 # ---------------------------------
 EOF
-        # Phân quyền chuẩn: User redis sở hữu, quyền 640 (chỉ owner đọc ghi, group đọc)
-        chown redis:redis "$WPSILA_REDIS_CONF"
-        chmod 640 "$WPSILA_REDIS_CONF"
+    
+	# Phân quyền chuẩn: User redis sở hữu, quyền 640 (chỉ owner đọc ghi, group đọc)
+    chown redis:redis "$WPSILA_REDIS_CONF"
+    chmod 640 "$WPSILA_REDIS_CONF"
         
-        echo "Da tao file cau hinh toi uu."
-    fi
+    echo "Da tao file cau hinh toi uu."
 
     # Bước 2.2: Nhúng (Include) file riêng vào file chính
     # Kiểm tra xem file chính đã có dòng include chưa
@@ -214,13 +216,36 @@ EOF
         echo "# WPSILA MODULAR CONFIG INCLUDE" >> "$REDIS_MAIN_CONF"
         # Dòng include nằm cuối file sẽ ghi đè các setting mặc định ở trên
         echo "include $WPSILA_REDIS_CONF" >> "$REDIS_MAIN_CONF"
-        
-        # Khởi động lại để áp dụng thay đổi
-        systemctl restart redis-server
+
         echo -e "${GREEN}Da kich hoat cau hinh toi uu.${NC}"
     else
-        echo "Cau hinh da duoc toi uu tu truoc."
+        echo "Da include trong $REDIS_MAIN_CONF."
     fi
+	
+    # [FIX LOGIC QUAN TRỌNG]
+    # Đưa các lệnh này ra NGOÀI khối if grep để đảm bảo luôn chạy
+    usermod -aG redis www-data
+
+    echo "Khoi dong lai Redis..."
+    systemctl restart redis-server  
+    systemctl restart "php${PHP_VER}-fpm"
+
+    # Đợi SOCKET
+    echo "Dang doi Redis Socket..."
+    for i in {1..10}; do
+        if [[ -S "/var/run/redis/redis-server.sock" ]]; then
+            echo "Socket da san sang."
+            break
+        fi
+        sleep 1
+    done
+
+    # Check lần cuối
+    if [[ ! -S "/var/run/redis/redis-server.sock" ]]; then
+        echo -e "${RED}LOI: Redis Socket khong khoi tao duoc!${NC}"
+        systemctl status redis-server --no-pager -l
+        exit 1
+    fi	
 fi
 # -------------------------------------------------------------------------------------------------------------------------------
 
@@ -259,7 +284,6 @@ fi
 # -------------------------------------------------------------------------------------------------------------------------------
 # ========================================================================
 # PHẦN 4: KIỂM TRA ĐÃ CÀI ĐẶT CHƯA (SAFETY CHECK)
-# Mục đích: Tránh ghi đè cấu hình của website đang chạy ổn định
 # ========================================================================
 echo -e "${YELLOW}[3/5] Kiem tra trang thai hien tai cua Website...${NC}"
 
@@ -268,6 +292,7 @@ if wp config has WP_REDIS_PREFIX --allow-root --path="$WP_PATH" 2>/dev/null; the
     
     # Nếu đã có, lấy thông tin ra cho người dùng xem
     CURRENT_PREFIX=$(wp config get WP_REDIS_PREFIX --allow-root --path="$WP_PATH" 2>/dev/null)
+	
     # Lấy trạng thái kết nối (Connected/Not Connected)
     CURRENT_STATUS=$(wp redis status --allow-root --path="$WP_PATH" | grep "Status" || echo "Status: Unknown")
     
@@ -343,7 +368,18 @@ echo "Generated New Prefix (de tranh cache nham giua cac website): $SMART_PREFIX
 # 6.2. Cài đặt Plugin (Nếu chưa có)
 # --force: Bỏ qua lỗi nếu plugin đã được cài rồi
 # Đây là plugin Redis Object Cache (https://wordpress.org/plugins/redis-cache/) của Till Krüss
-wp plugin install redis-cache --activate --allow-root --path="$WP_PATH" --quiet || true
+echo "Dang cai dat plugin Redis Object Cache..."
+if ! wp plugin install redis-cache --activate --allow-root --path="$WP_PATH" --quiet; then
+    echo -e "${RED}LOI: Khong the cai dat hoac kich hoat plugin Redis.${NC}"
+    echo "Huy bo qua trinh de tranh loi website."
+    
+    # Nếu lúc nãy chúng ta đã mở khóa, thì giờ phải khóa lại để bảo mật
+    if [[ "$IS_LOCKED" = true ]]; then
+        chmod 640 "$CONFIG_FILE"
+    fi
+    
+    exit 1
+fi
 
 # 6.3. Bơm cấu hình vào wp-config.php
 echo "Dang ghi cau hinh vao wp-config.php..."
@@ -357,9 +393,16 @@ wp config set WP_REDIS_PREFIX "$SMART_PREFIX" --allow-root --path="$WP_PATH" --t
 # Set Salt (Bổ trợ bảo mật)
 wp config set WP_CACHE_KEY_SALT "$SMART_PREFIX" --allow-root --path="$WP_PATH" --type=constant
 
-# Host & Port
-wp config set WP_REDIS_HOST "127.0.0.1" --allow-root --path="$WP_PATH" --type=constant
-wp config set WP_REDIS_PORT "6379" --allow-root --path="$WP_PATH" --type=constant
+# [FIX] Cấu hình Socket chuẩn cho Redis Object Cache
+# 1. Định nghĩa giao thức UNIX (bắt buộc)
+wp config set WP_REDIS_SCHEME "unix" --allow-root --path="$WP_PATH" --type=constant
+
+# 2. Dùng WP_REDIS_PATH thay cho WP_REDIS_HOST
+wp config set WP_REDIS_PATH "/var/run/redis/redis-server.sock" --allow-root --path="$WP_PATH" --type=constant
+
+# Xóa các biến HOST/PORT cũ nếu có (để tránh xung đột)
+wp config delete WP_REDIS_HOST --allow-root --path="$WP_PATH" 2>/dev/null || true
+wp config delete WP_REDIS_PORT --allow-root --path="$WP_PATH" 2>/dev/null || true
 
 # Timeout an toàn (1 giây): Nếu Redis chết, Web vẫn sống (chỉ chậm đi chút) thay vì báo lỗi 500
 wp config set WP_REDIS_TIMEOUT 1 --allow-root --path="$WP_PATH" --raw --type=constant
@@ -381,7 +424,7 @@ echo "Dang chuan hoa quyen han (Fix Permissions)..."
 
 # 1. Fix file drop-in (quan trọng)
 if [[ -f "$WP_PATH/wp-content/object-cache.php" ]]; then
-    chown root:www-data "$WP_PATH/wp-content/object-cache.php"
+    chown www-data:www-data "$WP_PATH/wp-content/object-cache.php"
     chmod 664 "$WP_PATH/wp-content/object-cache.php"
 fi
 
