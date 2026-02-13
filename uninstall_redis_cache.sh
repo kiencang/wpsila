@@ -38,6 +38,7 @@ fi
 
 # -------------------------------------------------------------------------------------------------------------------------------
 # --- Kiểm tra WP-CLI ---
+# Kiểm tra WP-CLI, mặc dù wpsila có cài rồi, nhưng phòng người dùng gỡ
 if ! command -v wp &> /dev/null; then
     echo "Loi: WP-CLI chua duoc cai dat."
     exit 1
@@ -50,17 +51,23 @@ fi
 echo -e "${RED}=== GO BO REDIS OBJECT CACHE (DEEP CLEAN) ===${NC}"
 echo -e "${YELLOW}Luu y: Script nay se xoa sach Plugin Redis va cac cau hinh lien quan.${NC}"
 echo -e "${YELLOW}Chu y: No chi xoa cai dat cho [ten mien cu the duoc chi dinh], khong xoa Redis cua tat ca website tren VPS.${NC}"
-echo -e "${YELLOW}Redis PHP & Redis Server van duoc giu lai nhung khong hoat dong tren website da bi xoa cau hinh.${NC}"
+echo -e "${YELLOW}Redis PHP & Redis Server van duoc giu lai, nhung khong hoat dong tren website da bi xoa cau hinh.${NC}"
 
 # 1. Nhập tên miền
 echo "--------------------------------------------------------"
 read -r -p "Nhap ten mien website (VD: example.com): " INPUT_DOMAIN
 
+# Làm sạch tên miền
 TEMP_DOMAIN=$(echo "$INPUT_DOMAIN" | tr '[:upper:]' '[:lower:]' | tr -d ' ')
 DOMAIN=$(echo "$TEMP_DOMAIN" | sed -E 's|^https?://||' | sed -E 's|/.*$||' | sed -E 's|:[0-9]+$||')
 
-if [[ -z "$DOMAIN" ]]; then echo -e "${RED}Loi: Ten mien trong!${NC}"; exit 1; fi
+# Kiểm tra rỗng
+if [[ -z "$DOMAIN" ]]; then
+     echo -e "${RED}Loi: Ten mien khong duoc de trong!${NC}"
+     exit 1
+fi
 
+# Kiểm tra tên miền đã được cài đặt hay chưa?
 WP_PATH="/var/www/$DOMAIN/public_html"
 CONFIG_FILE="$WP_PATH/wp-config.php"
 
@@ -118,11 +125,16 @@ chown root:www-data "$CONFIG_FILE"
 # 4. Thực hiện gỡ bỏ (WP-CLI)
 echo -e "${YELLOW}[2/4] Dang go bo Redis...${NC}"
 
+# 4.0. Dọn dẹp Cache
+echo "   - Flushing WordPress Cache..."
+wp cache flush --allow-root --path="$WP_PATH" --quiet || true
+
 # 4.1. Vô hiệu hóa Object Cache
 echo "   - Vo hieu hoa Object Cache..."
 
 # Dùng || true để không dừng script nếu redis chưa enable
-wp redis disable --allow-root --path="$WP_PATH" --quiet || true 
+# Ngắt kết nối giữa WordPress và Redis
+wp redis disable --allow-root --path="$WP_PATH" --quiet || true
 
 # [Safety] Xóa thủ công file drop-in
 if [[ -f "$WP_PATH/wp-content/object-cache.php" ]]; then
@@ -150,29 +162,20 @@ KEYS_TO_REMOVE=(
 
 for KEY in "${KEYS_TO_REMOVE[@]}"; do
     # Kiểm tra tồn tại trước khi xóa
-    if wp config has "$KEY" --allow-root --path="$WP_PATH" 2>/dev/null; then
-        # Thêm || true để đảm bảo script không chết nếu lỗi ghi file
-        wp config delete "$KEY" --allow-root --path="$WP_PATH" --quiet || true
-        echo "     + Da xoa: $KEY"
-    fi
+	if wp config has "$KEY" --allow-root --path="$WP_PATH" 2>/dev/null; then
+		# Nếu xóa thành công (&&) thì mới in thông báo
+		wp config delete "$KEY" --allow-root --path="$WP_PATH" --quiet && echo "      + Da xoa: $KEY" || echo "      ! Loi: Khong the xoa $KEY"
+	fi
 done
 
 # 4.3. Gỡ bỏ Plugin
-echo "   - Go bo Redis Plugin..."
+echo "   - Go bo plugin Redis..."
 if wp plugin is-installed redis-cache --allow-root --path="$WP_PATH"; then
     wp plugin deactivate redis-cache --uninstall --allow-root --path="$WP_PATH" --quiet || true
     echo "     + Plugin da go."
 else
     echo "     + Khong tim thay plugin."
 fi
-# -------------------------------------------------------------------------------------------------------------------------------
-
-# +++
-
-# -------------------------------------------------------------------------------------------------------------------------------
-# 4.4. Dọn dẹp Cache
-echo "   - Flushing WordPress Cache..."
-wp cache flush --allow-root --path="$WP_PATH" --quiet || true
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++

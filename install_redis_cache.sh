@@ -18,9 +18,10 @@
 # Chức năng:
 #   1. Cài đặt Redis Server hệ thống (nếu chưa có).
 #   2. Tối ưu hóa cấu hình Redis theo phương pháp Modular (An toàn khi update).
-#   3. Tự động xử lý quyền ghi file wp-config.php (Smart Lock/Unlock).
-#   4. Sinh Prefix thông minh chống trùng lặp dữ liệu giữa các web.
-#   5. Cài plugin và kích hoạt cache trong WordPress.
+#   3. Sử dụng giải pháp Unix Socket để tối ưu hiệu suất và bảo mật so với phương pháp TCP (127.0.0.1)
+#   4. Tự động xử lý quyền ghi file wp-config.php (Smart Lock/Unlock).
+#   5. Sinh Prefix thông minh chống trùng lặp dữ liệu giữa các web.
+#   6. Cài plugin Redis Object Cache (https://wordpress.org/plugins/redis-cache/) và kích hoạt cache Redis trong WordPress.
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
@@ -59,6 +60,7 @@ fi
 # +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
+# --- Kiểm tra WP-CLI ---
 # Kiểm tra WP-CLI, mặc dù wpsila có cài rồi, nhưng phòng người dùng gỡ
 if ! command -v wp &> /dev/null; then
     echo "Loi: WP-CLI chua duoc cai dat. Vui long cai dat WP-CLI truoc."
@@ -73,6 +75,7 @@ echo -e "${GREEN}=== CAI DAT REDIS OBJECT CACHE (AUTO) ===${NC}"
 echo -e "${YELLOW}Chi can thiet neu website cua ban co traffic rat cao (tren 3K view/ngay) hoac co rat nhieu binh luan (tren 50 comment moi ngay).${NC}"
 
 echo -e "${GREEN}Ban co muon cai dat Redis cache khong?${NC}"
+
 # Hỏi xác nhận
 read -r -p "Nhap 'y' de bat dau qua trinh cai dat, hoac nhan Enter de thoat: " START_INSTALL_REDIS
     
@@ -89,8 +92,8 @@ fi
 # [NEW] 0. NẠP CẤU HÌNH ĐỂ LẤY PHP VERSION
 # ========================================================================
 # Xác định thư mục chứa script
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
-CONF_FILE="$SCRIPT_DIR/wpsila.conf"
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )" # Thư mục hiện tại
+CONF_FILE="$SCRIPT_DIR/wpsila.conf" # File cấu hình
 
 # Nạp file cấu hình nếu tồn tại
 if [[ -f "$CONF_FILE" ]]; then
@@ -124,11 +127,11 @@ if ! command -v redis-server &> /dev/null || ! dpkg -s "php${PHP_VER}-redis" &> 
     # Khởi động Redis Server
     systemctl enable --now redis-server
 
-    # [BẮT BUỘC] Reload PHP-FPM để nhận diện extension mới vừa cài
+    # [BẮT BUỘC] restart PHP-FPM để nhận diện extension mới vừa cài
     # Nếu không có dòng này & redis php là cài mới thì WP-CLI ở dưới sẽ báo lỗi thiếu extension
-    systemctl reload "php${PHP_VER}-fpm"
+    systemctl restart "php${PHP_VER}-fpm"
     
-    echo -e "${GREEN}Da cai dat xong va Reload PHP.${NC}"
+    echo -e "${GREEN}Da cai dat xong Redis Server va restart PHP.${NC}"
 else
     echo -e "${GREEN}Redis Server va PHP Extension da duoc cai dat.${NC}"
 fi
@@ -153,6 +156,8 @@ TOTAL_RAM_MB=$((total_ram_kb / 1024))
 
 REDIS_RAM_LIMIT="64mb" # Mặc định an toàn nhất
 
+# Phần này dùng để tính toán RAM cho Redis cache dựa trên cấu hình của VPS
+# Điều này linh hoạt hơn, tận dụng được lợi thế khi VPS có RAM lớn trong khi không làm hỏng VPS có RAM nhỏ so với thiết lập cứng
 if [[ "$TOTAL_RAM_MB" -le 1100 ]]; then
     # VPS 1GB -> 64MB (An toàn tuyệt đối)
     REDIS_RAM_LIMIT="64mb"
@@ -170,13 +175,15 @@ fi
 echo -e "   - Tong RAM VPS: ${BLUE}${TOTAL_RAM_MB} MB${NC}"
 echo -e "   - Gioi han Redis: ${BLUE}${REDIS_RAM_LIMIT}${NC} (Muc an toan)"
 
-REDIS_MAIN_CONF="/etc/redis/redis.conf"
-WPSILA_REDIS_CONF="/etc/redis/wpsila-redis.conf"
+REDIS_MAIN_CONF="/etc/redis/redis.conf" # Cấu hình chính của Redis
+WPSILA_REDIS_CONF="/etc/redis/wpsila-redis.conf" # File cấu hình bổ sung để linh hoạt hơn
 
+# Kiểm tra sự tồn tại của file cấu hình chính
 if [[ -f "$REDIS_MAIN_CONF" ]]; then
     # Bước 2.1: Tạo file cấu hình riêng của wpsila (luôn luôn tạo)
     echo "Dang tao file cau hinh rieng biet (wpsila-redis.conf)..."
-        
+
+# Tiến hành ghi đè, luôn luôn làm, tránh việc cấu hình cũ ảnh hưởng đến thiết lập mới        
         cat > "$WPSILA_REDIS_CONF" <<EOF
 # --- WPSILA REDIS OPTIMIZATION (Dynamic RAM) ---
 # File cau hinh bo sung, duoc include vao redis.conf chinh.
@@ -193,6 +200,7 @@ maxmemory-policy allkeys-lru
 
 # 3. Bao mat mang & Hieu suat (Unix Socket)
 # Tat TCP (bind 0) hoac giu localhost, nhung uu tien Socket
+# Ngan chan moi ket noi voi Redis tu Internet
 bind 127.0.0.1 ::1
 protected-mode yes
 
@@ -209,7 +217,7 @@ EOF
     echo "Da tao file cau hinh toi uu."
 
     # Bước 2.2: Nhúng (Include) file riêng vào file chính
-    # Kiểm tra xem file chính đã có dòng include chưa
+    # Kiểm tra xem file chính đã có dòng include chưa, nếu chưa có mới thao tác, tránh tạo rác
     if ! grep -q "include $WPSILA_REDIS_CONF" "$REDIS_MAIN_CONF"; then
         echo "Dang lien ket file cau hinh vao Redis..."
         echo "" >> "$REDIS_MAIN_CONF"
@@ -219,18 +227,19 @@ EOF
 
         echo -e "${GREEN}Da kich hoat cau hinh toi uu.${NC}"
     else
-        echo "Da include trong $REDIS_MAIN_CONF."
+        echo "Da include trong $REDIS_MAIN_CONF." # Nếu đã có rồi thì chỉ cần thông báo
     fi
 	
     # [FIX LOGIC QUAN TRỌNG]
     # Đưa các lệnh này ra NGOÀI khối if grep để đảm bảo luôn chạy
+	# Đưa www-data vào nhóm của Redis để nó có thể thao tác được với redis-server.sock
     usermod -aG redis www-data
 
     echo "Khoi dong lai Redis..."
     systemctl restart redis-server  
     systemctl restart "php${PHP_VER}-fpm"
 
-    # Đợi SOCKET
+    # Đợi file SOCKET chắc chắn xuất hiện mới cài đặt tiếp. Cái này để phòng lỗi.
     echo "Dang doi Redis Socket..."
     for i in {1..10}; do
         if [[ -S "/var/run/redis/redis-server.sock" ]]; then
@@ -273,7 +282,7 @@ WP_PATH="/var/www/$DOMAIN/public_html"
 CONFIG_FILE="$WP_PATH/wp-config.php"
 
 # --- ĐẶT MÃ CLEANUP VÀ TRAP ---
-# Để dự phòng mã bị dừng giữa chừng thì bảo mật wp-config.php vẫn được giữ lại
+# Để dự phòng mã bị dừng giữa chừng thì bảo mật wp-config.php (nếu có) vẫn được giữ lại
 IS_LOCKED=false # Khai báo mặc định để tránh lỗi "unbound variable"
 cleanup() {
     # Nếu biến IS_LOCKED là true (tức là script đã mở khóa file)
@@ -300,7 +309,7 @@ fi
 # ========================================================================
 echo -e "${YELLOW}[3/5] Kiem tra trang thai hien tai cua Website...${NC}"
 
-# Sử dụng WP-CLI để kiểm tra xem hằng số WP_REDIS_PREFIX đã có chưa
+# Sử dụng WP-CLI để kiểm tra xem hằng số WP_REDIS_PREFIX đã có trong wp-config.php hay chưa?
 if wp config has WP_REDIS_PREFIX --allow-root --path="$WP_PATH" 2>/dev/null; then
     
     # Nếu đã có, lấy thông tin ra cho người dùng xem
@@ -313,7 +322,7 @@ if wp config has WP_REDIS_PREFIX --allow-root --path="$WP_PATH" 2>/dev/null; the
     echo -e "${GREEN}>>> WEBSITE NAY DA DUOC CAU HINH REDIS TU TRUOC!${NC}"
     echo "--------------------------------------------------"
     echo -e "Prefix hien tai: ${YELLOW}$CURRENT_PREFIX${NC}"
-    echo -e "Trang thai:      ${BLUE}$CURRENT_STATUS${NC}"
+    echo -e "Trang thai: ${BLUE}$CURRENT_STATUS${NC}"
     echo "--------------------------------------------------"
     echo -e "Ban co muon CAI DAT LAI (Re-install) khong?"
     echo -e "${RED}Luu y: Viec nay se tao Prefix moi va lam vo hieu hoa cache cu.${NC}"
@@ -338,6 +347,7 @@ fi
 # ========================================================================
 # PHẦN 5: XỬ LÝ QUYỀN FILE WP-CONFIG.PHP (SMART LOCK/UNLOCK)
 # Mục đích: Mở khóa file config nếu nó đang bị chmod 640/440
+# Phải mở khóa thì mới thêm cấu hình cho Redis cache được.
 # ========================================================================
 echo -e "${YELLOW}[4/5] Kiem tra quyen ghi file wp-config.php...${NC}"
 
@@ -375,7 +385,7 @@ RANDOM_SUFFIX=$(openssl rand -hex 3)
 # Kết hợp lại: example_com_a1b2c3_
 SMART_PREFIX="${SAFE_DOMAIN}_${RANDOM_SUFFIX}_"
 
-echo "Generated New Prefix (de tranh cache nham giua cac website): $SMART_PREFIX"
+echo "Tao Prefix moi (de tranh cache nham giua cac website): $SMART_PREFIX"
 
 # 6.2. Cài đặt Plugin (Nếu chưa có)
 # --force: Bỏ qua lỗi nếu plugin đã được cài rồi
@@ -412,7 +422,7 @@ wp config set WP_REDIS_SCHEME "unix" --allow-root --path="$WP_PATH" --type=const
 # 2. Dùng WP_REDIS_PATH thay cho WP_REDIS_HOST
 wp config set WP_REDIS_PATH "/var/run/redis/redis-server.sock" --allow-root --path="$WP_PATH" --type=constant
 
-# Xóa các biến HOST/PORT cũ nếu có (để tránh xung đột)
+# Xóa các biến HOST/PORT cũ nếu có (để tránh xung đột), dùng true cuối lệnh để phòng nếu nó không có thì script vẫn chạy tiếp
 wp config delete WP_REDIS_HOST --allow-root --path="$WP_PATH" 2>/dev/null || true
 wp config delete WP_REDIS_PORT --allow-root --path="$WP_PATH" 2>/dev/null || true
 
@@ -445,6 +455,7 @@ PLUGIN_DIR="$WP_PATH/wp-content/plugins/redis-cache"
 if [[ -d "$PLUGIN_DIR" ]]; then
     chown -R root:www-data "$PLUGIN_DIR"
     # Set quyền ghi cho group www-data (để update được từ Admin)
+	# Giống với phân quyền tiêu chuẩn của wpsila
     find "$PLUGIN_DIR" -type d -exec chmod 2775 {} +
     find "$PLUGIN_DIR" -type f -exec chmod 664 {} +
 fi
@@ -457,6 +468,7 @@ fi
 # PHẦN 7: KHÔI PHỤC QUYỀN FILE (QUAN TRỌNG)
 # ========================================================================
 # Nếu lúc nãy chúng ta đã mở khóa, thì giờ phải khóa lại để bảo mật
+# Phần này hơi thừa vì đã có trap luôn chạy, nhưng nó là thừa an toàn!
 if [[ "$IS_LOCKED" = true ]]; then
     echo "Dang khoa lai file wp-config.php (Ve trang thai 640)..."
     chmod 640 "$CONFIG_FILE"
