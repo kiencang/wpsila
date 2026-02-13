@@ -13,13 +13,13 @@ và dự án này tuân thủ [Semantic Versioning](https://semver.org/spec/v2.0
 ## [1.2.7] - 2025-02-14
 
 ### Fixed
-- Chuyển qua Scoket với mã an toàn hơn.
-- Bổ sung gỡ cài đặt Redis cache.
+- Chuyển qua Unix Socket với mã an toàn hơn phiên bản 1.2.4.
+- Bổ sung gỡ cài đặt Redis cache để giải quyết vấn đề các cài đặt cũ ảnh hưởng lên cài đặt mới.
 
 ## [1.2.6] - 2025-02-13
 
 ### Fixed
-- Quay về sử dụng TCP, vì việc chuyển từ TCP lên Unix có vấn đề, mặc dù mỗi cái cài mới thì không sao.
+- Quay về sử dụng TCP, vì việc chuyển từ TCP lên Unix Socket có vấn đề, mặc dù mỗi cái cài mới thì không sao.
 - Ưu tiên ổn định, quay về bản cũ.
 
 ## [1.2.5] - 2025-02-13
