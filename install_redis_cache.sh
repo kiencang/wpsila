@@ -272,6 +272,19 @@ fi
 WP_PATH="/var/www/$DOMAIN/public_html"
 CONFIG_FILE="$WP_PATH/wp-config.php"
 
+# --- ĐẶT MÃ CLEANUP VÀ TRAP ---
+# Để dự phòng mã bị dừng giữa chừng thì bảo mật wp-config.php vẫn được giữ lại
+IS_LOCKED=false # Khai báo mặc định để tránh lỗi "unbound variable"
+cleanup() {
+    # Nếu biến IS_LOCKED là true (tức là script đã mở khóa file)
+    if [[ "${IS_LOCKED:-false}" = true ]] && [[ -f "$CONFIG_FILE" ]]; then
+        chmod 640 "$CONFIG_FILE"
+        echo "Safety: Da khoa lai file wp-config.php."
+    fi
+}
+# Kích hoạt khi script thoát hoặc bị ngắt (Ctrl+C)
+trap cleanup EXIT INT TERM
+
 # Kiểm tra sự tồn tại của mã nguồn WordPress
 if [[ ! -d "$WP_PATH" ]] || [[ ! -f "$CONFIG_FILE" ]]; then
     echo -e "${RED}Loi: Khong tim thay ma nguon WordPress tai: $WP_PATH${NC}"
@@ -330,7 +343,6 @@ echo -e "${YELLOW}[4/5] Kiem tra quyen ghi file wp-config.php...${NC}"
 
 # Lấy quyền hiện tại dưới dạng số (VD: 640, 644)
 CURRENT_PERM=$(stat -c '%a' "$CONFIG_FILE")
-IS_LOCKED=false
 
 # Nếu quyền là 640 (Owner đọc ghi, Group đọc) hoặc 440 (Chỉ đọc) -> Cần mở khóa
 if [[ "$CURRENT_PERM" == "640" ]] || [[ "$CURRENT_PERM" == "440" ]]; then

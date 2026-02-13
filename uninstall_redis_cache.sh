@@ -64,6 +64,19 @@ if [[ -z "$DOMAIN" ]]; then echo -e "${RED}Loi: Ten mien trong!${NC}"; exit 1; f
 WP_PATH="/var/www/$DOMAIN/public_html"
 CONFIG_FILE="$WP_PATH/wp-config.php"
 
+# --- ĐẶT MÃ CLEANUP VÀ TRAP ---
+# Để dự phòng mã bị dừng giữa chừng thì bảo mật wp-config.php vẫn được giữ lại
+IS_LOCKED=false # Khai báo mặc định để tránh lỗi "unbound variable"
+cleanup() {
+    # Nếu biến IS_LOCKED là true (tức là script đã mở khóa file)
+    if [[ "${IS_LOCKED:-false}" = true ]] && [[ -f "$CONFIG_FILE" ]]; then
+        chmod 640 "$CONFIG_FILE"
+        echo "Safety: Da khoa lai file wp-config.php."
+    fi
+}
+# Kích hoạt khi script thoát hoặc bị ngắt (Ctrl+C)
+trap cleanup EXIT INT TERM
+
 if [[ ! -d "$WP_PATH" ]] || [[ ! -f "$CONFIG_FILE" ]]; then
     echo -e "${RED}Loi: Khong tim thay WordPress tai: $WP_PATH${NC}"
     exit 1
@@ -90,7 +103,6 @@ fi
 echo -e "${YELLOW}[1/4] Mo khoa file wp-config.php...${NC}"
 
 CURRENT_PERM=$(stat -c '%a' "$CONFIG_FILE")
-IS_LOCKED=false
 
 if [[ "$CURRENT_PERM" == "640" ]] || [[ "$CURRENT_PERM" == "440" ]]; then
     chmod 660 "$CONFIG_FILE"
