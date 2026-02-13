@@ -4,7 +4,7 @@
 set -euo pipefail
 
 # Phiên bản hiện tại của wpsila
-SILA_VERSION="v1.2.6"
+SILA_VERSION="v1.2.7"
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
@@ -237,11 +237,11 @@ rm -f "$INSTALL_DIR/"*.sh
 # Dev bắt buộc phải dùng trước khi công bố phiên bản mới
 # Có tác dụng ngăn chặn các vấn đề liên quan đến lỗi đường truyền
 # --------------------------------------------------------------------------------
-# Generated at: Fri Feb 13 03:47:22 +07 2026
-# Version: v1.2.6
+# Generated at: Sat Feb 14 02:27:40 +07 2026
+# Version: v1.2.7
 declare -A CHECKSUMS=(
     ["wpsila.conf"]="662450e1a59c15843872c40e872a686e29adbc4371c259c13cc7ad54c0aaae27"
-    ["wpsila_menu.sh"]="e692fa7bce06730adc646e996007cd094e12092db0788d2a5e00a7dea11827c6"
+    ["wpsila_menu.sh"]="87cbd0b276bef046f1501b14f952571d3807cd969244f7632a0e212f284b30f0"
     ["install_lcmp.sh"]="a5bf28499cef47ef0999e768f234bdfe9aef2ad05111158312ee23be981419ff"
     ["anti_apt_lock.sh"]="4b90f4620011a96117954fdd12e50a751e647101b3d804c24969107cb9b8e5e9"
     ["install_caddyserver.sh"]="84724a1186c738331d2978a297405185f537ed871d03c4334d19f72f51e27c20"
@@ -262,12 +262,13 @@ declare -A CHECKSUMS=(
     ["setup_sftp.sh"]="c810290a609c56cabe7ecc9937605a3cebf972205347a78b06b80a5f7b79d2c7"
     ["setup_adminer.sh"]="fa01d68aea03acd1801f1bf006b296cc75f011f1a00122091a0346d5fbad8c2a"
     ["show_pass.sh"]="1cef0cde8bb5b444ba55b0be9cf676c4bd246f20221ad041d8f5c4aa5785e2e3"
-    ["check_for_update.sh"]="390d9bc218ebbd40b30e57f9df977afa6b684b2188edc0b069458d23062126f8"
+    ["check_for_update.sh"]="9bee8bfcd6ee10cb8f4117711c5fddd32bcaff36e5bf384fa5c81951a8a9d55d"
     ["manage_wp_config.sh"]="c78466bda9f929952f0390603954c1d53cf105a879d8747e27dcbc03ba83cf45"
     ["view_logs.sh"]="61b0ed4e76e7cbfc76c5266acb9b8ac2760b46b43b8d3d2ff23676ba5aee241e"
     ["wp_reset_pass.sh"]="38ca1181c188939d7a504ed0e9f649c87e975c8ee63b64d0d8c85844eceef275"
     ["get_db_info.sh"]="856989c4e1496fdd69d3cae62d7205ec2d651d74ee08d1b2da572792873be152"
-    ["install_redis_cache.sh"]="5dc0371b1ed325ca4706cb8062d5e576ec0c944521337bc5a8553c38fd1fa4ec"
+    ["install_redis_cache.sh"]="ff793a305c28b20c2e9f5a01a764f242da375b2849304fd50ad148a1436d2478"
+    ["uninstall_redis_cache.sh"]="d54a470231f635131e3692d5b0647c2980ab3649bfbcbf31e2d42348e2544a90"
 )
 # --------------------------------------------------------------------------------
 
