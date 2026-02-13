@@ -49,6 +49,8 @@ fi
 # -------------------------------------------------------------------------------------------------------------------------------
 echo -e "${RED}=== GO BO REDIS OBJECT CACHE (DEEP CLEAN) ===${NC}"
 echo -e "${YELLOW}Luu y: Script nay se xoa sach Plugin Redis va cac cau hinh lien quan.${NC}"
+echo -e "${YELLOW}Chu y: No chi xoa cai dat cho [ten mien cu the duoc chi dinh], khong xoa Redis cua tat ca website tren VPS.${NC}"
+echo -e "${YELLOW}Redis PHP & Redis Server van duoc giu lai nhung khong hoat dong tren website da bi xoa cau hinh.${NC}"
 
 # 1. Nhập tên miền
 echo "--------------------------------------------------------"
@@ -183,5 +185,5 @@ rm -f "$WP_PATH/wp-content/redis-config.php" 2>/dev/null || true # File config c
 # 6. Hoàn tất
 echo -e "${GREEN}=== THANH CONG! ===${NC}"
 echo -e "Website: ${YELLOW}$DOMAIN${NC}"
-echo -e "Status:  ${GREEN}Clean Uninstalled${NC}"
+echo -e "Status:  ${GREEN}Da don dep thanh cong!${NC}"
 # -------------------------------------------------------------------------------------------------------------------------------
