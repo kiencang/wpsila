@@ -78,7 +78,7 @@ cleanup() {
     # Nếu biến IS_LOCKED là true (tức là script đã mở khóa file)
     if [[ "${IS_LOCKED:-false}" = true ]] && [[ -f "$CONFIG_FILE" ]]; then
         chmod 640 "$CONFIG_FILE"
-        echo "Safety: Da khoa lai file wp-config.php."
+        echo "An toan hon: Da khoa lai file wp-config.php."
     fi
 }
 # Kích hoạt khi script thoát hoặc bị ngắt (Ctrl+C)
@@ -95,7 +95,7 @@ fi
 # -------------------------------------------------------------------------------------------------------------------------------
 # 2. Xác nhận
 echo -e "${RED}CANH BAO: Thao tac tren domain: $DOMAIN${NC}"
-read -r -p "Nhap 'y' de XOA HOAN TOAN Redis: " CONFIRM
+read -r -p "Nhap 'y' de XOA HOAN TOAN Redis tren website: " CONFIRM
 
 if [[ "$CONFIRM" != "y" && "$CONFIRM" != "Y" ]]; then
     echo -e "${GREEN}Da huy thao tac.${NC}"
@@ -112,9 +112,10 @@ echo -e "${YELLOW}[1/4] Mo khoa file wp-config.php...${NC}"
 CURRENT_PERM=$(stat -c '%a' "$CONFIG_FILE")
 
 if [[ "$CURRENT_PERM" == "640" ]] || [[ "$CURRENT_PERM" == "440" ]]; then
-    chmod 660 "$CONFIG_FILE"
+    chmod 660 "$CONFIG_FILE" # Mở khóa
     IS_LOCKED=true
 fi
+
 # Đảm bảo quyền sở hữu đúng để WP-CLI ghi được
 chown root:www-data "$CONFIG_FILE"
 # -------------------------------------------------------------------------------------------------------------------------------
@@ -172,9 +173,9 @@ done
 echo "   - Go bo plugin Redis..."
 if wp plugin is-installed redis-cache --allow-root --path="$WP_PATH"; then
     wp plugin deactivate redis-cache --uninstall --allow-root --path="$WP_PATH" --quiet || true
-    echo "     + Plugin da go."
+    echo "    + Plugin da go."
 else
-    echo "     + Khong tim thay plugin."
+    echo "    + Khong tim thay plugin."
 fi
 # -------------------------------------------------------------------------------------------------------------------------------
 
@@ -200,5 +201,5 @@ rm -f "$WP_PATH/wp-content/redis-config.php" 2>/dev/null || true # File config c
 # 6. Hoàn tất
 echo -e "${GREEN}=== THANH CONG! ===${NC}"
 echo -e "Website: ${YELLOW}$DOMAIN${NC}"
-echo -e "Status:  ${GREEN}Da don dep thanh cong!${NC}"
+echo -e "Status: ${GREEN}Da don dep thanh cong!${NC}"
 # -------------------------------------------------------------------------------------------------------------------------------
