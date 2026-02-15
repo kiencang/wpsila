@@ -56,6 +56,27 @@ $DOMAIN {
         path *.ico *.gif *.jpg *.jpeg *.png *.svg *.woff *.woff2 *.webp *.avif
     }
     header @media_assets Cache-Control "public, max-age=31536000, immutable"
+	
+	# --- TRAFFIC CONTROL (RATE LIMIT LITE) ---
+    # 1. Chan cac Bot dot tai nguyen & Crawler vo dung
+    # Ngan chan hang loat request tu cac bot SEO/Scraper khong can thiet
+    @bad_bots {
+        header User-Agent *MJ12bot*
+        header User-Agent *PetalBot*
+        header User-Agent *DotBot*
+        header User-Agent *SemrushBot*
+        header User-Agent *Maubot*
+        header User-Agent *LieBaoFast*
+        header User-Agent *Mb2345Browser*
+    }
+    respond @bad_bots 403
+
+    # 2. Chan Scan User (Do tim user WordPress)
+    # Hacker thuong scan /?author=1 de lay ten dang nhap
+    @user_enum {
+        query author=*
+    }
+    respond @user_enum 403	
 
     # --- CHAN FILE NHAY CAM (SECURITY BLOCK) ---
     @forbidden {
@@ -81,7 +102,7 @@ $DOMAIN {
     # Tra ve 404
     respond @forbidden 404
 	
-	# PHP FastCGI, lấy động theo phiên bản PHP thiết lập ở đầu file lệnh.
+	# PHP FastCGI, lay dong theo phien ban PHP o dau file lenh.
     php_fastcgi unix//run/php/php${PHP_VER}-fpm.sock
 
     file_server
