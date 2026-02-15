@@ -1,5 +1,5 @@
 # -----------------------------------------------------------
-# MODULE: Kiểm tra tên miền nhập vào của người dùng
+# MODULE: Kiểm tra tên miền nhập vào của người dùng.
 # File: domain_check.sh
 # File này được nhúng vào script install_wp.sh
 # -----------------------------------------------------------
@@ -8,9 +8,9 @@
 
 # -------------------------------------------------------------------------------------------------------------------------------
 # E1. Cấu hình
-MAX_RETRIES=3
-COUNT=0
-DOMAIN=""
+MAX_RETRIES=3 # Thử tối đa 3 lần, tránh vòng lặp vô tận.
+COUNT=0 # Biến đếm.
+DOMAIN="" # Khai báo tên miền ban đầu.
 
 # Thiết lập prompt dựa trên loại cài đặt
 if [[ "$INSTALL_TYPE" == "subdomain" ]]; then

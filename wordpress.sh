@@ -1,5 +1,5 @@
 # -----------------------------------------------------------
-# MODULE: Cài đặt WordPress và phân quyền
+# MODULE: Cài đặt WordPress và phân quyền.
 # File: wordpress.sh
 # File này được nhúng vào script install_wp.sh
 # -----------------------------------------------------------
@@ -13,6 +13,7 @@
 # 2. logs và public_html (thư mục web) tách riêng để tránh việc phân quyền phức tạp.
 # 3. logs và public_html vẫn thuộc về cùng một thư mục cha chung, điều đó giúp dễ xóa sau này >
 # > Xóa thư mục tên miền là xóa cả logs và thư mục web (public_html).
+
 echo -e "${GREEN}[1/5] Dang tao thu muc chua ma nguon...${NC}"
 # Tạo thư mục web root (-p giúp không báo lỗi nếu thư mục đã tồn tại)
 mkdir -p "/var/www/$DOMAIN/public_html"
@@ -193,8 +194,8 @@ echo -e "${GREEN}>>> Da thiet lap System Cron (5 phut/lan) su dung $PHP_BIN.${NC
 echo -e "${GREEN}=============================================${NC}"
 echo -e "${GREEN}   Cai Dat Ma Nguon WordPress Hoan Tat!   ${NC}"
 echo -e "${GREEN}=============================================${NC}"
-echo -e "Domain:	${YELLOW}$DOMAIN${NC}"
-echo -e "Web Root:	${YELLOW}$WP_ROOT${NC}"
+echo -e "Domain: ${YELLOW}$DOMAIN${NC}"
+echo -e "Web Root: ${YELLOW}$WP_ROOT${NC}"
 echo -e "Logs Directory: ${YELLOW}/var/www/$DOMAIN/logs${NC}"
 echo -e "${GREEN}>>> Buoc tiep theo: Cau hinh Caddyfile.${NC}"
 sleep 2

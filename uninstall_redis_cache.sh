@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # -------------------------------------------------------------------------------------------------------------------------------
-# MODULE: Gỡ bỏ & Dọn dẹp Redis Object Cache (Clean Uninstall - Deep Clean)
+# MODULE: Gỡ bỏ & Dọn dẹp Redis Object Cache (Clean Uninstall - Deep Clean).
 # File: uninstall_redis_cache.sh
 # -------------------------------------------------------------------------------------------------------------------------------
 
@@ -27,7 +27,7 @@ NC='\033[0m'
 # +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
-# --- Kiểm tra quyền root ---
+# --- Kiểm tra quyền root & nâng quyền---
 if [[ $EUID -ne 0 ]]; then
     sudo -E "$0" "$@"
     exit $?
@@ -38,7 +38,8 @@ fi
 
 # -------------------------------------------------------------------------------------------------------------------------------
 # --- Kiểm tra WP-CLI ---
-# Kiểm tra WP-CLI, mặc dù wpsila có cài rồi, nhưng phòng người dùng gỡ
+# Kiểm tra WP-CLI, mặc dù wpsila có cài rồi, nhưng phòng người dùng gỡ.
+# Thoát sớm nếu chưa cài (fail-fast).
 if ! command -v wp &> /dev/null; then
     echo "Loi: WP-CLI chua duoc cai dat."
     exit 1
@@ -61,19 +62,20 @@ read -r -p "Nhap ten mien website (VD: example.com): " INPUT_DOMAIN
 TEMP_DOMAIN=$(echo "$INPUT_DOMAIN" | tr '[:upper:]' '[:lower:]' | tr -d ' ')
 DOMAIN=$(echo "$TEMP_DOMAIN" | sed -E 's|^https?://||' | sed -E 's|/.*$||' | sed -E 's|:[0-9]+$||')
 
-# Kiểm tra rỗng
+# Kiểm tra tên miền rỗng
 if [[ -z "$DOMAIN" ]]; then
      echo -e "${RED}Loi: Ten mien khong duoc de trong!${NC}"
      exit 1
 fi
 
-# Kiểm tra tên miền đã được cài đặt hay chưa?
-WP_PATH="/var/www/$DOMAIN/public_html"
-CONFIG_FILE="$WP_PATH/wp-config.php"
+# Kiểm tra tên miền trên VPS đã được cài đặt hay chưa?
+WP_PATH="/var/www/$DOMAIN/public_html" # Cấu hình chuẩn trên wpsila.
+CONFIG_FILE="$WP_PATH/wp-config.php" # Đường dẫn của file wp-config.php
 
 # --- ĐẶT MÃ CLEANUP VÀ TRAP ---
-# Để dự phòng mã bị dừng giữa chừng thì bảo mật wp-config.php vẫn được giữ lại
-IS_LOCKED=false # Khai báo mặc định để tránh lỗi "unbound variable"
+# Để dự phòng mã bị dừng giữa chừng thì bảo mật wp-config.php vẫn được giữ lại.
+IS_LOCKED=false # Khai báo mặc định để tránh lỗi "unbound variable".
+
 cleanup() {
     # Nếu biến IS_LOCKED là true (tức là script đã mở khóa file)
     if [[ "${IS_LOCKED:-false}" = true ]] && [[ -f "$CONFIG_FILE" ]]; then
@@ -82,8 +84,10 @@ cleanup() {
     fi
 }
 # Kích hoạt khi script thoát hoặc bị ngắt (Ctrl+C)
-trap cleanup EXIT INT TERM
+trap cleanup EXIT INT TERM # Các trường hợp bash bị dừng giữa chừng thì kích hoạt trap cleanup.
 
+# Thông báo khi không tìm thấy thư mục cài đặt của website.
+# Điều kiện bao gồm cả việc không tìm thấy file wp-config.php
 if [[ ! -d "$WP_PATH" ]] || [[ ! -f "$CONFIG_FILE" ]]; then
     echo -e "${RED}Loi: Khong tim thay WordPress tai: $WP_PATH${NC}"
     exit 1
@@ -199,6 +203,7 @@ rm -f "$WP_PATH/wp-content/redis-config.php" 2>/dev/null || true # File config c
 
 # -------------------------------------------------------------------------------------------------------------------------------
 # 6. Hoàn tất
+echo -e "${YELLOW}[4/4] Hoan tat...${NC}"
 echo -e "${GREEN}=== THANH CONG! ===${NC}"
 echo -e "Website: ${YELLOW}$DOMAIN${NC}"
 echo -e "Status: ${GREEN}Da don dep thanh cong!${NC}"
