@@ -74,11 +74,11 @@ CONFIG_FILE="$WP_PATH/wp-config.php" # Đường dẫn của file wp-config.php
 
 # --- ĐẶT MÃ CLEANUP VÀ TRAP ---
 # Để dự phòng mã bị dừng giữa chừng thì bảo mật wp-config.php vẫn được giữ lại.
-IS_LOCKED=false # Khai báo mặc định để tránh lỗi "unbound variable".
+IS_LOCKED=0 # Khai báo mặc định để tránh lỗi "unbound variable".
 
 cleanup() {
     # Nếu biến IS_LOCKED là true (tức là script đã mở khóa file)
-    if [[ "${IS_LOCKED:-false}" = true ]] && [[ -f "$CONFIG_FILE" ]]; then
+    if (( ${IS_LOCKED:-0} == 1 )) && [[ -f "$CONFIG_FILE" ]]; then
         chmod 640 "$CONFIG_FILE"
         echo "An toan hon: Da khoa lai file wp-config.php."
     fi
@@ -117,7 +117,7 @@ CURRENT_PERM=$(stat -c '%a' "$CONFIG_FILE")
 
 if [[ "$CURRENT_PERM" == "640" ]] || [[ "$CURRENT_PERM" == "440" ]]; then
     chmod 660 "$CONFIG_FILE" # Mở khóa
-    IS_LOCKED=true
+    IS_LOCKED=1
 fi
 
 # Đảm bảo quyền sở hữu đúng để WP-CLI ghi được
@@ -189,7 +189,7 @@ fi
 # 5. Khôi phục quyền FILE (RE-LOCK)
 echo -e "${YELLOW}[3/4] Khoi phuc va don dep...${NC}"
 
-if [[ "$IS_LOCKED" = true ]]; then
+if (( IS_LOCKED == 1 )); then
     chmod 640 "$CONFIG_FILE"
     echo "   - Da khoa lai wp-config.php (640)."
 fi

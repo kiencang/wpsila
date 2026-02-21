@@ -132,7 +132,7 @@ MAX_RETRIES=3       # Tổng số lần cho phép
 count=0             # Biến đếm số lần đã thử
 
 # 3. Vòng lặp giới hạn
-while [ "$count" -lt "$MAX_RETRIES" ]; do
+while [[ "$count" -lt "$MAX_RETRIES" ]]; do
     echo ""
     read -r -p "Nhap Email quan tri (Bat buoc, day phai la email cua ban): " TEMP_EMAIL
 	
@@ -158,7 +158,7 @@ while [ "$count" -lt "$MAX_RETRIES" ]; do
     count=$((count + 1))
     remaining=$((MAX_RETRIES - count))
     
-    if [ "$remaining" -gt 0 ]; then
+    if [[ "$remaining" -gt 0 ]]; then
         echo "⚠️ Ban con $remaining lan thu."
     else
         echo ""
@@ -170,6 +170,9 @@ done
 
 # Cho ra làm biến môi trường
 export ADMIN_EMAIL
+
+# Biến ADMIN_EMAIL đã được export, giờ ta dọn dẹp các biến tạm.
+unset TEMP_EMAIL count remaining
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++

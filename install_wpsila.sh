@@ -131,16 +131,17 @@ is_pkg_installed() {
 
 # Danh sách các gói cần thiết
 REQUIRED_PKGS="wget ca-certificates coreutils python3"
-NEED_INSTALL=false
+NEED_INSTALL=0
 
 for pkg in $REQUIRED_PKGS; do
     if ! is_pkg_installed "$pkg"; then
-        NEED_INSTALL=true
+        NEED_INSTALL=1
         break
     fi
 done
+unset pkg # HỦY BIẾN TẠM
 
-if [[ "$NEED_INSTALL" = true ]]; then
+if (( NEED_INSTALL == 1 )); then
 # -------------------------------------------------------------------------
 # Tắt tiến trình chạy cập nhật ngầm của Ubuntu
 # -------------------------------------------------------------------------
@@ -152,9 +153,9 @@ if [[ "$NEED_INSTALL" = true ]]; then
 	restore_environment() {
 		echo ">>> [System] Bat lai che do cap nhat nen..."
 		# Gỡ bỏ lệnh cấm (unmask) và khởi động lại timer
-		systemctl unmask apt-daily.service apt-daily-upgrade.service > /dev/null 2>&1
-		systemctl unmask apt-daily.timer apt-daily-upgrade.timer > /dev/null 2>&1
-		systemctl start apt-daily.timer apt-daily-upgrade.timer > /dev/null 2>&1
+		systemctl unmask apt-daily.service apt-daily-upgrade.service &> /dev/null
+		systemctl unmask apt-daily.timer apt-daily-upgrade.timer &> /dev/null
+		systemctl start apt-daily.timer apt-daily-upgrade.timer &> /dev/null
 	}
 
 # Hàm xử lý lock chuyên nghiệp - An toàn tuyệt đối
@@ -163,8 +164,8 @@ if [[ "$NEED_INSTALL" = true ]]; then
 
 		# 1. MASKING: Tạm thời vô hiệu hóa trigger cập nhật
 		# Dùng 'mask' mạnh hơn 'stop'. Nó ngăn systemd kích hoạt service dù có ai đó cố tình gọi.
-		systemctl mask apt-daily.service apt-daily-upgrade.service > /dev/null 2>&1
-		systemctl mask apt-daily.timer apt-daily-upgrade.timer > /dev/null 2>&1
+		systemctl mask apt-daily.service apt-daily-upgrade.service &> /dev/null
+		systemctl mask apt-daily.timer apt-daily-upgrade.timer &> /dev/null
 
 		# 2. WAITING: Chờ đợi văn minh (Không kill)
 		# Danh sách các file lock quan trọng
@@ -180,8 +181,8 @@ if [[ "$NEED_INSTALL" = true ]]; then
 
 		# Vòng lặp kiểm tra xem có tiến trình nào đang giữ lock không
 		# fuser trả về 0 nghĩa là có tiến trình đang dùng file -> Cần chờ
-		while fuser "${LOCK_FILES[@]}" >/dev/null 2>&1; do
-			if [ "$COUNT" -ge "$TIMEOUT" ]; then
+		while fuser "${LOCK_FILES[@]}" &> /dev/null; do
+			if [[ "$COUNT" -ge "$TIMEOUT" ]]; then
 				echo "!!! [Loi] Qua trinh cap nhat he thong bi ket lai qua lau (> 5 phut)."
 				echo "!!! Vui long cai lai va chay script wpsila ngay sau khi cai."
 				# Chuyên nghiệp là: Nếu kẹt quá lâu, hãy dừng lại báo lỗi thay vì phá hỏng hệ thống
@@ -344,6 +345,7 @@ for filename in "${!CHECKSUMS[@]}"; do
     # Thực hiện tải file
     download_file "$filename" "$dest"
 done
+unset filename dest # HỦY BIẾN TẠM
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++

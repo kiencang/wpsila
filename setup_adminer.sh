@@ -274,7 +274,7 @@ echo "Da tao file cau hinh: $CADDY_SITE_FILE"
 caddy fmt --overwrite "$CADDY_SITE_FILE"
 
 # Validate toàn bộ hệ thống
-if ! caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile > /dev/null 2>&1; then
+if ! caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile &> /dev/null; then
     echo -e "${RED}CANH BAO: File Caddyfile bi loi cu phap!${NC}"
     caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile
     

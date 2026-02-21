@@ -4,7 +4,7 @@
 set -euo pipefail
 
 # Phiên bản hiện tại của wpsila
-SCRIPT_VERSION="v1.2.9"
+SCRIPT_VERSION="v1.2.10"
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
@@ -40,7 +40,7 @@ RED='\033[0;31m'
 NC='\033[0m'
 
 # Biến trạng thái
-do_you_update="false"
+do_you_update=0
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
@@ -86,7 +86,7 @@ check_for_update() {
     l_major=${l_major:-0}; l_minor=${l_minor:-0}; l_patch=${l_patch:-0}
     r_major=${r_major:-0}; r_minor=${r_minor:-0}; r_patch=${r_patch:-0}
 
-    local should_update=false
+    local should_update=0
 
     # 4. Logic so sánh an toàn
     # --- BLOCK MAJOR UPDATE ---
@@ -101,17 +101,18 @@ check_for_update() {
     # Chỉ update nếu Major bằng nhau và (Minor lớn hơn HOẶC (Minor bằng nhau VÀ Patch lớn hơn))
     if (( 10#$r_major == 10#$l_major )); then
         if (( 10#$r_minor > 10#$l_minor )) || { (( 10#$r_minor == 10#$l_minor )) && (( 10#$r_patch > 10#$l_patch )); }; then
-            should_update=true
+            should_update=1
         fi
     fi
 
-    if [[ "$should_update" == "true" ]]; then
+    if (( should_update == 1 )); then
         echo -e "${YELLOW}Co phien ban moi: $latest_tag (Hien tai: $SCRIPT_VERSION)${NC}"
         # Dùng /dev/tty để đảm bảo read hoạt động kể cả khi script chạy trong pipe
         echo -ne "Ban co muon cap nhat ngay bay gio khong? [y/N]: "
+		local reply
         read -r reply < /dev/tty
         if [[ "$reply" =~ ^[Yy]$ ]]; then
-            do_you_update="true"
+            do_you_update=1
         fi
     fi
 }
@@ -126,7 +127,7 @@ if ! check_for_update; then
     echo -e "${YELLOW}Bo qua buoc cap nhat tu dong.${NC}"
 fi
 
-if [[ "$do_you_update" == "true" ]]; then
+if (( do_you_update == 1 )); then
     echo -e "${GREEN}Dang tai ban cap nhat...${NC}"
     
     # Reset timer sudo để tránh hỏi pass giữa chừng nếu đã sudo từ đầu

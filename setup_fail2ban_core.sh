@@ -66,7 +66,7 @@ fi
 echo -e "${GREEN}>>> [CORE] Tao cau hinh Global (Systemd Backend)...${NC}"
 
 # Backup file cu neu ton tai
-if [ -f /etc/fail2ban/jail.local ]; then
+if [[ -f /etc/fail2ban/jail.local ]]; then
     cp /etc/fail2ban/jail.local /etc/fail2ban/jail.local.bak
 fi
 
@@ -126,13 +126,13 @@ EOF
 # --- 4. KHỞI ĐỘNG & VERIFY ---
 echo -e "${GREEN}>>> [CORE] Khoi dong Fail2Ban...${NC}"
 
-systemctl unmask fail2ban > /dev/null 2>&1 || true
+systemctl unmask fail2ban &> /dev/null || true
 
 if systemctl restart fail2ban; then
     echo "   - Dang cho Fail2Ban khoi tao socket (10s)..."
     sleep 10
     
-    if fail2ban-client status sshd > /dev/null 2>&1; then
+    if fail2ban-client status sshd &> /dev/null; then
         echo -e "${GREEN}SUCCESS: Fail2Ban da bao ve SSH (Port ${SSH_PORT})!${NC}"
         echo "--------------------------------------------------------"
         fail2ban-client status sshd

@@ -287,10 +287,10 @@ CONFIG_FILE="$WP_PATH/wp-config.php"
 
 # --- ĐẶT MÃ CLEANUP VÀ TRAP ---
 # Để dự phòng mã bị dừng giữa chừng thì bảo mật wp-config.php (nếu có) vẫn được giữ lại.
-IS_LOCKED=false # Khai báo mặc định để tránh lỗi "unbound variable".
+IS_LOCKED=0 # Khai báo mặc định để tránh lỗi "unbound variable".
 cleanup() {
     # Nếu biến IS_LOCKED là true (tức là script đã mở khóa file).
-    if [[ "${IS_LOCKED:-false}" = true ]] && [[ -f "$CONFIG_FILE" ]]; then
+    if (( ${IS_LOCKED:-0} == 1 )) && [[ -f "$CONFIG_FILE" ]]; then
         chmod 640 "$CONFIG_FILE"
         echo "An toan hon: Da khoa lai file wp-config.php nhu thiet lap ban dau."
     fi
@@ -364,7 +364,7 @@ if [[ "$CURRENT_PERM" == "640" ]] || [[ "$CURRENT_PERM" == "440" ]]; then
     echo "Dang mo khoa tam thoi (Chmod 660) de ghi cau hinh..."
     chmod 660 "$CONFIG_FILE"
     # Đánh dấu cờ là đã mở khóa, để lát nữa còn khóa lại
-    IS_LOCKED=true
+    IS_LOCKED=1
 fi
 
 # Đảm bảo chủ sở hữu đúng là root:www-data trước khi thao tác
@@ -400,7 +400,7 @@ if ! wp plugin install redis-cache --activate --allow-root --path="$WP_PATH" --q
     echo "Huy bo qua trinh de tranh loi website."
     
     # Nếu lúc nãy chúng ta đã mở khóa, thì giờ phải khóa lại để bảo mật
-    if [[ "$IS_LOCKED" = true ]]; then
+    if (( IS_LOCKED == 1 )); then
         chmod 640 "$CONFIG_FILE"
     fi
     
@@ -476,7 +476,7 @@ fi
 # ========================================================================
 # Nếu lúc nãy chúng ta đã mở khóa, thì giờ phải khóa lại để bảo mật
 # Phần này hơi thừa vì đã có trap luôn chạy, nhưng nó là thừa an toàn!
-if [[ "$IS_LOCKED" = true ]]; then
+if (( IS_LOCKED == 1 )); then
     echo "Dang khoa lai file wp-config.php (Ve trang thai 640)..."
     chmod 640 "$CONFIG_FILE"
 fi

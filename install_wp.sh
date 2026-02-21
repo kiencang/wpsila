@@ -226,13 +226,13 @@ echo "Dang tao file cau hinh Caddy rieng biet..."
 echo "$CONTENT" > "$CADDY_SITE_FILE"
 
 # Format lại cho đẹp (Caddy chuẩn hóa)
-caddy fmt --overwrite "$CADDY_SITE_FILE" > /dev/null 2>&1
+caddy fmt --overwrite "$CADDY_SITE_FILE" &> /dev/null
 
 # I4. VALIDATE & RELOAD
 echo "Dang kiem tra cu phap Caddyfile..."
 
 # Kiểm tra tính hợp lệ của TOÀN BỘ cấu hình (bao gồm cả file mới vừa import)
-if ! caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile > /dev/null 2>&1; then
+if ! caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile &> /dev/null; then
     echo -e "${RED}CANH BAO: File cau hinh moi gay loi he thong!${NC}"
     
     # In ra lỗi cụ thể

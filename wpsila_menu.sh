@@ -36,7 +36,8 @@ fi
 # Hàm tạm dừng màn hình
 pause_screen() {
     echo -e "\n${BLUE}>> Nhan Enter de quay lai Menu...${NC}"
-    read -r
+    local dummy_key
+    read -r dummy_key
 }
 
 # Hàm thực thi script con an toàn

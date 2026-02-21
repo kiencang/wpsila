@@ -204,7 +204,7 @@ else
 fi
 
 # Bước 4: Kiểm tra và Reload SSH
-if [[ $NEED_RESTART -eq 1 ]]; then
+if (( NEED_RESTART == 1 )); then
     if sshd -t; then
         systemctl reload ssh
         echo "Da reload dich vu SSH (Config an toan)."

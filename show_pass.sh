@@ -51,7 +51,7 @@ TARGET_FILE="$SCRIPT_WPSILA_DIR/${WHAT_PASS}"
 
 # -------------------------------------------------------------------------------------------------------------------------------
 # 4. Kiểm tra và chạy lệnh
-if [ -f "$TARGET_FILE" ]; then
+if [[ -f "$TARGET_FILE" ]]; then
     echo "Dang doc file tai: $TARGET_FILE"
 	
 	# Hiển thị pass

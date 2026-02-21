@@ -105,7 +105,7 @@ fi
 
 # -------------------------------------------------------------------------------------------------------------------------------
 # 5. Kiểm tra user có tồn tại không?
-if ! wp user get "$TARGET_USER" --field=ID --allow-root --path="$WP_PATH" --skip-plugins --skip-themes > /dev/null 2>&1; then
+if ! wp user get "$TARGET_USER" --field=ID --allow-root --path="$WP_PATH" --skip-plugins --skip-themes &> /dev/null; then
     echo -e "${RED}Loi: User '$TARGET_USER' khong ton tai trong he thong.${NC}"
     exit 1
 fi
@@ -120,7 +120,7 @@ NEW_PASS="res_$(openssl rand -hex 8)"
 echo -e "${YELLOW}Dang thiet lap mat khau moi...${NC}"
 
 # 7. Thực thi việc reset mật khẩu
-if wp user update "$TARGET_USER" --user_pass="$NEW_PASS" --allow-root --path="$WP_PATH" --skip-plugins --skip-themes > /dev/null 2>&1; then
+if wp user update "$TARGET_USER" --user_pass="$NEW_PASS" --allow-root --path="$WP_PATH" --skip-plugins --skip-themes &> /dev/null; then
     echo ""
     echo -e "${GREEN}=== THANH CONG! ===${NC}"
     echo -e "Website: ${YELLOW}https://$DOMAIN/wp-admin${NC}"

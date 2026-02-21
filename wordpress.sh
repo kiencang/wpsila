@@ -64,7 +64,7 @@ DEFAULT_INSTALL_WP_EMAIL="admin@$DOMAIN"
 INSTALL_WP_EMAIL="${INSTALL_WP_EMAIL:-$DEFAULT_INSTALL_WP_EMAIL}"
 
 # G3.1. Cài đặt WP-CLI nếu chưa có
-if ! [ -x "$(command -v wp)" ]; then
+if ! [[ -x "$(command -v wp)" ]]; then
     echo " -> Dang tai WP-CLI..."
     curl -fLO https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
     chmod +x wp-cli.phar
@@ -183,6 +183,8 @@ if [[ -z "${PHP_VER:-}" ]]; then
     PHP_BIN="/usr/bin/php"
 fi
 
+# Bắt buộc phải giữ nguyên cú pháp cổ điển > /dev/null 2>&1
+# Tiến trình Cron của Ubuntu sử dụng shell dash (chỉ hiểu /bin/sh tiêu chuẩn), nó không hiểu Bash. Nếu đổi thành &> /dev/null, Cronjob này sẽ bị lỗi cú pháp và không chạy.
 CRON_CMD="*/5 * * * * $PHP_BIN /var/www/$DOMAIN/public_html/wp-cron.php > /dev/null 2>&1"
 
 # Logic thêm cron (Idempotent - Chạy nhiều lần không bị trùng)
