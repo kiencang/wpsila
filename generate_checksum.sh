@@ -4,7 +4,7 @@
 set -euo pipefail
 
 # Phiên bản của bash script
-VERSION="v1.2.7"
+VERSION="v1.3.0"
 
 # +++
 
@@ -52,6 +52,7 @@ FILE_LIST=(
 	"get_db_info.sh"
 	"install_redis_cache.sh"
 	"uninstall_redis_cache.sh"
+	"remove_pass_files.sh"
 )
 
 # Kiểm tra dependency

@@ -276,6 +276,10 @@ download_file "$REPO_URL/install_redis_cache.sh" "$INSTALL_DIR/install_redis_cac
 # -------------------------
 # Gỡ cài đặt Redis cache
 download_file "$REPO_URL/uninstall_redis_cache.sh" "$INSTALL_DIR/uninstall_redis_cache.sh"
+
+# -------------------------
+# Xóa file mật khẩu
+download_file "$REPO_URL/remove_pass_files.sh" "$INSTALL_DIR/remove_pass_files.sh"
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
