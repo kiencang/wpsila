@@ -259,4 +259,5 @@ fi
 # -------------------------------------------------------------------------------------------------------------------------------
 echo "Hoan tat! Xin chuc mung ban da cai thanh cong WordPress trên Caddy Web Server."
 echo "Nhap muc <4> de xem thong tin pass cua trang WordPress ban vua tao."
+echo -e "${YELLOW}Goi y: Sau khi luu mat khau, hay dung Menu <18> de xoa file mat khau nay di nhe!${NC}"
 # -------------------------------------------------------------------------------------------------------------------------------

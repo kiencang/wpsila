@@ -332,5 +332,6 @@ echo "[LOP 2] DATABASE LOGIN:"
 echo "   User: $USER_NAME"
 echo "   Pass: $DB_PASS"
 echo "   Xem lai thong tin pass o muc <10>"
+echo -e "${YELLOW}Goi y: Sau khi luu mat khau, hay dung Menu <18> de xoa file mat khau nay di nhe!${NC}"
 echo "======================================="
 # -------------------------------------------------------------------------------------------------------------------------------
