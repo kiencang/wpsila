@@ -11,6 +11,16 @@ export DEBIAN_FRONTEND=noninteractive
 # +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
+# Màu sắc cho thông báo
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
+NC='\033[0m' # No Color (ngắt màu)
+# -------------------------------------------------------------------------------------------------------------------------------
+
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
 # Chạy lệnh
 # curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/dev/install_wpsila_no_check_sum.sh | sudo bash
 # Cài mới và ghi đè hoàn toàn, không kiểm tra checksum, không kiểm tra sự tồn tại của wpsila.conf, không chặn ghi đè.
