@@ -97,9 +97,11 @@ show_menu() {
     echo -e "${BLUE}---------------------------------------------------------------${NC}"	
     echo -e " ${YELLOW}18.${NC} >> Xoa cac file chua mat khau de tang cuong bao mat"
     echo -e "${BLUE}---------------------------------------------------------------${NC}"	
+    echo -e " ${YELLOW}19.${NC} >> Xem danh sach & trang thai cac website tren VPS"
+    echo -e "${BLUE}---------------------------------------------------------------${NC}"	
     echo -e "  ${YELLOW}0.${NC} >> Exit (Thoat)"
     echo -e "${BLUE}===============================================================${NC}"
-    echo -n "Nhap lua chon (0-18): "
+    echo -n "Nhap lua chon (0-19): "
 }
 
 # -------------------------------------------------------------------------------------------------------------------------------
@@ -164,6 +166,8 @@ while true; do
 		17) run_script "uninstall_redis_cache.sh" ;;
 		
 		18) run_script "remove_pass_files.sh" ;;
+		
+		19) run_script "list_websites.sh" ;;
         
         0) echo -e "${GREEN}Tam biet! wpsila hen gap lai ban sau. Chuc website cua ban van hanh tot.${NC}"; exit 0 ;;
         
