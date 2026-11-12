@@ -54,6 +54,7 @@ FILE_LIST=(
 	"uninstall_redis_cache.sh"
 	"remove_pass_files.sh"
 	"list_websites.sh"
+	"manage_backup.sh"
 )
 
 # Kiểm tra dependency

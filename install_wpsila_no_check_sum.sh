@@ -295,6 +295,10 @@ download_file "$REPO_URL/remove_pass_files.sh" "$INSTALL_DIR/remove_pass_files.s
 # -------------------------
 # Liệt kê danh sách website
 download_file "$REPO_URL/remove_pass_files.sh" "$INSTALL_DIR/list_websites.sh"
+
+# -------------------------
+# Backup
+download_file "$REPO_URL/remove_pass_files.sh" "$INSTALL_DIR/manage_backup.sh"
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
