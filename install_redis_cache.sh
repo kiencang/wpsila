@@ -419,6 +419,10 @@ wp config set WP_REDIS_PREFIX "$SMART_PREFIX" --allow-root --path="$WP_PATH" --t
 # Set Salt (Bổ trợ bảo mật)
 wp config set WP_CACHE_KEY_SALT "$SMART_PREFIX" --allow-root --path="$WP_PATH" --type=constant
 
+# [NEW] Bật Selective Flush: Khi xóa cache của web này sẽ chỉ xóa đúng các key thuộc Prefix của nó,
+# tuyệt đối không làm mất cache của các website khác đang chạy chung Redis trên VPS.
+wp config set WP_REDIS_SELECTIVE_FLUSH true --allow-root --path="$WP_PATH" --raw --type=constant
+
 # [FIX] Cấu hình Socket chuẩn cho Redis Object Cache
 # 1. Định nghĩa giao thức UNIX (bắt buộc)
 wp config set WP_REDIS_SCHEME "unix" --allow-root --path="$WP_PATH" --type=constant

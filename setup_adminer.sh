@@ -248,9 +248,9 @@ $DOMAIN {
     file_server
 
     # Bao mat 2 lop (Basic Auth)
-    basicauth / {
-        $USER_NAME $HASHED_PASS
-    }
+	basic_auth {
+		$USER_NAME $HASHED_PASS
+	}
 
     # An file he thong
     @hiddenFiles {

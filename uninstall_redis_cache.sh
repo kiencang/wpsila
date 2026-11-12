@@ -154,6 +154,7 @@ echo "   - Don dep wp-config.php..."
 KEYS_TO_REMOVE=(
     "WP_REDIS_PREFIX"
     "WP_CACHE_KEY_SALT"
+    "WP_REDIS_SELECTIVE_FLUSH"
     "WP_REDIS_SCHEME"
     "WP_REDIS_PATH"
     "WP_REDIS_HOST"

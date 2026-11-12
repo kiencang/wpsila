@@ -291,6 +291,33 @@ echo -e "${YELLOW}Dang xoa Cronjob he thong cua website...${NC}"
 # +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
+# [NEW] Xóa các tài khoản SFTP gắn với website này
+echo -e "${YELLOW}Dang kiem tra va xoa tai khoan SFTP cua website...${NC}"
+
+# Tìm trong /etc/passwd các user có Home Directory (cột 6) trùng với $ROOT_DIR (/var/www/$DOMAIN)
+SFTP_USERS=$(awk -F: -v dir="$ROOT_DIR" '$6 == dir {print $1}' /etc/passwd || true)
+
+if [[ -n "$SFTP_USERS" ]]; then
+    for sftp_user in $SFTP_USERS; do
+        # Kiểm tra chắc chắn user này thuộc group 'sftp_only' do wpsila tạo ra thì mới xóa
+        if id -nG "$sftp_user" 2>/dev/null | grep -qw "sftp_only"; then
+            # Ngắt các tiến trình SFTP của user này nếu đang kết nối trên FileZilla/WinSCP
+            pkill -KILL -u "$sftp_user" &>/dev/null || true
+            # Xóa user khỏi hệ thống (không dùng -r vì thư mục web đã được xóa ở bước G2)
+            if userdel -f "$sftp_user" &>/dev/null; then
+                echo -e "${GREEN} -> Da xoa tai khoan SFTP: $sftp_user${NC}"
+            fi
+        fi
+    done
+    unset sftp_user
+else
+    echo "Khong tim thay tai khoan SFTP nao gan voi $DOMAIN."
+fi
+# -------------------------------------------------------------------------------------------------------------------------------
+
+# +++
+
+# -------------------------------------------------------------------------------------------------------------------------------
 # I. Kết thúc & thông báo
 echo -e ""
 echo -e "${GREEN}=== XOA WEBSITE THANH CONG! ===${NC}"
