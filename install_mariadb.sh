@@ -10,27 +10,35 @@
 echo -e "${GREEN}[1/3] Dang cai dat MariaDB Server...${NC}"
 
 # 1. Thêm Repo MariaDB chính chủ
-# Tạo thư mục keyring nếu chưa có
 mkdir -p /etc/apt/keyrings
 
-# Tải Key với flag -fsSL (Fail silent, Show error, Follow redirect) để an toàn
-# Kiểm tra nếu tải thất bại thì báo lỗi ngay
-if ! curl -fsSL 'https://mariadb.org/mariadb_release_signing_key.pgp' -o /etc/apt/keyrings/mariadb-keyring.pgp; then
-    echo -e "${RED}Loi: Khong the tai GPG Key cho MariaDB.${NC}"
-    exit 1
+# Nếu tải được GPG Key thì mới thêm Repo MariaDB, nếu mạng lỗi không tải được Key thì bỏ qua để dùng Repo Ubuntu luôn
+if curl -fsSL 'https://mariadb.org/mariadb_release_signing_key.pgp' -o /etc/apt/keyrings/mariadb-keyring.pgp; then
+    . /etc/os-release
+    echo "deb [signed-by=/etc/apt/keyrings/mariadb-keyring.pgp] https://deb.mariadb.org/${MARIADB_VER}/ubuntu $VERSION_CODENAME main" | tee /etc/apt/sources.list.d/mariadb.list
+
+    # Cấp quyền đọc cho user _apt
+    chmod a+r /etc/apt/keyrings/mariadb-keyring.pgp
+    chmod a+r /etc/apt/sources.list.d/mariadb.list
+else
+    echo -e "${YELLOW}Canh bao: Khong the tai GPG Key tu mariadb.org. Se su dung Repo chinh thuc cua Ubuntu...${NC}"
 fi
 
-# File source list
-# Tự động detect OS codename (jammy/noble)
-. /etc/os-release
-echo "deb [signed-by=/etc/apt/keyrings/mariadb-keyring.pgp] https://deb.mariadb.org/${MARIADB_VER}/ubuntu $VERSION_CODENAME main" | tee /etc/apt/sources.list.d/mariadb.list
-
-# Update lại apt sau khi thêm repo
-apt-get update
+# Update lại apt sau khi thêm repo (Nếu mirror deb.mariadb.org lỗi thì fallback về repo mặc định của Ubuntu)
+if ! apt-get update; then
+    echo -e "${YELLOW}Canh bao: Mirror deb.mariadb.org dang gap su co. Chuyen sang dung Repo chinh thuc cua Ubuntu...${NC}"
+    rm -f /etc/apt/sources.list.d/mariadb.list
+    apt-get update
+fi
 
 # Cài đặt MariaDB và công cụ Backup
-# Thêm mariadb-backup để sau này dễ dàng sao lưu
-apt-get install -y mariadb-server mariadb-client mariadb-backup
+# Bọc thêm fallback: Nếu lúc tải gói .deb từ Mirror MariaDB bị lỗi 404 thì tự động chuyển về Repo Ubuntu cài lại
+if ! apt-get install -y mariadb-server mariadb-client mariadb-backup; then
+    echo -e "${YELLOW}Canh bao: Tai goi tu Mirror MariaDB bi loi. Chuyen sang cai tu Repo chinh thuc cua Ubuntu...${NC}"
+    rm -f /etc/apt/sources.list.d/mariadb.list
+    apt-get update
+    apt-get install -y mariadb-server mariadb-client mariadb-backup
+fi
 
 # Khởi động MariaDB
 systemctl enable --now mariadb

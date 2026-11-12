@@ -9,12 +9,18 @@
 # -------------------------------------------------------------------------------------------------------------------------------
 # Hàm khôi phục sau khi cài xong
 restore_environment() {
+    local exit_code=$?
     echo ">>> [System] Dang bat lai che do cap nhat nen..."
-    # Gỡ bỏ lệnh cấm (unmask) và khởi động lại timer
-    systemctl unmask apt-daily.service apt-daily-upgrade.service &> /dev/null
-    systemctl unmask apt-daily.timer apt-daily-upgrade.timer &> /dev/null
-    systemctl start apt-daily.timer apt-daily-upgrade.timer &> /dev/null
-	echo ">>> [System] Xong!"
+    systemctl unmask apt-daily.service apt-daily-upgrade.service &> /dev/null || true
+    systemctl unmask apt-daily.timer apt-daily-upgrade.timer &> /dev/null || true
+    systemctl start apt-daily.timer apt-daily-upgrade.timer &> /dev/null || true
+
+    if [[ $exit_code -ne 0 ]]; then
+        echo -e "\033[0;31m!!! [LOI NGHIEM TRONG] Qua trinh cai dat bi dung dot ngot (Ma loi: $exit_code) !!!\033[0m"
+        echo -e "\033[1;33m>>> Vui long keo len tren de xem chi tiet dong bao loi.\033[0m"
+    else
+        echo ">>> [System] Xong!"
+    fi
 }
 # -------------------------------------------------------------------------------------------------------------------------------
 

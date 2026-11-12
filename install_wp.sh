@@ -66,6 +66,16 @@ if ! id "caddy" &>/dev/null; then
     exit 1
 fi
 
+if ! command -v php &>/dev/null; then
+    echo -e "${RED}Loi: PHP chua duoc cai dat. Qua trinh cai LCMP (muc 1) chua hoan tat.${NC}"
+    exit 1
+fi
+
+if ! command -v mariadb &>/dev/null; then
+    echo -e "${RED}Loi: MariaDB chua duoc cai dat. Qua trinh cai LCMP (muc 1) chua hoan tat.${NC}"
+    exit 1
+fi
+
 if ! id "www-data" &>/dev/null; then
     echo -e "${RED}Loi: User 'www-data' chua ton tai.${NC}"
     echo -e "${YELLOW}Goi y: Hay cai dat PHP-FPM.${NC}"
