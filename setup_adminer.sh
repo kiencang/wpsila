@@ -216,7 +216,7 @@ if ! systemctl is-active --quiet mariadb; then
     systemctl start mariadb
 fi
 
-mysql <<EOF
+mariadb <<EOF
 CREATE USER IF NOT EXISTS '${USER_NAME}'@'localhost' IDENTIFIED BY '${DB_PASS}';
 ALTER USER '${USER_NAME}'@'localhost' IDENTIFIED BY '${DB_PASS}';
 GRANT ALL PRIVILEGES ON *.* TO '${USER_NAME}'@'localhost' WITH GRANT OPTION;

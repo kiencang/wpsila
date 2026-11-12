@@ -155,21 +155,21 @@ fi
 if [[ -n "$DB_NAME" ]]; then
     echo -e "${YELLOW}Dang xoa Database va User...${NC}"
     
-    if ! command -v mysql &> /dev/null; then
-        echo -e "${RED}Loi: Khong tim thay lenh 'mysql'. Bo qua buoc xoa DB.${NC}"
+    if ! command -v mariadb &> /dev/null; then
+        echo -e "${RED}Loi: Khong tim thay lenh 'mariadb'. Bo qua buoc xoa DB.${NC}"
     else
         # Tạo chuỗi lệnh SQL để xóa sạch sẽ
-        # 2>/dev/null ở lệnh mysql giúp ẩn các cảnh báo không cần thiết
+        # 2>/dev/null ở lệnh mariadb giúp ẩn các cảnh báo không cần thiết
         SQL_CMD="DROP DATABASE IF EXISTS \`$DB_NAME\`;"
         SQL_CMD+="DROP USER IF EXISTS \`$DB_USER\`@'localhost';"
 		SQL_CMD+="DROP USER IF EXISTS \`$DB_USER\`@'127.0.0.1';"
         SQL_CMD+="DROP USER IF EXISTS \`$DB_USER\`@'%';"
         SQL_CMD+="FLUSH PRIVILEGES;"
 
-        if mysql -u root -e "$SQL_CMD" 2>/dev/null; then
+        if mariadb -u root -e "$SQL_CMD" 2>/dev/null; then
             echo -e "${GREEN}Da xoa Database & User thanh cong.${NC}"
         else
-            echo -e "${RED}Loi: MySQL bao loi (Sai pass root hoac thieu quyen). Vui long xoa DB thu cong.${NC}"
+            echo -e "${RED}Loi: Mariadb bao loi (Sai pass root hoac thieu quyen). Vui long xoa DB thu cong.${NC}"
         fi
     fi
 fi
