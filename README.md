@@ -17,6 +17,11 @@ Mỗi khi ra phiên bản mới cần làm như sau:
 
 Lúc này vps.wpsila.com sẽ chứa phiên bản mới nhất. Tải có kiểm tra checksum để đảm bảo dữ liệu tải về đầy đủ.
 
+<p align="center">
+  <img src="images/VSC-Ubuntu.png" alt="Chạy checksum">
+   <br><em>Chạy checksum, `$ bash ./checksum.sh` (generate_checksum.sh) qua giao diện Visual Studio Code (Running on Ubuntu / WSL 2)</em>
+</p>
+
 ---
 
 File install_wpsila_no_check_sum.sh dùng để test kiểm tra mã trước khi ra phiên bản chính thức, nó không có các ràng buộc về:
