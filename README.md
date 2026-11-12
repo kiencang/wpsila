@@ -18,7 +18,6 @@ curl -sL https://vps.wpsila.com | sudo bash
 Hướng dẫn sử dụng đầy đủ mời bạn xem chi tiết ở đây: https://wpsila.com/huong-dan/
 
 ## Gợi ý các theme & plugin nên dùng cùng với wpsila
-
 wpsila có thể dùng kèm với *bất kỳ theme & plugin nào*, tuy vậy chúng tôi gợi ý bạn nên dùng các theme & plugin dưới đây để đảm bảo website an toàn & có hiệu suất cao:
 
 - Giao diện: GeneratePress (https://wordpress.org/themes/generatepress/)
@@ -34,22 +33,18 @@ Ngoài ra các tính năng bảo mật miễn phí của Cloudflare (https://www
 **Chú ý**: Các công cụ trên chỉ là gợi ý, wpsila không có bất cứ ràng buộc nào là bạn phải dùng theme hay plugin cụ thể nào đó.
 
 ## Gợi ý công cụ dùng kèm wpsila
-
 wpsila nằm trong gói Sila Stack (https://wpsila.com/sila-stack/) hỗ trợ toàn diện cho blog WordPress. Để tối ưu thêm bạn có thể dùng thêm các công cụ dưới đây:
 
 - rtf-cafe: https://rtd-cafe.wpsila.com/
 - Plugin Simple Cafe Purge: https://simple-cafe-purge.wpsila.com/
 
 ## Tuyên bố miễn trừ trách nhiệm (Disclaimer)
-
 Script này được cung cấp miễn phí và mã nguồn mở. Mặc dù tôi đã cố gắng hết sức để kiểm tra kỹ lưỡng, nhưng việc sử dụng script này hoàn toàn thuộc về rủi ro của bạn (Use at your own risk).
 
 Tác giả không chịu trách nhiệm cho bất kỳ thiệt hại nào liên quan đến:
 
 - Mất mát dữ liệu.
-
 - Lỗi cấu hình hệ thống.
-
 - Các vấn đề bảo mật phát sinh.
 
 Tuyên bố miễn trừ trách nhiệm đầy đủ được tôi công bố tại đây: https://wpsila.com/disclaimer
