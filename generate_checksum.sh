@@ -53,6 +53,7 @@ FILE_LIST=(
 	"install_redis_cache.sh"
 	"uninstall_redis_cache.sh"
 	"remove_pass_files.sh"
+	"list_websites.sh"
 )
 
 # Kiểm tra dependency

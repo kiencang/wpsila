@@ -7,6 +7,7 @@ set -euo pipefail
 # Thiet lap moi truong chuan cho Automation
 export LC_ALL=C.UTF-8
 export DEBIAN_FRONTEND=noninteractive
+# -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
 
@@ -290,6 +291,10 @@ download_file "$REPO_URL/uninstall_redis_cache.sh" "$INSTALL_DIR/uninstall_redis
 # -------------------------
 # Xóa file mật khẩu
 download_file "$REPO_URL/remove_pass_files.sh" "$INSTALL_DIR/remove_pass_files.sh"
+
+# -------------------------
+# Liệt kê danh sách website
+download_file "$REPO_URL/remove_pass_files.sh" "$INSTALL_DIR/list_websites.sh"
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
