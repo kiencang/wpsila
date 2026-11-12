@@ -37,31 +37,32 @@ NC='\033[0m' # No Color (ngắt màu)
 
 # -------------------------------------------------------------------------------------------------------------------------------
 # B. CẤU HÌNH & ĐƯỜNG DẪN
-# Thiết lập các giá trị mặc định, phòng trường hợp config (wpsila.conf) lỗi
-DEFAULT_PHP_VER="8.3" # giá trị mặc định của phiên bản PHP
-DEFAULT_MARIADB_VER="10.11" # giá trị mặc định của MariaDB
-
-# B2. Định nghĩa đường dẫn (Sử dụng cách an toàn nhất, không phụ thuộc realpath)
+# Nạp cấu hình trung tâm từ wpsila.conf
 SCRIPT_WPSILA_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
-
-# Trỏ vào file config nằm cùng thư mục
 WPSILA_CONFIG_FILE="$SCRIPT_WPSILA_DIR/wpsila.conf"
 
-# B3. Kiểm tra sự tồn tại và nạp file config
-if [[ -f "$WPSILA_CONFIG_FILE" ]]; then
-    source "$WPSILA_CONFIG_FILE"
-    echo -e "${GREEN}Da tim thay file cau hinh: ${WPSILA_CONFIG_FILE}${NC}"
-else
-    echo -e "${YELLOW}Khong tim thay file config. Su dung phien ban mac dinh.${NC}"
+# Kiểm tra sự tồn tại và nạp file config
+if [[ ! -f "$WPSILA_CONFIG_FILE" ]]; then
+    echo -e "${RED}Loi: Khong tim thay file cau hinh trung tam ($WPSILA_CONFIG_FILE)!${NC}"
+    exit 1
 fi
 
-# B4. Chốt phiên bản & Export biến
-# Export ngay lập tức để toàn bộ quy trình bên dưới nhận diện được
-export PHP_VER="${PHP_VER:-$DEFAULT_PHP_VER}"
-export MARIADB_VER="${MARIADB_VER:-$DEFAULT_MARIADB_VER}"
+source "$WPSILA_CONFIG_FILE"
+echo -e "${GREEN}Da tim thay file cau hinh: ${WPSILA_CONFIG_FILE}${NC}"
+
+# Kiểm tra biến bắt buộc
+if [[ -z "${PHP_VER:-}" ]] || [[ -z "${MARIADB_VER:-}" ]]; then
+    echo -e "${RED}Loi: Bien PHP_VER hoac MARIADB_VER chua duoc khai bao trong wpsila.conf!${NC}"
+    exit 1
+fi
+
+# Export biến để các module con (install_php.sh, install_mariadb.sh) nhận diện được
+export PHP_VER
+export MARIADB_VER
 export SCRIPT_WPSILA_DIR
 
 echo -e "Phien ban PHP se cai dat: ${GREEN}$PHP_VER${NC}"
+echo -e "Phien ban MariaDB se cai dat: ${GREEN}$MARIADB_VER${NC}"
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++

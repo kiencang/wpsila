@@ -87,39 +87,32 @@ fi
 
 # -------------------------------------------------------------------------------------------------------------------------------
 # D. CẤU HÌNH PHIÊN BẢN PHP
-# D1. Đặt giá trị mặc định (phòng hờ không tìm thấy file config / wpsila.conf)
-DEFAULT_PHP_VER="8.3"
-
-# D2. Định nghĩa đường dẫn file config 
+# Nạp cấu hình trung tâm từ wpsila.conf
 # (Ví dụ: file config nằm cùng thư mục với script đang chạy)
 # Dòng lệnh này đảm bảo biến SCRIPT_WPSILA_DIR luôn là đường dẫn tuyệt đối tới thư mục chứa file này
-# Cách chuẩn mực
+# Xác định thư mục
 SCRIPT_WPSILA_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
-
-# ---
-# Hoặc có thể dùng cách đơn giản này:
-# SCRIPT_WPSILA_DIR="$(dirname "$(realpath "$0")")"
-# ----
 
 # Trỏ vào file config nằm cùng thư mục đó
 WPSILA_CONFIG_FILE="$SCRIPT_WPSILA_DIR/wpsila.conf"
 
-# D3. Kiểm tra và nạp file config
-if [[ -f "$WPSILA_CONFIG_FILE" ]]; then
-    # Lệnh 'source' hoặc dấu chấm '.' sẽ đọc biến từ file kia vào script này
-    source "$WPSILA_CONFIG_FILE"
-    echo -e "${GREEN}Da tim thay file cau hinh: ${WPSILA_CONFIG_FILE}${NC}"
-else
-    echo -e "${YELLOW}Khong tim thay file config. Su dung phien ban mac dinh.${NC}"
+# Kiểm tra và nạp file config
+if [[ ! -f "$WPSILA_CONFIG_FILE" ]]; then
+    echo -e "${RED}Loi: Khong tim thay file cau hinh trung tam ($WPSILA_CONFIG_FILE)!${NC}"
+    exit 1
 fi
 
-# D4. Chốt phiên bản cuối cùng
-# Cú pháp ${BIEN_1:-$BIEN_2} nghĩa là: Nếu BIEN_1 rỗng (chưa set trong config), thì lấy BIEN_2
-# Export ngay lập tức để toàn bộ quy trình bên dưới nhận diện được
-export PHP_VER="${PHP_VER:-$DEFAULT_PHP_VER}"
-export SCRIPT_WPSILA_DIR
+source "$WPSILA_CONFIG_FILE"
 
-echo "Phien ban PHP: $PHP_VER"
+if [[ -z "${PHP_VER:-}" ]]; then
+    echo -e "${RED}Loi: Bien PHP_VER chua duoc khai bao trong wpsila.conf!${NC}"
+    exit 1
+fi
+
+# Thông báo phiên bản PHP
+export PHP_VER
+export SCRIPT_WPSILA_DIR
+echo -e "Phien ban PHP he thong: ${GREEN}$PHP_VER${NC}"
 sleep 2
 # -------------------------------------------------------------------------------------------------------------------------------
 

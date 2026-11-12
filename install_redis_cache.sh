@@ -93,17 +93,33 @@ fi
 # ========================================================================
 # [NEW] 0. NẠP CẤU HÌNH ĐỂ LẤY PHP VERSION
 # ========================================================================
-# Xác định thư mục chứa script
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )" # Thư mục hiện tại
-CONF_FILE="$SCRIPT_DIR/wpsila.conf" # File cấu hình tùy chỉnh (luôn có).
+# Nạp cấu hình trung tâm từ wpsila.conf
+# (Ví dụ: file config nằm cùng thư mục với script đang chạy)
+# Dòng lệnh này đảm bảo biến SCRIPT_WPSILA_DIR luôn là đường dẫn tuyệt đối tới thư mục chứa file này
+# Xác định thư mục
+SCRIPT_WPSILA_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
-# Nạp file cấu hình nếu tồn tại
-if [[ -f "$CONF_FILE" ]]; then
-    source "$CONF_FILE"
-else
-    # Fallback nếu mất file config (Mặc định 8.3 cho an toàn)
-    PHP_VER="8.3"
+# Trỏ vào file config nằm cùng thư mục đó
+WPSILA_CONFIG_FILE="$SCRIPT_WPSILA_DIR/wpsila.conf"
+
+# Kiểm tra và nạp file config
+if [[ ! -f "$WPSILA_CONFIG_FILE" ]]; then
+    echo -e "${RED}Loi: Khong tim thay file cau hinh trung tam ($WPSILA_CONFIG_FILE)!${NC}"
+    exit 1
 fi
+
+source "$WPSILA_CONFIG_FILE"
+
+if [[ -z "${PHP_VER:-}" ]]; then
+    echo -e "${RED}Loi: Bien PHP_VER chua duoc khai bao trong wpsila.conf!${NC}"
+    exit 1
+fi
+
+# Thông báo phiên bản PHP
+export PHP_VER
+export SCRIPT_WPSILA_DIR
+echo -e "Phien ban PHP he thong: ${GREEN}$PHP_VER${NC}"
+sleep 2
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
