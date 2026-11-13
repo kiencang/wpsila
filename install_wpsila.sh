@@ -4,7 +4,7 @@
 set -euo pipefail
 
 # Phiên bản hiện tại của wpsila
-SILA_VERSION="v1.4.1"
+SILA_VERSION="v1.4.2"
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
@@ -20,7 +20,7 @@ SILA_VERSION="v1.4.1"
 # curl -sL https://vps.wpsila.com | sudo bash
 # -------------------------------------------------------------------------
 # Test trước khi đẩy lên link chính
-# curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/dev/install_wpsila.sh | sudo bash
+# curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/test/install_wpsila.sh | sudo bash
 # -------------------------------------------------------------------------
 
 # +++
