@@ -237,7 +237,6 @@ rm -f "$INSTALL_DIR/"*.sh
 # Sử dụng mã generate_checksum bên branches Dev chạy để lấy mã này về
 # Dev bắt buộc phải dùng trước khi công bố phiên bản mới
 # Có tác dụng ngăn chặn các vấn đề liên quan đến lỗi đường truyền
-=== KET QUA: Copy doan duoi day va thay vao script cai dat ===
 # --------------------------------------------------------------------------------
 # Generated at: Fri Nov 13 11:28:29 +07 2026
 # Version: v1.4.0
