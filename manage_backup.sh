@@ -252,8 +252,8 @@ restore_website_interactive() {
     local wp_path="$web_root/public_html"
     local backup_dir="$web_root/backups"
 
-    if [[ ! -d "$wp_path" || ! -f "$wp_path/wp-config.php" ]]; then
-        echo -e "${RED}Loi: Website $domain khong ton tai tren VPS!${NC}"
+    if [[ ! -d "$web_root" ]]; then
+        echo -e "${RED}Loi: Thu muc website $web_root khong ton tai tren VPS!${NC}"
         return
     fi
 
@@ -315,10 +315,16 @@ restore_website_interactive() {
     # Lấy tên DB hiện tại và quyền wp-config.php hiện tại
     local db_name current_wpconfig_perm
     db_name=$(extract_db_name "$wp_path")
+    if [[ -z "$db_name" ]]; then
+        db_name=$(extract_db_name "$ACTIVE_RESTORE_TMP/public_html")
+    fi
+    if [[ -z "$db_name" ]]; then
+        echo -e "${RED}Loi: Khong the xac dinh ten Database de khoi phuc!${NC}"
+        rm -rf "$ACTIVE_RESTORE_TMP"
+        ACTIVE_RESTORE_TMP=""
+        return
+    fi
     current_wpconfig_perm=$(stat -c '%a' "$wp_path/wp-config.php" 2>/dev/null || echo "660")
-
-    # Giữ lại bản sao wp-config.php hiện tại (phòng trường hợp DB pass hiện tại khác lúc backup)
-    cp -f "$wp_path/wp-config.php" "$ACTIVE_RESTORE_TMP/wp-config.current.bak"
 
     echo -e "${YELLOW}[2/4] Dang khoi phuc Database ($db_name)...${NC}"
     if ! mariadb "$db_name" < "$ACTIVE_RESTORE_TMP/database.sql"; then
@@ -332,9 +338,6 @@ restore_website_interactive() {
     # Xóa code cũ và chuyển code từ bản backup vào
     rm -rf "$wp_path"
     mv "$ACTIVE_RESTORE_TMP/public_html" "$wp_path"
-
-    # Khôi phục lại file wp-config.php có thông tin kết nối DB chuẩn hiện tại
-    cp -f "$ACTIVE_RESTORE_TMP/wp-config.current.bak" "$wp_path/wp-config.php"
 
     echo -e "${YELLOW}[4/4] Dang chuan hoa lai phân quyen va lam moi Cache...${NC}"
     chown root:root "$web_root"

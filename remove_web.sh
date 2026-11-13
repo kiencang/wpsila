@@ -88,10 +88,62 @@ CONFIG_FILE="$ROOT_DIR/public_html/wp-config.php"
 # +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
-# D. Kiểm tra thư mục web có tồn tại hay không?
+# D. Kiểm tra thư mục web có tồn tại hay không? (Hỗ trợ nhận diện cả Adminer ở bất kỳ tên miền nào)
+CADDY_SITE_FILE="/etc/caddy/sites-enabled/${DOMAIN}.caddy"
+ADMINER_DIR="/var/www/adminer"
+
 if [[ ! -d "$ROOT_DIR" ]]; then
-    echo -e "${RED}Loi: Thu muc $ROOT_DIR khong ton tai. Script se dung lai.${NC}"
-    exit 1
+    # Nếu không có thư mục /var/www/$DOMAIN, kiểm tra xem file .caddy của domain này có đang trỏ tới /var/www/adminer không
+    if [[ -f "$CADDY_SITE_FILE" ]] && grep -q "$ADMINER_DIR" "$CADDY_SITE_FILE"; then
+        echo -e "${YELLOW}>>> Phat hien '$DOMAIN' la trang quan tri Database (Adminer).${NC}"
+        echo -e "${RED}LUU Y: Thao tac nay se xoa cau hinh Adminer ($DOMAIN), tai khoan DB 'adminer_db' va ma nguon tai $ADMINER_DIR.${NC}"
+        read -r -p "Ban co chac chan muon XOA Adminer khong? (y/n): " confirm_adminer < /dev/tty
+
+        if [[ ! "$confirm_adminer" =~ ^[yY](es)?$ ]]; then
+            echo "Da HUY thao tac theo yeu cau. Adminer CHUA bi xoa."
+            exit 0
+        fi
+
+        # 1. Xóa file cấu hình Caddy & Reload Caddy
+        rm -f "$CADDY_SITE_FILE"
+        if systemctl reload caddy; then
+            echo -e "${GREEN}Da xoa cau hinh Caddy ($CADDY_SITE_FILE) va Reload thanh cong.${NC}"
+        else
+            echo -e "${RED}Canh bao: Khong the reload Caddy. Vui long kiem tra trang thai service.${NC}"
+        fi
+
+        # 2. Xóa chứng chỉ SSL cũ của $DOMAIN (nếu có)
+        CERT_PATH="/var/lib/caddy/.local/share/caddy/certificates/acme-v02.api.letsencrypt.org-directory"
+        if [[ -d "$CERT_PATH/$DOMAIN" ]]; then
+            rm -rf "${CERT_PATH:?}/$DOMAIN"
+            echo -e "${GREEN}Da xoa chung chi SSL cu cua $DOMAIN.${NC}"
+        fi
+
+        # 3. Nếu không còn tên miền nào khác đang trỏ vào /var/www/adminer thì dọn sạch toàn bộ Adminer
+        if ! grep -ql "$ADMINER_DIR" /etc/caddy/sites-enabled/*.caddy 2>/dev/null; then
+            if command -v mariadb &> /dev/null; then
+                mariadb -u root -e "DROP USER IF EXISTS 'adminer_db'@'localhost'; FLUSH PRIVILEGES;" 2>/dev/null || true
+                echo -e "${GREEN}Da xoa tai khoan DB 'adminer_db'@'localhost'.${NC}"
+            fi
+
+            if [[ -d "$ADMINER_DIR" ]]; then
+                rm -rf "$ADMINER_DIR"
+                echo -e "${GREEN}Da xoa thu muc ma nguon $ADMINER_DIR.${NC}"
+            fi
+
+            rm -f /var/log/caddy/adminer_access.log*
+            SCRIPT_WPSILA_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+            rm -f "$SCRIPT_WPSILA_DIR/adminerp.txt"
+            echo -e "${GREEN}Da xoa log va file mat khau adminerp.txt.${NC}"
+        fi
+
+        echo ""
+        echo -e "${GREEN}=== XOA ADMINER THANH CONG! ===${NC}"
+        exit 0
+    else
+        echo -e "${RED}Loi: Thu muc $ROOT_DIR khong ton tai. Script se dung lai.${NC}"
+        exit 1
+    fi
 fi
 
 echo -e "${YELLOW}--- Dang quet thong tin website: $DOMAIN ---${NC}"

@@ -170,6 +170,7 @@ fi
 if command -v php &>/dev/null; then
     PHP_SVC=$(get_svc_status "php${PHP_VER}-fpm")
     PHP_VER_INFO=$(get_pkg_version_info "php${PHP_VER}-fpm" 1)
+    [[ "$PHP_VER_INFO" == *"Co ban moi"* ]] && NEED_PATCH_UPDATE=1
     echo -e "  - PHP-FPM ($PHP_VER): ${PHP_SVC} | Phien ban: ${PHP_VER_INFO}"
 else
     echo -e "  - PHP-FPM ($PHP_VER): ${RED}[Chua cai dat]${NC}"
@@ -179,6 +180,7 @@ fi
 if command -v mariadb &>/dev/null; then
     MDB_SVC=$(get_svc_status "mariadb")
     MDB_VER_INFO=$(get_pkg_version_info "mariadb-server" 1)
+    [[ "$MDB_VER_INFO" == *"Co ban moi"* ]] && NEED_PATCH_UPDATE=1
     echo -e "  - MariaDB      : ${MDB_SVC} | Phien ban: ${MDB_VER_INFO}"
 else
     echo -e "  - MariaDB      : ${RED}[Chua cai dat]${NC}"
