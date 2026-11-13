@@ -87,15 +87,15 @@ check_disk_safety() {
     return 0
 }
 
-# 2. Lấy tên Database từ wp-config.php (Ưu tiên WP-CLI, có grep dự phòng nếu PHP web đang lỗi)
+# 2. Lấy tên Database từ wp-config.php (Ưu tiên đọc tĩnh an toàn không thực thi PHP, dự phòng WP-CLI dưới user www-data)
 extract_db_name() {
     local wp_path="$1"
     local db_name=""
-    if command -v wp &>/dev/null; then
-        db_name=$(wp config get DB_NAME --path="$wp_path" --allow-root --quiet --skip-plugins --skip-themes 2>/dev/null | tr -d '\r\n' || true)
+    if [[ -f "$wp_path/wp-config.php" ]]; then
+        db_name=$(grep -E "^[[:space:]]*define\(\s*['\"]DB_NAME['\"]" "$wp_path/wp-config.php" 2>/dev/null | sed -E "s/.*['\"]DB_NAME['\"]\s*,\s*['\"]([^'\"]+)['\"].*/\1/" | head -n 1 | tr -d '\r\n' || true)
     fi
-    if [[ -z "$db_name" && -f "$wp_path/wp-config.php" ]]; then
-        db_name=$(grep -E "define\(\s*['\"]DB_NAME['\"]" "$wp_path/wp-config.php" | sed -E "s/.*['\"]DB_NAME['\"]\s*,\s*['\"]([^'\"]+)['\"].*/\1/" | head -n 1 | tr -d '\r\n' || true)
+    if [[ -z "$db_name" ]] && command -v wp &>/dev/null; then
+        db_name=$(runuser -u www-data -- wp config get DB_NAME --path="$wp_path" --quiet --skip-plugins --skip-themes 2>/dev/null | tr -d '\r\n' || true)
     fi
     echo "$db_name"
 }
@@ -148,14 +148,22 @@ backup_single_site() {
     ACTIVE_TMP_TAR="${final_archive}.tmp"
 
     echo "  - [2/3] Dang nen ma nguon & Database (Che do tiet kiem CPU/Disk)..."
-    if nice -n 19 ionice -c 3 tar -czf "$ACTIVE_TMP_TAR" \
+    local tar_rc=0
+    local tar_prefix=(nice -n 19)
+    if command -v ionice &>/dev/null && ionice -c 3 true &>/dev/null; then
+        tar_prefix=(nice -n 19 ionice -c 3)
+    fi
+    "${tar_prefix[@]}" tar --warning=no-file-changed -czf "$ACTIVE_TMP_TAR" \
         --exclude="public_html/wp-content/cache/*" \
         --exclude="public_html/wp-content/updraft/*" \
         --exclude="public_html/wp-content/ai1wm-backups/*" \
         --exclude="public_html/wp-content/backups/*" \
         --exclude="public_html/wp-content/debug.log" \
         -C "$backup_dir" database.sql \
-        -C "$web_root" public_html 2>/dev/null; then
+        -C "$web_root" public_html 2>/dev/null || tar_rc=$?
+
+    # Exit code 0 (hoàn hảo) hoặc 1 (có file thay đổi nhẹ khi web đang chạy) của GNU tar đều hợp lệ
+    if (( tar_rc == 0 || tar_rc == 1 )); then
 
         # Xóa file SQL lẻ sau khi đã đưa vào trong gói nén
         rm -f "$ACTIVE_TMP_SQL"
@@ -243,8 +251,8 @@ restore_website_interactive() {
     local domain
     domain=$(echo "$input_domain" | tr '[:upper:]' '[:lower:]' | tr -d ' ' | sed -E 's|^https?://||; s|/.*$||; s|:[0-9]+$||')
 
-    if [[ -z "$domain" ]]; then
-        echo -e "${RED}Loi: Ten mien khong duoc de trong!${NC}"
+    if [[ -z "$domain" ]] || [[ ! "$domain" =~ ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\.[a-z]{2,}$ ]]; then
+        echo -e "${RED}Loi: Ten mien khong hop le!${NC}"
         return
     fi
 
@@ -335,6 +343,8 @@ restore_website_interactive() {
     fi
 
     echo -e "${YELLOW}[3/4] Dang khoi phuc ma nguon (public_html)...${NC}"
+    # Gỡ cờ bất biến chattr (nếu wp-config.php đang ở chế độ khóa) trước khi xóa code cũ
+    chattr -R -i "$wp_path" 2>/dev/null || true
     # Xóa code cũ và chuyển code từ bản backup vào
     rm -rf "$wp_path"
     mv "$ACTIVE_RESTORE_TMP/public_html" "$wp_path"
@@ -346,14 +356,17 @@ restore_website_interactive() {
     find "$wp_path" -type d -exec chmod 2775 {} +
     find "$wp_path" -type f -exec chmod 664 {} +
     chmod "$current_wpconfig_perm" "$wp_path/wp-config.php"
+    if [[ "$current_wpconfig_perm" == "640" || "$current_wpconfig_perm" == "440" ]]; then
+        chattr +i "$wp_path/wp-config.php" 2>/dev/null || true
+    fi
 
     # Xóa thư mục tạm
     rm -rf "$ACTIVE_RESTORE_TMP"
     ACTIVE_RESTORE_TMP=""
 
-    # Xóa Object Cache (nếu có) và Reload PHP-FPM để làm mới OPcache
+    # Xóa Object Cache (nếu có) dưới quyền www-data và Reload PHP-FPM để làm mới OPcache
     if command -v wp &>/dev/null; then
-        wp cache flush --path="$wp_path" --allow-root --quiet 2>/dev/null || true
+        runuser -u www-data -- wp cache flush --path="$wp_path" --quiet 2>/dev/null || true
     fi
     systemctl reload "php${PHP_VER}-fpm" 2>/dev/null || true
 
@@ -452,7 +465,7 @@ case "$sub_choice" in
     1)
         read -r -p "Nhap ten mien website muon sao luu (VD: example.com): " in_dom < /dev/tty
         clean_dom=$(echo "$in_dom" | tr '[:upper:]' '[:lower:]' | tr -d ' ' | sed -E 's|^https?://||; s|/.*$||; s|:[0-9]+$||')
-        if [[ -n "$clean_dom" ]]; then
+        if [[ -n "$clean_dom" ]] && [[ "$clean_dom" =~ ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\.[a-z]{2,}$ ]]; then
             backup_single_site "$clean_dom"
         else
             echo -e "${RED}Loi: Ten mien khong hop le!${NC}"

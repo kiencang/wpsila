@@ -45,10 +45,10 @@ fi
 # --- 1. CÀI ĐẶT & KIỂM TRA PHỤ THUỘC ---
 echo -e "${GREEN}>>> [CORE] Kiem tra Fail2Ban & UFW...${NC}"
 
-# Tu dong cai dat neu thieu (Dam bao script chay doc lap duoc)
-if ! command -v fail2ban-client &> /dev/null; then
-    echo -e "${YELLOW}Fail2Ban chua duoc cai dat. Dang cai dat...${NC}"
-    apt-get update -qq && apt-get install -y fail2ban ufw
+# Tu dong cai dat neu thieu (Dam bao script chay doc lap duoc va co python3-systemd cho Ubuntu 22.04)
+if ! command -v fail2ban-client &> /dev/null || ! dpkg -s python3-systemd &> /dev/null; then
+    echo -e "${YELLOW}Fail2Ban hoac python3-systemd chua duoc cai dat. Dang cai dat...${NC}"
+    apt-get update -qq && apt-get install -y fail2ban python3-systemd ufw
 fi
 
 # Kiem tra UFW

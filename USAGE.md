@@ -52,37 +52,55 @@ Dang tai cac module...
 [CHECKSUM OK] install_lcmp.sh
 [CHECKSUM OK] wordpress.sh
 === CAI DAT THANH CONG! ===
-Phien ban: v1.0.0
-Xin chuc mung ban! Hay go lenh: wpsila de bat dau su dung.
+Phien ban: v1.4.1
+Xin chuc mung ban! Hay go lenh: sudo wpsila de bat dau su dung.
 ```
 
 Tiếp theo hãy gõ wpsila để vào menu điều khiển chính:
 
 ```
-===========================================================
-                   WPSILA WORDPRESS BLOG
-===========================================================
+===============================================================
+                   WPSILA WORDPRESS BLOG                   
+===============================================================
   1. <Cai dat Caddy Web Server (mot lan la du)>
   2. <Toi uu he thong (mot lan la du)>
------------------------------------------------------------
+---------------------------------------------------------------
   3. >> Cai dat Website WordPress moi
   4. >> Xem pass WordPress vua tao
------------------------------------------------------------
+---------------------------------------------------------------
   5. >> Them tai khoan sFTP
   6. >> Xem pass sFTP
------------------------------------------------------------
+---------------------------------------------------------------
   7. >> Cai dat Subdomain WordPress
------------------------------------------------------------
+---------------------------------------------------------------
   8. >> Xoa (delete) Website WordPress
------------------------------------------------------------
+---------------------------------------------------------------
   9. >> Cai dat Adminer (Quan ly Database)
  10. >> Xem pass Adminer
------------------------------------------------------------
+---------------------------------------------------------------
  11. >> Kiem tra cap nhat (update) wpsila
------------------------------------------------------------
+---------------------------------------------------------------
+ 12. >> Khoa/Mo khoa wp-config.php (De sua file/cai plugin)
+---------------------------------------------------------------
+ 13. >> Xem Log thoi gian thuc (Debug loi 500/502)
+---------------------------------------------------------------
+ 14. >> Khoi phuc mat khau Admin WordPress (Do ban quen pass)
+---------------------------------------------------------------
+ 15. >> Lay thong tin Database cua mot website cu the
+---------------------------------------------------------------
+ 16. >> Cai dat Redis cache (chi can cho website traffic cao)
+---------------------------------------------------------------
+ 17. >> Go cai dat Redis cache cho mot website cu the
+---------------------------------------------------------------
+ 18. >> Xoa cac file chua mat khau de tang cuong bao mat
+---------------------------------------------------------------
+ 19. >> Xem danh sach & trang thai cac website tren VPS
+---------------------------------------------------------------
+ 20. >> Quan ly Sao luu & Khoi phuc (Local Backup/Restore)
+---------------------------------------------------------------
   0. >> Exit (Thoat)
-===========================================================
-Nhap lua chon (0-11):
+===============================================================
+Nhap lua chon (0-20):
 ```
 
 Ở đây bạn muốn chọn mục nào thì nhập số tương ứng cho mục đấy.

@@ -75,7 +75,7 @@ chmod 755 /var/log/caddy
 echo "========================================================"
 echo "   SETUP ADMINER (De quan tri co so du lieu/database)"
 echo "========================================================"
-read -r -p "Nhap dia chi cho phan quan tri database (VD: db.domain.com): " INPUT_DOMAIN
+read -r -p "Nhap dia chi cho phan quan tri database (VD: db.domain.com): " INPUT_DOMAIN < /dev/tty
 
 # Xử lý chuỗi
 # Xóa khoảng trắng, chuyển chữ hoa thành chữ thường
@@ -183,22 +183,60 @@ if [[ ! -S "$PHP_SOCKET" ]]; then
 fi
 echo "OK."
 
-# --- 2. CÀI ĐẶT ADMINER ---
+# --- 2. CÀI ĐẶT ADMINER (CÓ FALLBACK 2 NGUỒN & KIỂM TRA FILE PHP HỢP LỆ) ---
 echo "[2/4] Dang tai Adminer..."
 mkdir -p "$INSTALL_DIR"
 rm -f "$INSTALL_DIR/index.php"
 
-# SỬA LỖI: Dùng link chính chủ Adminer.org để luôn lấy bản mới nhất & bỏ -q để hiện tiến trình
+ADMINER_OK=0
 echo "Dang tai source code..."
-if wget -O "$INSTALL_DIR/index.php" "https://www.adminer.org/latest-mysql.php"; then
-    echo -e "${GREEN}Tai Adminer thanh cong.${NC}"
-else
-    echo -e "${RED}Loi: Khong the tai Adminer tu adminer.org${NC}"
-    exit 1
+
+# Nguồn 1: Trang chủ adminer.org
+if curl -fsSL --retry 3 --retry-delay 2 --connect-timeout 10 "https://www.adminer.org/latest-mysql.php" -o "$INSTALL_DIR/index.php"; then
+    if [[ -s "$INSTALL_DIR/index.php" ]] && grep -q "<?php" "$INSTALL_DIR/index.php"; then
+        ADMINER_OK=1
+    fi
 fi
 
-# Gán quyền sở hữu cho user và group www-data
-chown -R www-data:www-data "$INSTALL_DIR"
+# Nguồn 2 (Dự phòng): GitHub Releases chính thức của vrana/adminer
+if (( ADMINER_OK == 0 )); then
+    echo -e "${YELLOW}Canh bao: Nguon adminer.org gap su co. Chuyen sang tai tu kho du phong GitHub (vrana/adminer)...${NC}"
+    GH_ADMINER_URL=""
+
+    # Ưu tiên 2a: Lấy tag mới nhất qua HTTP Redirect (Không dùng api.github.com nên không bị giới hạn 60 req/giờ)
+    ADMINER_LATEST_REDIRECT=$(curl -fsSLI --retry 3 --connect-timeout 10 -o /dev/null -w '%{url_effective}' "https://github.com/vrana/adminer/releases/latest" || true)
+    if [[ "$ADMINER_LATEST_REDIRECT" == *"/releases/tag/v"* ]]; then
+        ADMINER_TAG="${ADMINER_LATEST_REDIRECT##*/}"
+        ADMINER_VER="${ADMINER_TAG#v}"
+        if [[ "$ADMINER_VER" =~ ^[0-9]+\.[0-9]+(\.[0-9]+)?$ ]]; then
+            GH_ADMINER_URL="https://github.com/vrana/adminer/releases/download/v${ADMINER_VER}/adminer-${ADMINER_VER}-mysql.php"
+        fi
+    fi
+
+    # Ưu tiên 2b: Dự phòng qua GitHub API nếu Redirect không trả về tag chuẩn
+    if [[ -z "$GH_ADMINER_URL" ]]; then
+        GH_ADMINER_URL=$(curl -fsSL --retry 2 --connect-timeout 10 "https://api.github.com/repos/vrana/adminer/releases/latest" | grep -oE 'https://github\.com/vrana/adminer/releases/download/[^" ]+/adminer-[0-9.]+-mysql\.php' | head -n 1 || true)
+    fi
+
+    if [[ -n "$GH_ADMINER_URL" ]] && curl -fsSL --retry 3 --retry-delay 2 --connect-timeout 10 "$GH_ADMINER_URL" -o "$INSTALL_DIR/index.php"; then
+        if [[ -s "$INSTALL_DIR/index.php" ]] && grep -q "<?php" "$INSTALL_DIR/index.php"; then
+            ADMINER_OK=1
+        fi
+    fi
+    unset ADMINER_LATEST_REDIRECT ADMINER_TAG ADMINER_VER GH_ADMINER_URL
+fi
+
+if (( ADMINER_OK == 1 )); then
+    echo -e "${GREEN}Tai Adminer thanh cong.${NC}"
+else
+    rm -f "$INSTALL_DIR/index.php"
+    echo -e "${RED}Loi: Khong the tai Adminer tu ca adminer.org va GitHub!${NC}"
+    exit 1
+fi
+unset ADMINER_OK
+
+# Gán quyền sở hữu root:root (755/644) để PHP-FPM đọc được nhưng không một website/plugin nào sửa được mã nguồn Adminer
+chown -R root:root "$INSTALL_DIR"
 
 # Phân quyền
 chmod 755 "$INSTALL_DIR"
@@ -251,8 +289,9 @@ $DOMAIN {
 		$USER_NAME $HASHED_PASS
 	}
 
-    # An file he thong
+    # An file he thong (tru /.well-known/* cho SSL)
     @hiddenFiles {
+        not path /.well-known/*
         path */.*
     }
     respond @hiddenFiles 404
@@ -270,7 +309,7 @@ EOF
 echo "Da tao file cau hinh: $CADDY_SITE_FILE"
 
 # Format
-caddy fmt --overwrite "$CADDY_SITE_FILE"
+caddy fmt --overwrite "$CADDY_SITE_FILE" || true
 
 # Validate toàn bộ hệ thống
 if ! caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile &> /dev/null; then
@@ -299,8 +338,10 @@ CRED_FILE="$SCRIPT_WPSILA_DIR/adminerp.txt"
 # Kiểm tra nếu file tồn tại thì mới xóa
 rm -f "$CRED_FILE"
 
-# Tạo mới
-cat > "$CRED_FILE" <<EOF
+# Tạo mới với umask 077 (chỉ root đọc được ngay từ khi tạo)
+(
+    umask 077
+    cat > "$CRED_FILE" <<EOF
 ----------------------------------------
 ADMINER CREDENTIALS
 Date: $(date)
@@ -314,7 +355,8 @@ Pass: ${WEB_PASS}
 User: ${USER_NAME}
 Pass: ${DB_PASS}
 EOF
-chmod 600 "$CRED_FILE" # Chỉ user hiện tại mới đọc được file này
+)
+chmod 600 "$CRED_FILE" # Đảm bảo chỉ user root hiện tại mới đọc được file này
 
 # Xuất ra màn hình
 echo ""

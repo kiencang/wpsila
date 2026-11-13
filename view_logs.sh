@@ -39,7 +39,7 @@ echo -e "Cong cu nay giup ban xem loi Website hoac PHP ngay lap tuc."
 echo "------------------------------------------------"
 
 # 1. Nhập tên miền
-read -r -p "Nhap ten mien (VD: example.com): " INPUT_DOMAIN
+read -r -p "Nhap ten mien (VD: example.com): " INPUT_DOMAIN < /dev/tty
 
 # 2. Chuẩn hóa tên miền
 TEMP_DOMAIN=$(echo "$INPUT_DOMAIN" | tr '[:upper:]' '[:lower:]' | tr -d ' ')
@@ -49,14 +49,29 @@ if [[ -z "$DOMAIN" ]]; then
      echo -e "${RED}Loi: Ten mien khong duoc de trong!${NC}"
      exit 1
 fi
+
+if [[ ! "$DOMAIN" =~ ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\.[a-z]{2,}$ ]]; then
+     echo -e "${RED}Loi: Dia chi website '$DOMAIN' chua ky tu khong hop le hoac sai dinh dang.${NC}"
+     exit 1
+fi
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
 # 3. Xác định các file log quan trọng
+SCRIPT_WPSILA_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+if [[ -f "$SCRIPT_WPSILA_DIR/wpsila.conf" ]]; then
+    # shellcheck source=/dev/null
+    source "$SCRIPT_WPSILA_DIR/wpsila.conf"
+fi
+
 ACCESS_LOG="/var/www/$DOMAIN/logs/access.log"
-PHP_LOG=$(find /var/log -name "php*-fpm.log" | head -n 1)
+if [[ -n "${PHP_VER:-}" && -f "/var/log/php${PHP_VER}-fpm.log" ]]; then
+    PHP_LOG="/var/log/php${PHP_VER}-fpm.log"
+else
+    PHP_LOG=$(find /var/log -maxdepth 1 -name "php*-fpm.log" 2>/dev/null | head -n 1 || true)
+fi
 
 echo "------------------------------------------------"
 echo "Chon loai Log muon xem:"
@@ -65,7 +80,7 @@ echo "   => Xem ai dang truy cap, loi 403, 404, 500 tu Web Server."
 echo "2. Xem PHP System Log (Global)"
 echo "   => Xem loi he thong PHP, loi 502 Bad Gateway, PHP Crash."
 echo "------------------------------------------------"
-read -r -p "Nhap lua chon (1/2): " LOG_CHOICE
+read -r -p "Nhap lua chon (1/2): " LOG_CHOICE < /dev/tty
 
 TARGET_LOG=""
 
@@ -96,7 +111,7 @@ if [[ -f "$TARGET_LOG" ]]; then
     # Bẫy tín hiệu SIGINT để không thoát luôn menu chính khi bấm Ctrl+C
     trap : SIGINT
 
-    tail -f -n 50 "$TARGET_LOG"
+    tail -f -n 50 "$TARGET_LOG" || true
     
     trap - SIGINT
     

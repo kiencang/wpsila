@@ -59,10 +59,8 @@ clean_ver() {
 
 # Kiểm tra phiên bản đang cài vs phiên bản mới nhất trong kho APT cache
 # Tham số $1: Tên gói (VD: php8.3-fpm, mariadb-server, caddy, redis-server)
-# Tham số $2: Có đánh dấu gợi ý cập nhật tự động không (1 = có, 0 = không)
 get_pkg_version_info() {
     local pkg_name="$1"
-    local track_update="${2:-0}"
     local policy_out installed_raw candidate_raw installed_clean candidate_clean
 
     policy_out=$(apt-cache policy "$pkg_name" 2>/dev/null || true)
@@ -78,9 +76,6 @@ get_pkg_version_info() {
     candidate_clean=$(clean_ver "$candidate_raw")
 
     if [[ -n "$candidate_raw" && "$candidate_raw" != "(none)" && "$installed_raw" != "$candidate_raw" ]]; then
-        if (( track_update == 1 )); then
-            NEED_PATCH_UPDATE=1
-        fi
         printf "%-10s | ${YELLOW}(Co ban moi: %s!)${NC}" "$installed_clean" "$candidate_clean"
     else
         printf "%-10s | ${GREEN}(Da la ban moi nhat)${NC}" "$installed_clean"
@@ -160,7 +155,7 @@ echo -e "${YELLOW}[2] PHIEN BAN PHAN MEM LOI (CORE STACK)${NC}"
 # 1. Caddy
 if command -v caddy &>/dev/null; then
     CADDY_SVC=$(get_svc_status "caddy")
-    CADDY_VER_INFO=$(get_pkg_version_info "caddy" 0)
+    CADDY_VER_INFO=$(get_pkg_version_info "caddy")
     echo -e "  - Caddy Server : ${CADDY_SVC} | Phien ban: ${CADDY_VER_INFO}"
 else
     echo -e "  - Caddy Server : ${RED}[Chua cai dat]${NC}"
@@ -169,7 +164,7 @@ fi
 # 2. PHP-FPM
 if command -v php &>/dev/null; then
     PHP_SVC=$(get_svc_status "php${PHP_VER}-fpm")
-    PHP_VER_INFO=$(get_pkg_version_info "php${PHP_VER}-fpm" 1)
+    PHP_VER_INFO=$(get_pkg_version_info "php${PHP_VER}-fpm")
     [[ "$PHP_VER_INFO" == *"Co ban moi"* ]] && NEED_PATCH_UPDATE=1
     echo -e "  - PHP-FPM ($PHP_VER): ${PHP_SVC} | Phien ban: ${PHP_VER_INFO}"
 else
@@ -179,7 +174,7 @@ fi
 # 3. MariaDB
 if command -v mariadb &>/dev/null; then
     MDB_SVC=$(get_svc_status "mariadb")
-    MDB_VER_INFO=$(get_pkg_version_info "mariadb-server" 1)
+    MDB_VER_INFO=$(get_pkg_version_info "mariadb-server")
     [[ "$MDB_VER_INFO" == *"Co ban moi"* ]] && NEED_PATCH_UPDATE=1
     echo -e "  - MariaDB      : ${MDB_SVC} | Phien ban: ${MDB_VER_INFO}"
 else
@@ -189,7 +184,7 @@ fi
 # 4. Redis Server
 if command -v redis-server &>/dev/null; then
     REDIS_SVC=$(get_svc_status "redis-server")
-    REDIS_VER_INFO=$(get_pkg_version_info "redis-server" 0)
+    REDIS_VER_INFO=$(get_pkg_version_info "redis-server")
     echo -e "  - Redis Server : ${REDIS_SVC} | Phien ban: ${REDIS_VER_INFO}"
 else
     echo -e "  - Redis Server : ${YELLOW}[Chua cai dat]${NC} (Chi can cho web traffic cao - Muc 16)"
@@ -197,7 +192,7 @@ fi
 
 # 5. WP-CLI
 if command -v wp &>/dev/null; then
-    WPCLI_VER=$(wp cli version --allow-root 2>/dev/null | awk '{print $2}' || echo "N/A")
+    WPCLI_VER=$(runuser -u www-data -- wp cli version 2>/dev/null | awk '{print $2}' || echo "N/A")
     echo -e "  - WP-CLI       : ${GREEN}[San sang] ${NC} | Phien ban: ${WPCLI_VER}"
 else
     echo -e "  - WP-CLI       : ${YELLOW}[Chua cai dat]${NC} (Se tu dong cai khi tao web dau tien)"
@@ -226,10 +221,14 @@ for config_path in /var/www/*/public_html/wp-config.php; do
     # 1. Tính dung lượng thư mục web
     SIZE=$(du -sh "$WEB_DIR" 2>/dev/null | awk '{print $1}' || echo "N/A")
     
-    # 2. Kiểm tra trạng thái khóa wp-config.php
+    # 2. Kiểm tra trạng thái khóa wp-config.php (kèm cờ immutable chattr)
     PERM=$(stat -c '%a' "$config_path" 2>/dev/null || echo "---")
     if [[ "$PERM" == "640" || "$PERM" == "440" ]]; then
-        LOCK_STATUS="Khoa ($PERM)"
+        if lsattr "$config_path" 2>/dev/null | awk '{print $1}' | grep -q 'i'; then
+            LOCK_STATUS="Khoa (${PERM}+i)"
+        else
+            LOCK_STATUS="Khoa ($PERM)"
+        fi
     else
         LOCK_STATUS="Mo ($PERM)"
     fi
@@ -272,8 +271,11 @@ if (( NEED_PATCH_UPDATE == 1 )); then
     if [[ "$DO_PATCH" =~ ^[yY](es)?$ ]]; then
         echo -e "${GREEN}>>> Dang tien hanh cap nhat ban va cho PHP ${PHP_VER} va MariaDB...${NC}"
         export DEBIAN_FRONTEND=noninteractive
-        apt-get update -qq
-        apt-get install --only-upgrade -y "php${PHP_VER}-*" "mariadb-*"
+        apt-get update -qq || true
+        apt-get install --only-upgrade -y \
+            -o Dpkg::Options::="--force-confdef" \
+            -o Dpkg::Options::="--force-confold" \
+            "php${PHP_VER}-*" "mariadb-*"
         echo -e "${GREEN}>>> Cap nhat hoan tat! Phien ban moi da duoc ap dung.${NC}"
     else
         echo -e "${YELLOW}Da bo qua cap nhat. Ban co the quay lai muc 19 de cap nhat bat cu luc nao.${NC}"

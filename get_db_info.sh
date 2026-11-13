@@ -51,7 +51,7 @@ echo "Cong cu nay trich xuat thong tin ket noi DB chinh xac tu wp-config.php"
 echo "------------------------------------------------"
 
 # 1. Nhập tên miền
-read -r -p "Nhap ten mien website (VD: example.com): " INPUT_DOMAIN
+read -r -p "Nhap ten mien website (VD: example.com): " INPUT_DOMAIN < /dev/tty
 
 # 2. Chuẩn hóa tên miền
 TEMP_DOMAIN=$(echo "$INPUT_DOMAIN" | tr '[:upper:]' '[:lower:]' | tr -d ' ')
@@ -59,6 +59,11 @@ DOMAIN=$(echo "$TEMP_DOMAIN" | sed -E 's|^https?://||' | sed -E 's|/.*$||' | sed
 
 if [[ -z "$DOMAIN" ]]; then
      echo -e "${RED}Loi: Ten mien khong duoc de trong!${NC}"
+     exit 1
+fi
+
+if [[ ! "$DOMAIN" =~ ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\.[a-z]{2,}$ ]]; then
+     echo -e "${RED}Loi: Dia chi website '$DOMAIN' chua ky tu khong hop le hoac sai dinh dang.${NC}"
      exit 1
 fi
 # -------------------------------------------------------------------------------------------------------------------------------
@@ -84,13 +89,26 @@ fi
 # -------------------------------------------------------------------------------------------------------------------------------
 echo -e "${YELLOW}Dang doc cau hinh...${NC}"
 
-# 4. Lấy thông tin (sử dụng WP-CLI)
-# --skip-plugins --skip-themes: Quan trọng để tránh lỗi từ plugin hoặc theme làm hỏng lệnh
-# || true: Để script không bị dừng nếu giá trị nào đó thiếu
-DB_NAME=$(wp config get DB_NAME --path="$WP_PATH" --allow-root --quiet --skip-plugins --skip-themes 2>/dev/null || echo "Khong tim thay")
-DB_USER=$(wp config get DB_USER --path="$WP_PATH" --allow-root --quiet --skip-plugins --skip-themes 2>/dev/null || echo "Khong tim thay")
-DB_PASS=$(wp config get DB_PASSWORD --path="$WP_PATH" --allow-root --quiet --skip-plugins --skip-themes 2>/dev/null || echo "Khong tim thay")
-DB_HOST=$(wp config get DB_HOST --path="$WP_PATH" --allow-root --quiet --skip-plugins --skip-themes 2>/dev/null || echo "localhost")
+# 4. Lấy thông tin (Ưu tiên đọc tĩnh an toàn từ wp-config.php, dự phòng WP-CLI dưới user www-data)
+extract_wp_const() {
+    local key="$1"
+    local val=""
+    val=$(grep -E "^[[:space:]]*define\(\s*['\"]${key}['\"]" "$CONFIG_FILE" 2>/dev/null | sed -E "s/.*['\"]${key}['\"]\s*,\s*['\"]([^'\"]*)['\"].*/\1/" | head -n 1 | tr -d '\r\n' || true)
+    if [[ -z "$val" ]] && command -v wp &>/dev/null; then
+        val=$(runuser -u www-data -- wp config get "$key" --path="$WP_PATH" --quiet --skip-plugins --skip-themes 2>/dev/null | tr -d '\r\n' || true)
+    fi
+    echo "$val"
+}
+
+DB_NAME=$(extract_wp_const "DB_NAME")
+DB_USER=$(extract_wp_const "DB_USER")
+DB_PASS=$(extract_wp_const "DB_PASSWORD")
+DB_HOST=$(extract_wp_const "DB_HOST")
+
+DB_NAME="${DB_NAME:-Khong tim thay}"
+DB_USER="${DB_USER:-Khong tim thay}"
+DB_PASS="${DB_PASS:-Khong tim thay}"
+DB_HOST="${DB_HOST:-localhost}"
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++

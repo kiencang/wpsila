@@ -1,3 +1,4 @@
+# shellcheck shell=bash
 # -----------------------------------------------------------
 # MODULE: Kiểm tra tên miền nhập vào của người dùng.
 # File: domain_check.sh

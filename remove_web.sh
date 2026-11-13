@@ -50,8 +50,9 @@ echo -e "${YELLOW}=== CONG CU XOA WEBSITE WORDPRESS (CADDY) ===${NC}"
 echo -e "${RED}LUY Y: HANH DONG NAY KHONG THE HOAN TAC, HAY BACKUP TRUOC!${NC}"
 read -r -p "Nhap dia chi website muon xoa (VD: example.com): " INPUT_DOMAIN < /dev/tty
 
-# Sanitize input: Xóa khoảng trắng, chuyển chữ hoa thành chữ thường
-DOMAIN=$(echo "$INPUT_DOMAIN" | tr -d ' ' | tr '[:upper:]' '[:lower:]')
+# Sanitize input: Xóa khoảng trắng, chuyển chữ hoa thành chữ thường, cắt http(s)://, path và port
+TEMP_DOMAIN=$(echo "$INPUT_DOMAIN" | tr -d ' ' | tr '[:upper:]' '[:lower:]')
+DOMAIN=$(echo "$TEMP_DOMAIN" | sed -E 's|^https?://||' | sed -E 's|/.*$||' | sed -E 's|:[0-9]+$||')
 
 # Kiểm tra đầu vào
 if [[ -z "$DOMAIN" ]]; then
@@ -157,7 +158,7 @@ echo -e "${YELLOW}--- Dang quet thong tin website: $DOMAIN ---${NC}"
 # +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
-# E. Lấy thông tin Database (Sử dụng WP-CLI - Reliable Method)
+# E. Lấy thông tin Database (Ưu tiên đọc tĩnh an toàn, dự phòng WP-CLI dưới user www-data)
 DB_NAME=""
 DB_USER=""
 WP_PATH="$ROOT_DIR/public_html" # Đường dẫn tới thư mục chứa wp-config.php
@@ -165,22 +166,19 @@ WP_PATH="$ROOT_DIR/public_html" # Đường dẫn tới thư mục chứa wp-con
 if [[ -f "$CONFIG_FILE" ]]; then
     echo -e "${GREEN}Da tim thay wp-config.php.${NC}"
 
-    # Kiểm tra xem lệnh wp có tồn tại không
-    if command -v wp &> /dev/null; then
-        # Lấy DB_NAME và DB_USER
-        # --skip-themes --skip-plugins: Bắt buộc dùng để tránh lỗi PHP từ plugin làm hỏng luồng script
-        # tr -d '\r\n': Cắt bỏ ký tự xuống dòng thừa để đảm bảo chuỗi sạch 100%
-		# Thêm "|| true" để nếu WP-CLI lỗi, script không bị dừng bởi set -e
-        DB_NAME=$(wp config get DB_NAME --path="$WP_PATH" --allow-root --quiet --skip-themes --skip-plugins 2>/dev/null | tr -d '\r\n' || true)
-        DB_USER=$(wp config get DB_USER --path="$WP_PATH" --allow-root --quiet --skip-themes --skip-plugins 2>/dev/null | tr -d '\r\n' || true)
-        
-    else
-        echo -e "${RED}Loi: WP-CLI chua duoc cai dat. Khong the lay thong tin DB.${NC}"
+    # 1. Trích xuất tĩnh an toàn (không thực thi PHP dưới quyền root, bỏ qua dòng comment)
+    DB_NAME=$(grep -E "^[[:space:]]*define\(\s*['\"]DB_NAME['\"]" "$CONFIG_FILE" 2>/dev/null | sed -E "s/.*['\"]DB_NAME['\"]\s*,\s*['\"]([^'\"]+)['\"].*/\1/" | head -n 1 | tr -d '\r\n' || true)
+    DB_USER=$(grep -E "^[[:space:]]*define\(\s*['\"]DB_USER['\"]" "$CONFIG_FILE" 2>/dev/null | sed -E "s/.*['\"]DB_USER['\"]\s*,\s*['\"]([^'\"]+)['\"].*/\1/" | head -n 1 | tr -d '\r\n' || true)
+
+    # 2. Nếu đọc tĩnh chưa lấy được, dự phòng qua WP-CLI dưới quyền www-data
+    if [[ -z "$DB_NAME" || -z "$DB_USER" ]] && command -v wp &> /dev/null; then
+        [[ -z "$DB_NAME" ]] && DB_NAME=$(runuser -u www-data -- wp config get DB_NAME --path="$WP_PATH" --quiet --skip-themes --skip-plugins 2>/dev/null | tr -d '\r\n' || true)
+        [[ -z "$DB_USER" ]] && DB_USER=$(runuser -u www-data -- wp config get DB_USER --path="$WP_PATH" --quiet --skip-themes --skip-plugins 2>/dev/null | tr -d '\r\n' || true)
     fi
 
     # Kiểm tra kết quả trả về
     if [[ -z "$DB_NAME" ]]; then
-        echo -e "${YELLOW}Canh bao: Khong the trich xuat ten Database (co the file config loi hoac WP-CLI gap su co).${NC}"
+        echo -e "${YELLOW}Canh bao: Khong the trich xuat ten Database (co the file config loi).${NC}"
         echo -e "${YELLOW}Hanh dong: Script se chi xoa file, DATABASE CHUA XOA.${NC}"
     else
         echo -e "Phat hien Database: ${RED}$DB_NAME${NC}"
@@ -218,9 +216,11 @@ if [[ -n "$DB_NAME" ]]; then
         # Tạo chuỗi lệnh SQL để xóa sạch sẽ
         # 2>/dev/null ở lệnh mariadb giúp ẩn các cảnh báo không cần thiết
         SQL_CMD="DROP DATABASE IF EXISTS \`$DB_NAME\`;"
-        SQL_CMD+="DROP USER IF EXISTS \`$DB_USER\`@'localhost';"
-		SQL_CMD+="DROP USER IF EXISTS \`$DB_USER\`@'127.0.0.1';"
-        SQL_CMD+="DROP USER IF EXISTS \`$DB_USER\`@'%';"
+        if [[ -n "$DB_USER" ]]; then
+            SQL_CMD+="DROP USER IF EXISTS \`$DB_USER\`@'localhost';"
+            SQL_CMD+="DROP USER IF EXISTS \`$DB_USER\`@'127.0.0.1';"
+            SQL_CMD+="DROP USER IF EXISTS \`$DB_USER\`@'%';"
+        fi
         SQL_CMD+="FLUSH PRIVILEGES;"
 
         if mariadb -u root -e "$SQL_CMD" 2>/dev/null; then
@@ -244,6 +244,9 @@ if [[ "$ROOT_DIR" == "/var/www" ]] || [[ "$ROOT_DIR" == "/" ]]; then
     exit 1
 fi
 
+# Gỡ cờ bất biến chattr (nếu wp-config.php từng được khóa) trước khi xóa thư mục
+chattr -R -i "$ROOT_DIR" 2>/dev/null || true
+
 rm -rf "$ROOT_DIR"
 
 if [[ ! -d "$ROOT_DIR" ]]; then
@@ -257,57 +260,52 @@ fi
 # +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
-# G3. Xóa chứng chỉ https đã xin cấp trước đây lưu trong Caddy
-# Định nghĩa đường dẫn gốc chứa cert
-CERT_PATH="/var/lib/caddy/.local/share/caddy/certificates/acme-v02.api.letsencrypt.org-directory"
-
-# G3.1. Kiểm tra xem biến DOMAIN có rỗng không? (thừa, nhưng thôi cho chắc!)
+# G3. Xóa chứng chỉ https đã xin cấp trước đây lưu trong Caddy (hỗ trợ cả Let's Encrypt và ZeroSSL)
+# G3.1. Kiểm tra xem biến DOMAIN có rỗng không?
 if [[ -z "$DOMAIN" ]]; then
     echo "LOI: Bien ten mien bi rong! Dung lai de bao ve he thong."
     exit 1
 fi
 
-# G3.2. Kiểm tra xem thư mục cert của tên miền đó có tồn tại không rồi mới xóa
-if [[ -d "$CERT_PATH/$DOMAIN" ]]; then
-    echo -e "${YELLOW}Dang xoa chung chi cu cua $DOMAIN...${NC}"
-	rm -rf "${CERT_PATH:?}/$DOMAIN"
-	
-	# Thông báo xóa chứng chỉ cũ thành công
-	if [[ ! -d "$CERT_PATH/$DOMAIN" ]]; then
-		echo -e "${GREEN}Xoa thanh cong chung chi cu cua $DOMAIN...${NC}"
-	fi
-else
+# G3.2. Quét và xóa chứng chỉ của tên miền chính trên mọi ACME directory
+FOUND_MAIN_CERT=0
+for cert_dir in /var/lib/caddy/.local/share/caddy/certificates/*/"$DOMAIN"; do
+    if [[ -d "$cert_dir" ]]; then
+        FOUND_MAIN_CERT=1
+        echo -e "${YELLOW}Dang xoa chung chi cu cua $DOMAIN tai: $cert_dir ...${NC}"
+        rm -rf "${cert_dir:?}"
+        echo -e "${GREEN}Xoa thanh cong chung chi cu cua $DOMAIN.${NC}"
+    fi
+done
+if (( FOUND_MAIN_CERT == 0 )); then
     echo "Khong tim thay chung chi cu cua $DOMAIN (Co the chua duoc tao bao gio)."
 fi
 
 # G3.3. Xử lý luôn cả tên miền chuyển hướng
-# Xác định tên miền chuyển hướng
 if [[ "$DOMAIN" == www.* ]]; then
-    # Nếu bắt đầu bằng www. -> Cắt bỏ 4 ký tự đầu (www.)
     RED_DOMAIN="${DOMAIN#www.}"
 else
-    # Nếu không có www. -> Thêm www. vào đầu
     RED_DOMAIN="www.$DOMAIN"
 fi
 
-# Phòng thủ
 if [[ -z "$RED_DOMAIN" ]]; then
     echo "LOI: Bien ten mien bi rong! Dung lai de bao ve he thong."
     exit 1
 fi
 
-# Xóa https của cả tên miền chuyển hướng nếu nó có
-if [[ -d "$CERT_PATH/$RED_DOMAIN" ]]; then
-    echo -e "${YELLOW}Dang xoa chung chi cu cua $RED_DOMAIN...${NC}"
-	rm -rf "${CERT_PATH:?}/$RED_DOMAIN"
-	
-	# Thông báo xóa chứng chỉ cũ thành công
-	if [[ ! -d "$CERT_PATH/$RED_DOMAIN" ]]; then
-		echo -e "${GREEN}Xoa thanh cong chung chi cu cua $RED_DOMAIN...${NC}"
-	fi
-else
+FOUND_RED_CERT=0
+for cert_dir in /var/lib/caddy/.local/share/caddy/certificates/*/"$RED_DOMAIN"; do
+    if [[ -d "$cert_dir" ]]; then
+        FOUND_RED_CERT=1
+        echo -e "${YELLOW}Dang xoa chung chi cu cua $RED_DOMAIN tai: $cert_dir ...${NC}"
+        rm -rf "${cert_dir:?}"
+        echo -e "${GREEN}Xoa thanh cong chung chi cu cua $RED_DOMAIN.${NC}"
+    fi
+done
+if (( FOUND_RED_CERT == 0 )); then
     echo "Khong tim thay chung chi cu cua $RED_DOMAIN (Co the chua duoc tao bao gio)."
 fi
+unset cert_dir FOUND_MAIN_CERT FOUND_RED_CERT
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
@@ -339,10 +337,10 @@ fi
 # +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
-# Xóa Cronjob của domain tương ứng
+# Xóa Cronjob của domain tương ứng (Dùng grep -Fv để so khớp chuỗi tĩnh chính xác, không bị dấu chấm làm nhiễu regex)
 echo -e "${YELLOW}Dang xoa Cronjob he thong cua website...${NC}"
 
-(crontab -u www-data -l 2>/dev/null || true) | grep -v "/var/www/$DOMAIN/public_html/wp-cron.php" | crontab -u www-data - || true
+(crontab -u www-data -l 2>/dev/null || true) | grep -Fv "/var/www/$DOMAIN/public_html/wp-cron.php" | crontab -u www-data - || true
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++

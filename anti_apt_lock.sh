@@ -1,3 +1,4 @@
+# shellcheck shell=bash
 # -----------------------------------------------------------
 # MODULE: Chống chặn thao tác với apt
 # File: anti_apt_lock.sh
@@ -48,9 +49,19 @@ prepare_environment() {
     local TIMEOUT=300 # Chờ tối đa 5 phút (300s) cho tiến trình cũ update xong
     local COUNT=0
 
+    # Hàm kiểm tra xem APT/DPKG có đang bị khóa không (Hỗ trợ cả trường hợp Ubuntu Minimal chưa cài sẵn gói psmisc/fuser)
+    is_apt_locked() {
+        if command -v fuser &>/dev/null; then
+            fuser "${LOCK_FILES[@]}" &>/dev/null
+            return $?
+        else
+            pgrep -x "apt|apt-get|dpkg|unattended-upgr" &>/dev/null
+            return $?
+        fi
+    }
+
     # Vòng lặp kiểm tra xem có tiến trình nào đang giữ lock không
-    # fuser trả về 0 nghĩa là có tiến trình đang dùng file -> Cần chờ
-    while fuser "${LOCK_FILES[@]}" &> /dev/null; do
+    while is_apt_locked; do
         if [[ "$COUNT" -ge "$TIMEOUT" ]]; then
             echo "!!! [Loi] Qua trinh cap nhat he thong bi ket qua lau (> 5 phut)."
             echo "!!! Vui long cai lai VPS (reinstall) va chay script wpsila ngay sau khi cai."

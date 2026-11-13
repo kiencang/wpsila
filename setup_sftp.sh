@@ -75,8 +75,9 @@ echo "CONG CU TAO USER SFTP CHO WORDPRESS (SECURE MODE)"
 echo "--------------------------------------------------------"
 read -r -p "Nhap dia chi website (VD: example.com): " INPUT_DOMAIN < /dev/tty
 
-# Sanitize input: Xóa khoảng trắng, chuyển chữ hoa thành chữ thường
-DOMAIN=$(echo "$INPUT_DOMAIN" | tr -d ' ' | tr '[:upper:]' '[:lower:]')
+# Sanitize input: Xóa khoảng trắng, chuyển chữ hoa thành chữ thường, cắt http(s)://, path và port
+TEMP_DOMAIN=$(echo "$INPUT_DOMAIN" | tr -d ' ' | tr '[:upper:]' '[:lower:]')
+DOMAIN=$(echo "$TEMP_DOMAIN" | sed -E 's|^https?://||' | sed -E 's|/.*$||' | sed -E 's|:[0-9]+$||')
 
 # Kiểm tra đầu vào
 if [[ -z "$DOMAIN" ]]; then
@@ -119,12 +120,26 @@ fi
 read -r -p "Nhap user sFTP moi: " SFTP_USER < /dev/tty
 
 if [[ -z "$SFTP_USER" ]]; then
-    echo "Loi: User '$SFTP_USER' khong duoc de trong!"
+    echo -e "${RED}Loi: User sFTP khong duoc de trong!${NC}"
     exit 1
 fi
 
+# Kiểm tra định dạng username chuẩn POSIX (chữ thường, số, gạch dưới, gạch ngang, tối đa 32 ký tự)
+if [[ ! "$SFTP_USER" =~ ^[a-z_][a-z0-9_-]{0,31}$ ]]; then
+    echo -e "${RED}Loi: Ten user '$SFTP_USER' khong hop le (Chi dung chu thuong a-z, so 0-9, dau _ hoac -).${NC}"
+    exit 1
+fi
+
+# Chặn các tên user hệ thống nhạy cảm
+case "$SFTP_USER" in
+    root|www-data|caddy|mysql|mariadb|redis|ubuntu|debian|admin|nobody|sshd|daemon|bin|sys)
+        echo -e "${RED}Loi: '$SFTP_USER' la ten user he thong duoc bao ve. Vui long chon ten khac!${NC}"
+        exit 1
+        ;;
+esac
+
 if id "$SFTP_USER" &>/dev/null; then
-    echo "Loi: User '$SFTP_USER' da ton tai tren he thong!"
+    echo -e "${RED}Loi: User '$SFTP_USER' da ton tai tren he thong!${NC}"
     exit 1
 fi
 # -------------------------------------------------------------------------------------------------------------------------------
@@ -145,8 +160,10 @@ fi
 # 4.2. Cấu hình SSHD (Phương pháp tách file config - Modern Way)
 SSHD_CONFIG_MAIN="/etc/ssh/sshd_config"
 SSHD_CONFIG_DIR="/etc/ssh/sshd_config.d"
-SFTP_CONFIG_FILE="$SSHD_CONFIG_DIR/99-sftp-jail.conf"
+# Dùng tiền tố 05- để đọc TRƯỚC 50-cloud-init.conf (OpenSSH ưu tiên giá trị khớp đầu tiên cho PasswordAuthentication)
+SFTP_CONFIG_FILE="$SSHD_CONFIG_DIR/05-sftp-jail.conf"
 NEED_RESTART=0
+MODIFIED_MAIN_SSHD=0
 
 echo "Dang cau hinh SSH theo chuan moi (config.d)..."
 
@@ -162,6 +179,7 @@ if ! grep -Fq "Include $SSHD_CONFIG_DIR/*.conf" "$SSHD_CONFIG_MAIN"; then
     echo "Canh bao: File config chinh chua co lenh Include. Dang them vao..."
     # Backup trước
     cp "$SSHD_CONFIG_MAIN" "${SSHD_CONFIG_MAIN}.bak"
+    MODIFIED_MAIN_SSHD=1
     
     # Thêm dòng Include vào đầu file (sử dụng sed)
     # 1i nghĩa là insert vào dòng 1
@@ -170,10 +188,15 @@ if ! grep -Fq "Include $SSHD_CONFIG_DIR/*.conf" "$SSHD_CONFIG_MAIN"; then
 fi
 
 # Bước 3: Tạo file cấu hình riêng cho SFTP
-# Chúng ta dùng tên 99-sftp-jail.conf để đảm bảo nó được load.
+# Dùng tên 05-sftp-jail.conf để load trước 50-cloud-init.conf trên VPS Cloud, đảm bảo Match Group sftp_only mở được PasswordAuthentication.
+if [[ -f "$SSHD_CONFIG_DIR/99-sftp-jail.conf" ]]; then
+    rm -f "$SSHD_CONFIG_DIR/99-sftp-jail.conf"
+    NEED_RESTART=1
+fi
 # Kiểm tra nếu nội dung file chưa đúng hoặc file chưa tồn tại thì ghi đè lại cho chắc.
 
-# Nội dung cấu hình mong muốn
+# Nội dung cấu hình mong muốn (Bắt buộc có 'Match all' ở cuối để đóng block Match Group,
+# tránh làm ảnh hưởng các cấu hình toàn cục phía dưới trong /etc/ssh/sshd_config)
 read -r -d '' SFTP_CONFIG_CONTENT << EOT || true
 # --- SFTP JAIL CONFIGURATION ---
 # Created by Auto Script
@@ -183,6 +206,7 @@ Match Group sftp_only
     AllowTCPForwarding no
     X11Forwarding no
     PasswordAuthentication yes
+Match all
 # -------------------------------
 EOT
 
@@ -215,9 +239,11 @@ if (( NEED_RESTART == 1 )); then
         rm -f "$SFTP_CONFIG_FILE"
         echo "Da xoa file config gay loi de bao dam an toan cho Server."
 		
-        # Khôi phục lại file backup nếu cần thiết (tuỳ chọn)
-		cp "${SSHD_CONFIG_MAIN}.bak" "$SSHD_CONFIG_MAIN"
-        echo "-> Da khoi phuc lai file config cu."
+        # Chỉ khôi phục lại file backup nếu chính lượt chạy này đã sửa file sshd_config gốc
+        if (( MODIFIED_MAIN_SSHD == 1 )) && [[ -f "${SSHD_CONFIG_MAIN}.bak" ]]; then
+            cp "${SSHD_CONFIG_MAIN}.bak" "$SSHD_CONFIG_MAIN"
+            echo "-> Da khoi phuc lai file config cu."
+        fi
         exit 1
     fi
 fi
@@ -296,8 +322,10 @@ CRED_FILE="$SCRIPT_WPSILA_DIR/sftpp.txt"
 # Kiểm tra nếu file tồn tại thì mới xóa
 rm -f "$CRED_FILE"
 
-# Tạo mới
-cat > "$CRED_FILE" <<EOF
+# Tạo mới với umask 077 (chỉ root đọc được ngay từ lúc tạo)
+(
+    umask 077
+    cat > "$CRED_FILE" <<EOF
 ----------------------------------------
 SFTP CREDENTIALS
 Date: $(date)
@@ -309,7 +337,8 @@ Protocol:   SFTP (SSH File Transfer Protocol)
 User:       $SFTP_USER
 Password:   $SFTP_PASS
 EOF
-chmod 600 "$CRED_FILE" # Chỉ user hiện tại mới đọc được file này
+)
+chmod 600 "$CRED_FILE" # Đảm bảo chỉ user root hiện tại mới đọc được file này
 
 echo ""
 echo "========================================================"

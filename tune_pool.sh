@@ -98,41 +98,54 @@ TOTAL_RAM=$((total_ram_kb / 1024))
 echo ">> Thong tin he thong:"
 echo "- Tong RAM: ${TOTAL_RAM} MB"
 
-# 4. TÍNH TOÁN THÔNG SỐ (Logic Safe Tuning)
-# Công thức dựa trên mức tiêu thụ trung bình 50-60MB/tiến trình PHP
-# Dành lại RAM cho OS và MySQL.
+# 4. TÍNH TOÁN THÔNG SỐ (Logic Safe Tuning - Ưu tiên WordPress Blog trên VPS 1GB - 2GB RAM)
+# Đặc thù WordPress Blog (không chạy WooCommerce): Mỗi tiến trình PHP-FPM tốn trung bình ~35-45MB RAM (do OPcache đã dùng chung).
+# Giữ số tiến trình chờ (start/spare) gọn gàng trên VPS 1-2GB để nhường RAM rảnh cho Linux Page Cache tăng tốc đọc file tĩnh.
 
-if [[ "$TOTAL_RAM" -le 1500 ]]; then
-    # --- CẤU HÌNH CHO VPS ~1GB RAM ---
-    RAM_PROFILE="1GB (Low End)"
-    PM_MAX_CHILDREN=5
+if [[ "$TOTAL_RAM" -le 1200 ]]; then
+    # --- CẤU HÌNH CHO VPS ~1GB RAM (Ưu tiên an toàn tuyệt đối chống OOM) ---
+    RAM_PROFILE="1GB (Low End Blog)"
+    PM_MAX_CHILDREN=6
     PM_START_SERVERS=2
     PM_MIN_SPARE=1
     PM_MAX_SPARE=3
+    PM_MAX_REQUESTS=500
 
-elif [[ "$TOTAL_RAM" -le 3500 ]]; then
-    # --- CẤU HÌNH CHO VPS ~2GB RAM ---
-    RAM_PROFILE="2GB (Entry Level)"
+elif [[ "$TOTAL_RAM" -le 2500 ]]; then
+    # --- CẤU HÌNH CHO VPS ~2GB RAM (Phân khúc chủ lực cho Blog) ---
+    RAM_PROFILE="2GB (Entry Level Blog)"
     PM_MAX_CHILDREN=15
-    PM_START_SERVERS=4
+    PM_START_SERVERS=3
     PM_MIN_SPARE=2
-    PM_MAX_SPARE=6
+    PM_MAX_SPARE=5
+    PM_MAX_REQUESTS=500
 
-elif [[ "$TOTAL_RAM" -le 7000 ]]; then
+elif [[ "$TOTAL_RAM" -le 5000 ]]; then
     # --- CẤU HÌNH CHO VPS ~4GB RAM ---
     RAM_PROFILE="4GB (Mid Range)"
-    PM_MAX_CHILDREN=40
-    PM_START_SERVERS=10
-    PM_MIN_SPARE=5
-    PM_MAX_SPARE=15
+    PM_MAX_CHILDREN=30
+    PM_START_SERVERS=6
+    PM_MIN_SPARE=4
+    PM_MAX_SPARE=10
+    PM_MAX_REQUESTS=1000
+
+elif [[ "$TOTAL_RAM" -le 10000 ]]; then
+    # --- CẤU HÌNH CHO VPS ~8GB RAM ---
+    RAM_PROFILE="8GB (High Performance)"
+    PM_MAX_CHILDREN=60
+    PM_START_SERVERS=12
+    PM_MIN_SPARE=6
+    PM_MAX_SPARE=18
+    PM_MAX_REQUESTS=1000
 
 else
-    # --- CẤU HÌNH CHO VPS >= 8GB RAM ---
-    RAM_PROFILE="8GB+ (High Performance)"
-    PM_MAX_CHILDREN=80
+    # --- CẤU HÌNH CHO VPS >= 16GB RAM ---
+    RAM_PROFILE="16GB+ (Enterprise)"
+    PM_MAX_CHILDREN=100
     PM_START_SERVERS=20
     PM_MIN_SPARE=10
     PM_MAX_SPARE=30
+    PM_MAX_REQUESTS=1000
 fi
 
 echo ">> Ap dung cau hinh cho muc RAM: $RAM_PROFILE"
@@ -144,13 +157,16 @@ echo "- pm.start_servers = $PM_START_SERVERS"
 
 # -------------------------------------------------------------------------------------------------------------------------------
 # 5. TẠO FILE CẤU HÌNH (GHI ĐÈ)
-# Link dẫn của file
-CONFIG_FILE="${CONF_DIR}/99-wpsila-pool-tune.conf"
+# Lưu ý quan trọng: PHP-FPM nạp các file trong pool.d/*.conf theo thứ tự bảng chữ cái ASCII.
+# Chữ số '9' (ASCII 57) đứng trước chữ cái 'w' (ASCII 119), nên tiền tố '99-' sẽ bị đọc TRƯỚC www.conf và bị www.conf ghi đè.
+# Do đó, bắt buộc dùng tiền tố 'zz-' (đứng sau 'w') để ghi đè chính xác cấu hình [www] mặc định.
+rm -f "${CONF_DIR}/99-wpsila-pool-tune.conf"
+CONFIG_FILE="${CONF_DIR}/zz-wpsila-pool-tune.conf"
 
 cat > "${CONFIG_FILE}" <<EOF
 ; =========================================================================
 ; TUNED BY WPSILA SCRIPT - RAM PROFILE: ${RAM_PROFILE}
-; File này ghi đè cấu hình mặc định trong www.conf
+; File nay duoc doc sau www.conf (nho tien to zz-) de ghi de cau hinh [www]
 ; =========================================================================
 
 [www]
@@ -159,7 +175,10 @@ pm.max_children = ${PM_MAX_CHILDREN}
 pm.start_servers = ${PM_START_SERVERS}
 pm.min_spare_servers = ${PM_MIN_SPARE}
 pm.max_spare_servers = ${PM_MAX_SPARE}
-pm.max_requests = 1000
+; Tai tao worker sau ${PM_MAX_REQUESTS} request de giai phong triet de bo nho ro ri tu plugin
+pm.max_requests = ${PM_MAX_REQUESTS}
+; Tự động thu hồi tiến trình PHP nếu bị treo I/O quá 300s (đồng bộ với max_execution_time)
+request_terminate_timeout = 300s
 EOF
 # -------------------------------------------------------------------------------------------------------------------------------
 
@@ -170,14 +189,16 @@ EOF
 echo ">> Dang reload lai PHP-FPM..."
 
 # Test cấu hình trước khi reload để tránh sập web
-if php-fpm"${PHP_VER}" -t; then
-    service php"${PHP_VER}"-fpm reload
-    echo -e "${GREEN}THANH CONG! Cau hinh moi da duoc ap dung cho Pool. ${NC}"
+PHP_FPM_BIN=$(PATH="/usr/sbin:/sbin:$PATH" command -v "php-fpm${PHP_VER}" || true)
+if [[ -n "$PHP_FPM_BIN" ]] && "$PHP_FPM_BIN" -t; then
+    systemctl reload "php${PHP_VER}-fpm"
+    echo -e "${GREEN}THANH CONG! Cau hinh moi da duoc ap dung cho Pool.${NC}"
 	echo "File cau hinh: $CONFIG_FILE"
 else
     echo -e "${RED}Loi cau hinh! Da huy bo reload. Vui long kiem tra lai file log.${NC}"
-    rm "${CONFIG_FILE}"
+    rm -f "${CONFIG_FILE}"
     echo -e "${YELLOW}Da xoa bo cau hinh loi de khoi phuc lai trang thai cu.${NC}"
+    exit 1
 fi
 echo "-------------------------------------------------------------"
 # -------------------------------------------------------------------------------------------------------------------------------

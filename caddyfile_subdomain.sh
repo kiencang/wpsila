@@ -1,22 +1,26 @@
+# shellcheck shell=bash
 # -----------------------------------------------------------
 # MODULE: Caddyfile cho subdomain
-# File: caddy_subdomain.sh
+# File: caddyfile_subdomain.sh
 # File này được nhúng vào script install_wp.sh
 # -----------------------------------------------------------
-read -r -d '' CONTENT <<EOF || true
-###start_wpsila_kiencang_$DOMAIN###
-# 1. Chuyen huong RED_DOMAIN ve DOMAIN (không cần nếu là cài subdomain)
-# Subdomain không cần chuyển hướng
 
-# 2. Cau hinh chinh
+# Đảm bảo file snippet dùng chung /etc/caddy/snippets/wp_common.conf luôn tồn tại
+# (Tương thích ngược hoàn toàn cho các VPS đã cài LCMP từ phiên bản cũ trước khi nâng cấp)
+WP_COMMON_SNIPPET_FILE="/etc/caddy/snippets/wp_common.conf"
+if [[ -d "/etc/caddy" && -w "/etc/caddy" ]] && [[ ! -f "$WP_COMMON_SNIPPET_FILE" ]]; then
+    # Nạp nội dung snippet chuẩn từ caddyfile.sh (chế độ chỉ tạo snippet, không đọc biến RED_DOMAIN)
+    if [[ -f "${SCRIPT_WPSILA_DIR:-.}/caddyfile.sh" ]]; then
+        WP_SNIPPET_ONLY=1
+        source "${SCRIPT_WPSILA_DIR:-.}/caddyfile.sh"
+        unset WP_SNIPPET_ONLY
+    fi
+fi
+
+read -r -d '' CONTENT <<EOF || true
+# Subdomain khong can chuyen huong www
 $DOMAIN {
     root * /var/www/$DOMAIN/public_html
-    encode zstd gzip
-	
-    # Tang gioi han upload, can chinh them /etc/php/PHP_VER/fpm/php.ini cho dong bo
-    request_body {
-        max_size 100MB
-    }	
 
     # Log: Tu dong xoay vong
     log {
@@ -26,84 +30,12 @@ $DOMAIN {
         }
     }
 
-    # --- SECURITY HEADERS ---
-    # Sau khi HTTPS da chay on dinh, hay bo comment dong Strict-Transport-Security
-    header {
-        X-Content-Type-Options "nosniff"
-        X-Frame-Options "SAMEORIGIN"
-        X-XSS-Protection "0"
-        Referrer-Policy "strict-origin-when-cross-origin"
-        Permissions-Policy "camera=(), microphone=(), geolocation=(), browsing-topics=()"
-        # Strict-Transport-Security "max-age=31536000; includeSubDomains"
-        -Server
-        -X-Powered-By
-    }
+    # Nhung cau hinh bao mat & toi uu chung cho toan bo website WordPress
+    import /etc/caddy/snippets/wp_common.conf
 
-    # --- CACHE CODE (CSS/JS) ---
-    # Khong dung immutable de tranh loi khi update code
-    @code_assets {
-        file
-        path *.css *.js
-    }
-    header @code_assets Cache-Control "public, max-age=604800"
-
-    # --- CACHE MEDIA (ANH/FONT) ---
-    # Dung immutable vi file anh it khi sua noi dung ma giu nguyen ten
-    @media_assets {
-        file
-        path *.ico *.gif *.jpg *.jpeg *.png *.svg *.woff *.woff2 *.webp *.avif
-    }
-    header @media_assets Cache-Control "public, max-age=31536000, immutable"
-	
-	# --- TRAFFIC CONTROL (RATE LIMIT LITE) ---
-    # 1. Chan cac Bot dot tai nguyen & Crawler vo dung
-    # Ngan chan hang loat request tu cac bot SEO/Scraper khong can thiet
-    @bad_bots {
-        header User-Agent *MJ12bot*
-        header User-Agent *PetalBot*
-        header User-Agent *DotBot*
-        header User-Agent *SemrushBot*
-        header User-Agent *Maubot*
-        header User-Agent *LieBaoFast*
-        header User-Agent *Mb2345Browser*
-    }
-    respond @bad_bots 403
-
-    # 2. Chan Scan User (Do tim user WordPress)
-    # Hacker thuong scan /?author=1 de lay ten dang nhap
-    @user_enum {
-        query author=*
-    }
-    respond @user_enum 403		
-
-    # --- CHAN FILE NHAY CAM (SECURITY BLOCK) ---
-    @forbidden {
-        # 1. Block PHP Uploads 
-        path /wp-content/uploads/*.php
-
-        # 2. Block System Files & Directories
-        path /wp-config.php
-        path /.htaccess
-		path /.git
-        path /.git/*     
-        path *.env   
-        path /readme.html
-        path /license.txt
-		
-		# 3. Block xmlrpc 
-		path /xmlrpc.php
-        
-        # 4. Block Backups & Logs
-        path *.sql *.bak *.log *.old
-        # path *.zip *.rar *.tar *.7z
-    }
-    # Tra ve 404
-    respond @forbidden 404
-	
-	# PHP FastCGI, lay dong theo phien ban PHP o dau file lenh.
+    # PHP FastCGI, lay dong theo phien ban PHP o dau file lenh
     php_fastcgi unix//run/php/php${PHP_VER}-fpm.sock
 
     file_server
 }
-###end_wpsila_kiencang_$DOMAIN###	
 EOF

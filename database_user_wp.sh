@@ -1,3 +1,4 @@
+# shellcheck shell=bash
 # -----------------------------------------------------------
 # MODULE: Cài đặt database và user cho WordPress
 # File: database_user_wp.sh
@@ -57,6 +58,7 @@ GRANT ALL PRIVILEGES ON \`${GEN_DB_NAME}\`.* TO '${GEN_DB_USER}'@'127.0.0.1';
 -- 4. Flush (Thực ra MariaDB hiện đại tự flush khi tạo user, nhưng giữ lại cũng không sao)
 FLUSH PRIVILEGES;
 EOF
+CREATED_DB_RES=1
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
@@ -69,10 +71,12 @@ CRED_FILE="$SCRIPT_WPSILA_DIR/wpp.txt"
 # Kiểm tra nếu file tồn tại thì mới xóa
 rm -f "$CRED_FILE"
 
-# Tạo file mới cho trang WordPress đang cài
+# Tạo file mới cho trang WordPress đang cài với umask 077 (chỉ root đọc được ngay từ lúc tạo)
 # Chủ động ghi đè chứ không ghi nối tiếp, dấu tích website trước không được lưu
 # Điều này cũng khiến người dùng buộc phải chủ động lưu lại mật khẩu
-cat > "$CRED_FILE" <<EOF
+(
+    umask 077
+    cat > "$CRED_FILE" <<EOF
 ----------------------------------------
 WORDPRESS DATABASE CREDENTIALS
 Date: $(date)
@@ -82,7 +86,8 @@ Database User : ${GEN_DB_USER}
 Database Pass : ${GEN_DB_PASS}
 ----------------------------------------
 EOF
-chmod 600 "$CRED_FILE" # Chỉ user hiện tại mới đọc được file này
+)
+chmod 600 "$CRED_FILE" # Đảm bảo chắc chắn chỉ user root hiện tại mới đọc được file này
 # Xem xét bổ sung câu lệnh để xóa file này đi và cho người dùng quyết định
 # -------------------------------------------------------------------------------------------------------------------------------
 

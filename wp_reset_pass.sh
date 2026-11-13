@@ -50,7 +50,7 @@ echo "Cong cu nay su dung WP-CLI de doi mat khau ngay lap tuc."
 echo "------------------------------------------------"
 
 # 1. Nhập tên miền
-read -r -p "Nhap ten mien (VD: example.com): " INPUT_DOMAIN
+read -r -p "Nhap ten mien (VD: example.com): " INPUT_DOMAIN < /dev/tty
 
 # 2. Chuẩn hóa tên miền
 TEMP_DOMAIN=$(echo "$INPUT_DOMAIN" | tr '[:upper:]' '[:lower:]' | tr -d ' ')
@@ -58,6 +58,11 @@ DOMAIN=$(echo "$TEMP_DOMAIN" | sed -E 's|^https?://||' | sed -E 's|/.*$||' | sed
 
 if [[ -z "$DOMAIN" ]]; then
      echo -e "${RED}Loi: Ten mien khong duoc de trong!${NC}"
+     exit 1
+fi
+
+if [[ ! "$DOMAIN" =~ ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\.[a-z]{2,}$ ]]; then
+     echo -e "${RED}Loi: Dia chi website '$DOMAIN' chua ky tu khong hop le hoac sai dinh dang.${NC}"
      exit 1
 fi
 # -------------------------------------------------------------------------------------------------------------------------------
@@ -81,9 +86,9 @@ fi
 # -------------------------------------------------------------------------------------------------------------------------------
 echo -e "${YELLOW}Dang quet danh sach Quan tri vien (Administrator)...${NC}"
 
-# 4. Liệt kê user Admin (Dùng WP-CLI)
+# 4. Liệt kê user Admin (Dùng WP-CLI dưới user www-data để tránh leo thang đặc quyền)
 # --skip-plugins --skip-themes: Tránh lỗi PHP từ plugin làm hỏng lệnh
-if ! wp user list --role=administrator --fields=ID,user_login,user_email --format=table --allow-root --path="$WP_PATH" --skip-plugins --skip-themes; then
+if ! runuser -u www-data -- wp user list --role=administrator --fields=ID,user_login,user_email --format=table --path="$WP_PATH" --skip-plugins --skip-themes; then
     echo -e "${RED}Loi: Khong the ket noi Database hoac chay WP-CLI.${NC}"
     exit 1
 fi
@@ -93,7 +98,7 @@ fi
 
 # -------------------------------------------------------------------------------------------------------------------------------
 echo "------------------------------------------------"
-read -r -p "Nhap 'user_login' (Ten dang nhap) ban muon reset: " TARGET_USER
+read -r -p "Nhap 'user_login' (Ten dang nhap) ban muon reset: " TARGET_USER < /dev/tty
 
 if [[ -z "$TARGET_USER" ]]; then
     echo -e "${RED}Loi: Ban chua nhap user.${NC}"
@@ -105,7 +110,7 @@ fi
 
 # -------------------------------------------------------------------------------------------------------------------------------
 # 5. Kiểm tra user có tồn tại không?
-if ! wp user get "$TARGET_USER" --field=ID --allow-root --path="$WP_PATH" --skip-plugins --skip-themes &> /dev/null; then
+if ! runuser -u www-data -- wp user get "$TARGET_USER" --field=ID --path="$WP_PATH" --skip-plugins --skip-themes &> /dev/null; then
     echo -e "${RED}Loi: User '$TARGET_USER' khong ton tai trong he thong.${NC}"
     exit 1
 fi
@@ -120,7 +125,7 @@ NEW_PASS="res_$(openssl rand -hex 8)"
 echo -e "${YELLOW}Dang thiet lap mat khau moi...${NC}"
 
 # 7. Thực thi việc reset mật khẩu
-if wp user update "$TARGET_USER" --user_pass="$NEW_PASS" --allow-root --path="$WP_PATH" --skip-plugins --skip-themes &> /dev/null; then
+if runuser -u www-data -- wp user update "$TARGET_USER" --user_pass="$NEW_PASS" --path="$WP_PATH" --skip-plugins --skip-themes &> /dev/null; then
     echo ""
     echo -e "${GREEN}=== THANH CONG! ===${NC}"
     echo -e "Website: ${YELLOW}https://$DOMAIN/wp-admin${NC}"

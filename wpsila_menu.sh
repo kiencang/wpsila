@@ -11,6 +11,9 @@
 # -------------------------------------------------------------------------------------------------------------------------------
 # A. Cấu hình & Định nghĩa
 # -------------------------------------------------------------------------------------------------------------------------------
+set -uo pipefail
+export LC_ALL=C.UTF-8
+
 # Màu sắc
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -37,7 +40,7 @@ fi
 pause_screen() {
     echo -e "\n${BLUE}>> Nhan Enter de quay lai Menu...${NC}"
     local dummy_key
-    read -r dummy_key
+    read -r dummy_key < /dev/tty
 }
 
 # Hàm thực thi script con an toàn
@@ -111,7 +114,7 @@ show_menu() {
 # -------------------------------------------------------------------------------------------------------------------------------
 while true; do
     show_menu
-    read -r choice
+    read -r choice < /dev/tty
     echo "" # Xuống dòng cho đẹp
     
     case $choice in

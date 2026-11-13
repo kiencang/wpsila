@@ -56,15 +56,20 @@ echo -e "${YELLOW}Redis PHP & Redis Server van duoc giu lai, nhung khong hoat do
 
 # 1. Nhập tên miền
 echo "--------------------------------------------------------"
-read -r -p "Nhap ten mien website (VD: example.com): " INPUT_DOMAIN
+read -r -p "Nhap ten mien website (VD: example.com): " INPUT_DOMAIN < /dev/tty
 
 # Làm sạch tên miền
 TEMP_DOMAIN=$(echo "$INPUT_DOMAIN" | tr '[:upper:]' '[:lower:]' | tr -d ' ')
 DOMAIN=$(echo "$TEMP_DOMAIN" | sed -E 's|^https?://||' | sed -E 's|/.*$||' | sed -E 's|:[0-9]+$||')
 
-# Kiểm tra tên miền rỗng
+# Kiểm tra tên miền rỗng và định dạng
 if [[ -z "$DOMAIN" ]]; then
      echo -e "${RED}Loi: Ten mien khong duoc de trong!${NC}"
+     exit 1
+fi
+
+if [[ ! "$DOMAIN" =~ ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\.[a-z]{2,}$ ]]; then
+     echo -e "${RED}Loi: Dia chi website '$DOMAIN' chua ky tu khong hop le hoac sai dinh dang.${NC}"
      exit 1
 fi
 
@@ -80,6 +85,8 @@ cleanup() {
     # Nếu biến IS_LOCKED là true (tức là script đã mở khóa file)
     if (( ${IS_LOCKED:-0} == 1 )) && [[ -f "$CONFIG_FILE" ]]; then
         chmod 640 "$CONFIG_FILE"
+        chattr +i "$CONFIG_FILE" 2>/dev/null || true
+        IS_LOCKED=0
         echo "An toan hon: Da khoa lai file wp-config.php."
     fi
 }
@@ -99,7 +106,7 @@ fi
 # -------------------------------------------------------------------------------------------------------------------------------
 # 2. Xác nhận
 echo -e "${RED}CANH BAO: Thao tac tren domain: $DOMAIN${NC}"
-read -r -p "Nhap 'y' de XOA HOAN TOAN Redis tren website: " CONFIRM
+read -r -p "Nhap 'y' de XOA HOAN TOAN Redis tren website: " CONFIRM < /dev/tty
 
 if [[ "$CONFIRM" != "y" && "$CONFIRM" != "Y" ]]; then
     echo -e "${GREEN}Da huy thao tac.${NC}"
@@ -115,7 +122,8 @@ echo -e "${YELLOW}[1/4] Mo khoa file wp-config.php...${NC}"
 
 CURRENT_PERM=$(stat -c '%a' "$CONFIG_FILE")
 
-if [[ "$CURRENT_PERM" == "640" ]] || [[ "$CURRENT_PERM" == "440" ]]; then
+if [[ "$CURRENT_PERM" == "640" ]] || [[ "$CURRENT_PERM" == "440" ]] || lsattr "$CONFIG_FILE" 2>/dev/null | awk '{print $1}' | grep -q 'i'; then
+    chattr -i "$CONFIG_FILE" 2>/dev/null || true
     chmod 660 "$CONFIG_FILE" # Mở khóa
     IS_LOCKED=1
 fi
@@ -127,19 +135,19 @@ chown root:www-data "$CONFIG_FILE"
 # +++
 
 # -------------------------------------------------------------------------------------------------------------------------------
-# 4. Thực hiện gỡ bỏ (WP-CLI)
+# 4. Thực hiện gỡ bỏ (WP-CLI dưới quyền www-data)
 echo -e "${YELLOW}[2/4] Dang go bo Redis...${NC}"
 
 # 4.0. Dọn dẹp Cache
 echo "   - Flushing WordPress Cache..."
-wp cache flush --allow-root --path="$WP_PATH" --quiet || true
+runuser -u www-data -- wp cache flush --path="$WP_PATH" --quiet || true
 
 # 4.1. Vô hiệu hóa Object Cache
 echo "   - Vo hieu hoa Object Cache..."
 
 # Dùng || true để không dừng script nếu redis chưa enable
 # Ngắt kết nối giữa WordPress và Redis
-wp redis disable --allow-root --path="$WP_PATH" --quiet || true
+runuser -u www-data -- wp redis disable --path="$WP_PATH" --quiet || true
 
 # [Safety] Xóa thủ công file drop-in
 if [[ -f "$WP_PATH/wp-content/object-cache.php" ]]; then
@@ -168,16 +176,16 @@ KEYS_TO_REMOVE=(
 
 for KEY in "${KEYS_TO_REMOVE[@]}"; do
     # Kiểm tra tồn tại trước khi xóa
-	if wp config has "$KEY" --allow-root --path="$WP_PATH" 2>/dev/null; then
+	if runuser -u www-data -- wp config has "$KEY" --path="$WP_PATH" 2>/dev/null; then
 		# Nếu xóa thành công (&&) thì mới in thông báo
-		wp config delete "$KEY" --allow-root --path="$WP_PATH" --quiet && echo "      + Da xoa: $KEY" || echo "      ! Loi: Khong the xoa $KEY"
+		runuser -u www-data -- wp config delete "$KEY" --path="$WP_PATH" --quiet && echo "      + Da xoa: $KEY" || echo "      ! Loi: Khong the xoa $KEY"
 	fi
 done
 
 # 4.3. Gỡ bỏ Plugin
 echo "   - Go bo plugin Redis..."
-if wp plugin is-installed redis-cache --allow-root --path="$WP_PATH"; then
-    wp plugin deactivate redis-cache --uninstall --allow-root --path="$WP_PATH" --quiet || true
+if runuser -u www-data -- wp plugin is-installed redis-cache --path="$WP_PATH" 2>/dev/null; then
+    runuser -u www-data -- wp plugin deactivate redis-cache --uninstall --path="$WP_PATH" --quiet || true
     echo "    + Plugin da go."
 else
     echo "    + Khong tim thay plugin."
@@ -192,6 +200,8 @@ echo -e "${YELLOW}[3/4] Khoi phuc va don dep...${NC}"
 
 if (( IS_LOCKED == 1 )); then
     chmod 640 "$CONFIG_FILE"
+    chattr +i "$CONFIG_FILE" 2>/dev/null || true
+    IS_LOCKED=0
     echo "   - Da khoa lai wp-config.php (640)."
 fi
 

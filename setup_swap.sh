@@ -9,6 +9,7 @@
 
 # -------------------------------------------------------------------------------------------------------------------------------
 set -euo pipefail
+export LC_ALL=C.UTF-8
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
@@ -65,11 +66,10 @@ else
             exit 1
         fi
 
-        echo "Tat swap cu..."
-        swapoff -a
-        
-        # Xóa sạch sẽ
+        echo "Tat swapfile cu..."
+        # Chỉ tắt đúng /swapfile để không ảnh hưởng tới phân vùng swap/zram khác của hệ thống
         if [[ -f "$SWAP_FILE" ]]; then
+            swapoff "$SWAP_FILE" 2>/dev/null || true
             rm -f "$SWAP_FILE"
         fi
         sed -i "\#$SWAP_FILE#d" /etc/fstab
@@ -79,7 +79,7 @@ else
     echo "Tao Swap moi ${SWAP_SIZE_GB}GB..."
     
     # Check disk space
-    FREE_DISK=$(df --output=avail -B 1G / | tail -n 1 | tr -d 'G')
+    FREE_DISK=$(df --output=avail -B 1G / | tail -n 1 | tr -d ' G')
     if [[ "$FREE_DISK" -lt 5 ]]; then
         echo -e "${RED}Loi: O cung chi con ${FREE_DISK}GB (Can > 5GB).${NC}"
         exit 1
@@ -114,9 +114,11 @@ SYSCTL_D_FILE="/etc/sysctl.d/99-wpsila-swap.conf"
 
 # Swappiness=10: Tốt cho VPS chạy Web Server (MariaDB thích RAM thật hơn)
 # VFS Cache=50: Cân bằng giữa việc cache file và giải phóng RAM
+# Overcommit Memory=1: Bắt buộc cho Redis và giúp cấp phát bộ nhớ mượt mà trên Linux
 cat > "$SYSCTL_D_FILE" <<EOF
 vm.swappiness=10
 vm.vfs_cache_pressure=50
+vm.overcommit_memory=1
 EOF
 
 sysctl -p "$SYSCTL_D_FILE" > /dev/null

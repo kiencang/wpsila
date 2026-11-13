@@ -31,6 +31,16 @@ fi
 # Xác định kiểu pass cần hiển thị
 # Chung cho cả 3 file hiển thị pass WordPress (wpp.txt), sFTP (sftpp.txt), Adminer (adminerp.txt)
 WHAT_PASS="${1:-nopa}"
+
+# Kiểm tra chặt danh sách file được phép đọc (chống Path Traversal)
+case "$WHAT_PASS" in
+    wpp.txt|sftpp.txt|adminerp.txt)
+        ;;
+    *)
+        echo "Loi: Ten file mat khau khong hop le ($WHAT_PASS)."
+        exit 1
+        ;;
+esac
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++

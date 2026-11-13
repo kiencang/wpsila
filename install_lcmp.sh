@@ -91,17 +91,15 @@ fi
 
 # -------------------------------------------------------------------------
 
-# C2. Kiểm tra user "caddy"
+# C2. Kiểm tra user "caddy" (Nếu cài dở từ lần trước thì cho phép chạy tiếp để hoàn tất)
 if id "caddy" &>/dev/null; then
-    echo -e "${RED}[X] LOI: User 'caddy' da ton tai.${NC}"
-    echo -e "${YELLOW}Giai phap:${NC} Reinstall OS ve trang thai ban dau."
-    exit 1
+    echo -e "${YELLOW}[!] Phat hien user 'caddy' da ton tai (Co the lan cai dat truoc bi gian doan).${NC}"
+    echo -e "${YELLOW}    Script se tiep tuc cai dat va hoan thien cac thanh phan con thieu...${NC}"
 fi
 
-# C3. Kiểm tra Port 80 & 443
-# Dùng grep -E để gộp lệnh, code gọn hơn
-if ss -tuln | grep -qE ":(80|443) "; then
-    echo -e "${RED}[X] LOI NGHIEM TRONG: Cong 80 hoac 443 dang ban!${NC}"
+# C3. Kiểm tra Port 80 & 443 (Chỉ chặn nếu bị chiếm bởi Web Server khác ngoài Caddy)
+if ss -tulnp | grep -E ":(80|443) " | grep -vq "caddy"; then
+    echo -e "${RED}[X] LOI NGHIEM TRONG: Cong 80 hoac 443 dang bi chiem boi dich vu khac!${NC}"
     echo -e "${YELLOW}Nguyen nhan:${NC} VPS dang chay Web Server khac (Apache, Nginx...)."
     echo -e "${YELLOW}Giai phap:${NC} Vui long su dung VPS moi tinh (Clean OS)."
     exit 1
@@ -135,7 +133,7 @@ count=0             # Biến đếm số lần đã thử
 # 3. Vòng lặp giới hạn
 while [[ "$count" -lt "$MAX_RETRIES" ]]; do
     echo ""
-    read -r -p "Nhap Email quan tri (Bat buoc, day phai la email cua ban): " TEMP_EMAIL
+    read -r -p "Nhap Email quan tri (Bat buoc, day phai la email cua ban): " TEMP_EMAIL < /dev/tty
 	
 	# Xóa khoảng trắng dư thừa
 	ADMIN_EMAIL=$(echo "$TEMP_EMAIL" | tr -d ' ')
@@ -200,8 +198,8 @@ echo "--------------------------------------------------------"
 echo "Cap nhat he thong va cai dat cac goi co ban..."
 
 # C4.1. Gỡ bỏ các webserver mặc định (Apache/Nginx) nếu có để tránh xung đột tiềm ẩn
-# Dùng || true để không báo lỗi nếu không tìm thấy gói
-apt-get remove --purge -y apache2 apache2-* nginx nginx-* &>/dev/null || true
+# Dùng || true để không báo lỗi nếu không tìm thấy gói, bọc ngoặc đơn để tránh shell globbing
+apt-get remove --purge -y apache2 'apache2-*' nginx 'nginx-*' &>/dev/null || true
 
 # C4.2 Cập nhật và cài đặt gói bổ trợ
 # Đã xóa dấu '&& \' bị thừa ở cuối lệnh để tránh lỗi cú pháp
@@ -215,7 +213,8 @@ apt-get install -y --no-install-recommends -o Dpkg::Lock::Timeout=60 \
     software-properties-common \
     zip \
     unzip \
-    gnupg
+    gnupg \
+    psmisc
 
 echo -e "${GREEN}[OK] Da cai dat xong dependencies (cac goi phu thuoc).${NC}"
 sleep 2
@@ -292,13 +291,16 @@ Admin Email: $ADMIN_EMAIL
 ----------------------------------------
 EOF
 
-# Ghi nối vào file quản trị tổng thể wpsila.conf
-# Thêm khoảng trắng vào cuối
-echo "" >> "$WPSILA_CONFIG_FILE"
-cat >> "$WPSILA_CONFIG_FILE" <<EOF
+# Ghi nối vào file quản trị tổng thể wpsila.conf (Idempotent - Không bị trùng lặp nếu chạy lại)
+if grep -q "^INSTALL_WP_EMAIL=" "$WPSILA_CONFIG_FILE"; then
+    sed -i "s|^INSTALL_WP_EMAIL=.*|INSTALL_WP_EMAIL=\"$ADMIN_EMAIL\"|" "$WPSILA_CONFIG_FILE"
+else
+    echo "" >> "$WPSILA_CONFIG_FILE"
+    cat >> "$WPSILA_CONFIG_FILE" <<EOF
 # 3. Email của admin WP
 INSTALL_WP_EMAIL="$ADMIN_EMAIL"
 EOF
+fi
 
 echo -e "Da cap nhat ${GREEN}email${NC} vao file cau hinh."
 

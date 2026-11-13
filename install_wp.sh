@@ -114,6 +114,40 @@ export PHP_VER
 export SCRIPT_WPSILA_DIR
 echo -e "Phien ban PHP he thong: ${GREEN}$PHP_VER${NC}"
 sleep 2
+
+# --- CƠ CHẾ TỰ ĐỘNG ROLLBACK NẾU CÀI ĐẶT BỊ LỖI GIỮA CHỪNG ---
+INSTALL_WP_DONE=0
+CREATED_DB_RES=0
+CREATED_WEB_DIR=0
+CREATED_CADDY_FILE=0
+
+rollback_failed_wp_install() {
+    local exit_code=$?
+    if (( exit_code != 0 && INSTALL_WP_DONE == 0 )); then
+        echo ""
+        echo -e "${RED}!!! Qua trinh cai dat gap su co (Ma loi: $exit_code). Dang tu dong don dep (Rollback) de he thong sach se...${NC}"
+        if (( CREATED_DB_RES == 1 )) && [[ -n "${GEN_DB_NAME:-}" && -n "${GEN_DB_USER:-}" ]]; then
+            mariadb <<EOF 2>/dev/null || true
+DROP DATABASE IF EXISTS \`${GEN_DB_NAME}\`;
+DROP USER IF EXISTS '${GEN_DB_USER}'@'localhost';
+DROP USER IF EXISTS '${GEN_DB_USER}'@'127.0.0.1';
+FLUSH PRIVILEGES;
+EOF
+            [[ -n "${CRED_FILE:-}" ]] && rm -f "$CRED_FILE"
+            echo -e "${YELLOW} -> Da thu hoi Database va User tam thoi.${NC}"
+        fi
+        if (( CREATED_WEB_DIR == 1 )) && [[ -n "${DOMAIN:-}" && "$DOMAIN" != "/" && "$DOMAIN" != "." ]]; then
+            rm -rf "/var/www/${DOMAIN:?}"
+            (crontab -u www-data -l 2>/dev/null || true) | grep -Fv "/var/www/$DOMAIN/public_html/wp-cron.php" | crontab -u www-data - 2>/dev/null || true
+            echo -e "${YELLOW} -> Da xoa thu muc web va cronjob tam thoi.${NC}"
+        fi
+        if (( CREATED_CADDY_FILE == 1 )) && [[ -n "${DOMAIN:-}" && -f "/etc/caddy/sites-enabled/${DOMAIN}.caddy" ]]; then
+            rm -f "/etc/caddy/sites-enabled/${DOMAIN}.caddy"
+            echo -e "${YELLOW} -> Da xoa file cau hinh Caddy tam thoi.${NC}"
+        fi
+    fi
+}
+trap rollback_failed_wp_install EXIT
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
@@ -225,7 +259,8 @@ fi
 # I3. GHI FILE CẤU HÌNH (Write New File)
 echo "Dang tao file cau hinh Caddy rieng biet..."
 
-# Ghi nội dung vào file mới
+# Đánh dấu đã tạo file .caddy mới trong lượt chạy này (để Rollback biết cần xóa nếu validate lỗi)
+CREATED_CADDY_FILE=1
 echo "$CONTENT" > "$CADDY_SITE_FILE"
 
 # Format lại cho đẹp (Caddy chuẩn hóa)
@@ -253,6 +288,7 @@ else
 	chown -R caddy:caddy "/var/www/$DOMAIN/logs"
 	
     systemctl reload caddy
+    INSTALL_WP_DONE=1
     echo "Da cap nhat cau hinh cho $DOMAIN."
 fi
 # -------------------------------------------------------------------------------------------------------------------------------

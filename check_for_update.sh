@@ -21,7 +21,7 @@ SCRIPT_VERSION="v1.4.1"
 # Kiểm tra quyền
 if [[ $EUID -ne 0 ]]; then
    # 2. Nếu không phải root, tự động chạy lại script này bằng sudo
-   sudo "$0" "$@"
+   sudo -E "$0" "$@"
    # 3. Thoát tiến trình cũ (không phải root) để tiến trình mới (có root) chạy
    exit $?
 fi
@@ -49,19 +49,25 @@ do_you_update=0
 check_for_update() {
     echo -e "${YELLOW}Dang kiem tra cap nhat tu GitHub...${NC}"
 
-    # 1. Lấy JSON từ GitHub API
-    local latest_json
-    if ! latest_json=$(curl -sL -f -m 10 -A "WPSila-Updater" "https://api.github.com/repos/$GITHUB_USER/$GITHUB_REPO/releases/latest"); then
-        echo -e "${RED}Loi: Khong the ket noi den GitHub API hoac limit rate.${NC}"
-        return 1
+    # 1. Lấy tag phiên bản mới nhất (Ưu tiên qua HTTP Redirect để không bị giới hạn 60 req/giờ của GitHub API, dự phòng qua API)
+    local latest_tag=""
+    local redirect_url
+    redirect_url=$(curl -fsSLI -m 10 -A "WPSila-Updater" -o /dev/null -w '%{url_effective}' "https://github.com/$GITHUB_USER/$GITHUB_REPO/releases/latest" || true)
+    if [[ "$redirect_url" == *"/releases/tag/"* ]]; then
+        latest_tag="${redirect_url##*/}"
     fi
 
-    # 2. [TỐI ƯU] Dùng Python3 (có sẵn trên Ubuntu 22.04/24.04) để parse JSON chuẩn xác 100%
-    local latest_tag
-    latest_tag=$(echo "$latest_json" | python3 -c "import sys, json; print(json.load(sys.stdin).get('tag_name', ''))")
+    if [[ -z "$latest_tag" ]]; then
+        local latest_json
+        if ! latest_json=$(curl -sL -f -m 10 -A "WPSila-Updater" "https://api.github.com/repos/$GITHUB_USER/$GITHUB_REPO/releases/latest"); then
+            echo -e "${RED}Loi: Khong the ket noi den GitHub API hoac limit rate.${NC}"
+            return 1
+        fi
+        latest_tag=$(echo "$latest_json" | python3 -c "import sys, json; print(json.load(sys.stdin).get('tag_name', ''))" 2>/dev/null || true)
+    fi
 
     if [[ -z "$latest_tag" ]]; then
-        echo -e "${RED}Loi: Khong tim thay tag_name trong phan hoi API.${NC}"
+        echo -e "${RED}Loi: Khong tim thay tag_name trong phan hoi GitHub.${NC}"
         return 1
     fi
 
@@ -71,18 +77,22 @@ check_for_update() {
         return 0
     fi
 
-    # 3. Tách Version (Xử lý kỹ lỗi số Bát phân - Octal number error)
+    # 3. Tách Version (Xử lý kỹ lỗi số Bát phân 10# và làm sạch hậu tố như -beta, -rc1)
     local l_ver=${SCRIPT_VERSION#v}
     local r_ver=${latest_tag#v}
 
     local l_major l_minor l_patch
     local r_major r_minor r_patch
 
-    # Tách và gán mặc định 0
+    # Tách theo dấu chấm
     IFS='.' read -r l_major l_minor l_patch <<< "$l_ver"
     IFS='.' read -r r_major r_minor r_patch <<< "$r_ver"
-    
-    # Ép kiểu base 10 (10#) để tránh lỗi nếu version là 08, 09
+
+    # Làm sạch mọi hậu tố không phải chữ số (ví dụ: 2-beta -> 2) trước khi ép kiểu 10#
+    l_major="${l_major%%[^0-9]*}"; l_minor="${l_minor%%[^0-9]*}"; l_patch="${l_patch%%[^0-9]*}"
+    r_major="${r_major%%[^0-9]*}"; r_minor="${r_minor%%[^0-9]*}"; r_patch="${r_patch%%[^0-9]*}"
+
+    # Gán mặc định 0 nếu rỗng
     l_major=${l_major:-0}; l_minor=${l_minor:-0}; l_patch=${l_patch:-0}
     r_major=${r_major:-0}; r_minor=${r_minor:-0}; r_patch=${r_patch:-0}
 
@@ -129,16 +139,13 @@ fi
 
 if (( do_you_update == 1 )); then
     echo -e "${GREEN}Dang tai ban cap nhat...${NC}"
-    
-    # Reset timer sudo để tránh hỏi pass giữa chừng nếu đã sudo từ đầu
-    sudo -v 
 
     # Sử dụng exec để thay thế tiến trình hiện tại hoàn toàn
     export DEBIAN_FRONTEND=noninteractive
     
     # Lưu ý: Thêm cờ -- update để script mới biết nó đang được chạy ở chế độ update (nếu cần)
 	# Bản online
-    exec sudo bash -c "curl -sL https://vps.wpsila.com | bash -s -- update"
+    exec bash -c "curl -fsSL https://vps.wpsila.com | bash -s -- update"
 	
 	#Bản test
 	# exec sudo bash -c "curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/install_wpsila.sh | bash -s -- update"
