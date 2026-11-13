@@ -7,19 +7,20 @@ Phần này chỉ dành cho dev, không liên quan đến người dùng cuối.
 
 ## Ra phiên bản mới
 Mỗi khi ra phiên bản mới cần làm như sau:
-- Cập nhật version mới cho check_for_update.sh trong main (ví dụ v0.3.1)
+- Cập nhật điều chỉnh cụ thể trong CHANGELOG.md;
+- Cập nhật version mới cho **check_for_update.sh** trong main (ví dụ v0.3.1); cái này được ứng dụng dùng để kiểm tra phiên bản mới ra để người dùng tải về nếu cần;
 - Trên GitHub, tạo phiên bản mới tương ứng với version vừa nhập trong check_for_update.sh
-- Sử dụng generate_checksum để tạo checksum cho các file của phiên bản mới (ví dụ dùng WSL trên Windows bash ./generate_checksum.sh)
-- Nhớ thay đổi version tương ứng trong generate_checksum để nó tạo chính xác các file theo version
-- Cập nhật các checksum này vào file install_wpsila.sh (nhớ điều chỉnh cả phiên bản)
-- Đẩy file install_wpsila.sh lên vps.wpsila.com
-- Cập nhật các thông báo vesion trên README của main và trên website chính wpsila.com
+- Sử dụng generate_checksum để tạo checksum cho các file của phiên bản mới (ví dụ dùng WSL trên Windows `bash ./generate_checksum.sh`)
+- Nhớ thay đổi version tương ứng trong generate_checksum để nó lấy chính xác các file theo version
+- Cập nhật các checksum này vào file `install_wpsila.sh` (nhớ điều chỉnh cả phiên bản)
+- Đẩy file `install_wpsila.sh` lên `vps.wpsila.com`
+- Cập nhật các thông báo vesion trên README của main và trên website chính `wpsila.com`
 
-Lúc này vps.wpsila.com sẽ chứa phiên bản mới nhất. Tải có kiểm tra checksum để đảm bảo dữ liệu tải về đầy đủ.
+Lúc này `vps.wpsila.com` sẽ chứa phiên bản mới nhất. Tải có kiểm tra checksum để đảm bảo dữ liệu tải về đầy đủ.
 
 <p align="center">
   <img src="images/VSC-Ubuntu.png" alt="Chạy checksum">
-   <br><em>Chạy checksum, `$ bash ./checksum.sh` (generate_checksum.sh) qua giao diện Visual Studio Code (Running on Ubuntu / WSL 2)</em>
+   <br><em>Chạy checksum, `bash ./checksum.sh` (generate_checksum.sh) qua giao diện Visual Studio Code (Running on Ubuntu / WSL 2)</em>
 </p>
 
 ---
@@ -85,8 +86,12 @@ j. Kiểm tra cập nhật cho wpsila
 k. Cấu hình swap (tăng RAM cho web)
 - setup_swap.sh
 
-l. Tăng cường bảo mật
+l. Tăng cường bảo mật / backup
 - setup_fail2ban_core.sh
+- manage_backup.sh
+
+m. Thông tin các phiên bản / Danh sách website
+- list_websites.sh
 
 ---
 ## Các file không có trong phần cài đặt chính
