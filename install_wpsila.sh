@@ -4,7 +4,7 @@
 set -euo pipefail
 
 # Phiên bản hiện tại của wpsila
-SILA_VERSION="v1.4.0"
+SILA_VERSION="v1.4.1"
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
@@ -238,8 +238,8 @@ rm -f "$INSTALL_DIR/"*.sh
 # Dev bắt buộc phải dùng trước khi công bố phiên bản mới
 # Có tác dụng ngăn chặn các vấn đề liên quan đến lỗi đường truyền
 # --------------------------------------------------------------------------------
-# Generated at: Fri Nov 13 11:28:29 +07 2026
-# Version: v1.4.0
+# Generated at: Fri Nov 13 14:28:19 +07 2026
+# Version: v1.4.1
 declare -A CHECKSUMS=(
     ["wpsila.conf"]="2edbaef3dc7bbef03470455a6c12b3b594ca83db8bdf787efafe8f8e61a09b95"
     ["wpsila_menu.sh"]="587fd60b75eecbd71dd68b57cad2c21b908eac7e1b80c0b7424f058659946bb8"
@@ -263,7 +263,7 @@ declare -A CHECKSUMS=(
     ["setup_sftp.sh"]="0bf74ffa3ab770a55a19238b08adf707b77cdaa53bafa0f99f35fd280e10dd79"
     ["setup_adminer.sh"]="d916b8bb0f94b1b0073f7bf71159a67cee2c27932d965a7cf5eef1638d299460"
     ["show_pass.sh"]="35124c7bd96c1ec3f8dfaf8e69d75dc8b02d8c0f562d380c47b86613be7fc148"
-    ["check_for_update.sh"]="689b57659467bcb8f1cdf4d684edb31c2863e76f8410d26ae27e581f9ed55d3f"
+    ["check_for_update.sh"]="4d65d7b2cdd027a29503511c01ed980a2dccdf6bc8cf982f6a58287f7a5a05d1"
     ["manage_wp_config.sh"]="c78466bda9f929952f0390603954c1d53cf105a879d8747e27dcbc03ba83cf45"
     ["view_logs.sh"]="61b0ed4e76e7cbfc76c5266acb9b8ac2760b46b43b8d3d2ff23676ba5aee241e"
     ["wp_reset_pass.sh"]="9409b9404c29815db0cfe355c530ed48ced435f1457074108e3740349b45aed7"
