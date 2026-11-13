@@ -4,7 +4,7 @@
 set -euo pipefail
 
 # Phiên bản hiện tại của wpsila
-SILA_VERSION="v1.3.0"
+SILA_VERSION="v1.4.0"
 # -------------------------------------------------------------------------------------------------------------------------------
 
 # +++
@@ -237,40 +237,43 @@ rm -f "$INSTALL_DIR/"*.sh
 # Sử dụng mã generate_checksum bên branches Dev chạy để lấy mã này về
 # Dev bắt buộc phải dùng trước khi công bố phiên bản mới
 # Có tác dụng ngăn chặn các vấn đề liên quan đến lỗi đường truyền
+=== KET QUA: Copy doan duoi day va thay vao script cai dat ===
 # --------------------------------------------------------------------------------
-# Generated at: Mon Feb 23 22:57:56 +07 2026
-# Version: v1.3.0
+# Generated at: Fri Nov 13 11:28:29 +07 2026
+# Version: v1.4.0
 declare -A CHECKSUMS=(
-    ["wpsila.conf"]="662450e1a59c15843872c40e872a686e29adbc4371c259c13cc7ad54c0aaae27"
-    ["wpsila_menu.sh"]="b44c1e8fe46896b1ed55ee6b65e2458d2222b86b8f31c641ef83c1ed6cbc6701"
-    ["install_lcmp.sh"]="e5e6a57f5c49db5011bb8d48c70c1f155b7b1a6f0b8b4131f534255ca0bf01f9"
-    ["anti_apt_lock.sh"]="165d6637c6463cbc3c86710bcab5c46eaa8c5d16877340707147650ae9ab0063"
+    ["wpsila.conf"]="2edbaef3dc7bbef03470455a6c12b3b594ca83db8bdf787efafe8f8e61a09b95"
+    ["wpsila_menu.sh"]="587fd60b75eecbd71dd68b57cad2c21b908eac7e1b80c0b7424f058659946bb8"
+    ["install_lcmp.sh"]="a6ba5f85efe5bc4f982299b4cc3498074b880e6c316dec7c58b305e12f5a70f2"
+    ["anti_apt_lock.sh"]="394a3f452371795ea6a8924f74580c6cbaaa8feeabd05e8e6bb24b91e7d7a7d5"
     ["install_caddyserver.sh"]="84724a1186c738331d2978a297405185f537ed871d03c4334d19f72f51e27c20"
-    ["install_php.sh"]="53b33e9609968fb8ca39a8dc5aafe08c7df8260be126e74e523f1fb2472fdc7a"
-    ["install_mariadb.sh"]="d3abc7ac72c97a10054f4534eac0fcc2001375c395b8a5f755a9bcded8e64123"
-    ["install_wp.sh"]="daa3a1e3264febeaa072a7840f117372e1936cc19e4ba99fa0e84e8bc399f8d7"
+    ["install_php.sh"]="d7f68130f6b77e3cdc690a5de23852d6127a1a44e8f6b9c981ae4b6b9ea05169"
+    ["install_mariadb.sh"]="35920ed9e452a78cbc0527d97fcb39ba5e6b4194310a72feb829b8878c58452d"
+    ["install_wp.sh"]="d849eedeb5bb7f16dc34800f8de023268184aac81c42f07a6907bb313cb91564"
     ["domain_check.sh"]="1905c2648924e3c9ab42608b9701ef4d7692cbf38893d2d560ce621db5f423f4"
     ["database_user_wp.sh"]="9f11dc3c7426dc8fb0adcef3cdea9f5a09bf71b0c0529ebf8efeac9d2f730972"
     ["wordpress.sh"]="cde4111c7f938497f493cdea81599a2f6e541251d199580b3b27287756bcf6d6"
     ["caddyfile.sh"]="a3b05f58c453b3f00d16cda865a00594085115b37d38648d6b4814308f277c8a"
     ["caddyfile_subdomain.sh"]="aa20c4c329db51deb09481c1f36d38da0b2d15950534c830cdede12e952c73ad"
     ["tune_mariadb.sh"]="a76ca6118bfbad12a86e2b049ca691efbc795b8cda964d85b2228825ee6ccb3b"
-    ["tune_php.sh"]="97ccd09ec9f6bc45c9dcc24bae1dddfb9bdcc6e08ef422c728b70e376a292fb3"
-    ["tune_pool.sh"]="0c3946db1e55a14da878a9f771aedd6864791c54c5839ecb7c71a4371131810b"
+    ["tune_php.sh"]="e223f83eefacb4fa6c8f40a009c8b24d9507fc1cc5675d07ba8aca8634cc564a"
+    ["tune_pool.sh"]="a3a1d33ed044576348315121ed4e69a894ef539934b52ab637ba943319a82b6b"
     ["setup_swap.sh"]="bcfa315ec6dffdb0c9c5573d2fe66338a8dac68e0ef6bf35cc3fa2e70e964780"
     ["setup_fail2ban_core.sh"]="8ecb74309fde4408c3335399b183a43bd629659fe981c12146eb9aa53cdf3d00"
-    ["remove_web.sh"]="fa68e459a33dcda6a4ab81c93b541bb14cfb270bbe1d4a7edecc9cab47474410"
+    ["remove_web.sh"]="85af7ec4dc09690ab389a3b40e0b42295da3e2c12a12d6127172fff4b75b6485"
     ["setup_sftp.sh"]="0bf74ffa3ab770a55a19238b08adf707b77cdaa53bafa0f99f35fd280e10dd79"
-    ["setup_adminer.sh"]="53251b71497a8b22e064ee0413a4dc15b69eab3ce65e607f86dcd73ea7c3992a"
+    ["setup_adminer.sh"]="d916b8bb0f94b1b0073f7bf71159a67cee2c27932d965a7cf5eef1638d299460"
     ["show_pass.sh"]="35124c7bd96c1ec3f8dfaf8e69d75dc8b02d8c0f562d380c47b86613be7fc148"
     ["check_for_update.sh"]="689b57659467bcb8f1cdf4d684edb31c2863e76f8410d26ae27e581f9ed55d3f"
     ["manage_wp_config.sh"]="c78466bda9f929952f0390603954c1d53cf105a879d8747e27dcbc03ba83cf45"
     ["view_logs.sh"]="61b0ed4e76e7cbfc76c5266acb9b8ac2760b46b43b8d3d2ff23676ba5aee241e"
     ["wp_reset_pass.sh"]="9409b9404c29815db0cfe355c530ed48ced435f1457074108e3740349b45aed7"
     ["get_db_info.sh"]="856989c4e1496fdd69d3cae62d7205ec2d651d74ee08d1b2da572792873be152"
-    ["install_redis_cache.sh"]="7a36d0baf406abcffba6b0b1da0b16466b5bf29b16827e082cf8eb9ace51e461"
-    ["uninstall_redis_cache.sh"]="75449d7e08a465adfc8e0dc93544162b2d53d2265fe5cb9fa4eaa8b9c5681839"
+    ["install_redis_cache.sh"]="250ab0b39ea072137fa25bb478a68787e785fc31ecb991c0955ceac50b2b90fe"
+    ["uninstall_redis_cache.sh"]="415356e7c5e60cd6c80f74f0449c026660d46d498d68574fdc27f84d1ce8723e"
     ["remove_pass_files.sh"]="83fcd53c7a37d824052cc80e02752402c601b021b095e478eb4dcf8658e2f249"
+    ["list_websites.sh"]="d529f286f0fd8b0db3f71c924af855cc2bbc9a683ea0613a21ed2729d22f1fb4"
+    ["manage_backup.sh"]="904eb11318d9b3fed5bc910ea6faf80d4acdfd19a6e4e307686cc87dd3ad60e7"
 )
 # --------------------------------------------------------------------------------
 
