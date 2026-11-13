@@ -112,18 +112,23 @@ if [[ ! -d "$ROOT_DIR" ]]; then
             echo -e "${RED}Canh bao: Khong the reload Caddy. Vui long kiem tra trang thai service.${NC}"
         fi
 
-        # 2. Xóa chứng chỉ SSL cũ của $DOMAIN (nếu có)
-        CERT_PATH="/var/lib/caddy/.local/share/caddy/certificates/acme-v02.api.letsencrypt.org-directory"
-        if [[ -d "$CERT_PATH/$DOMAIN" ]]; then
-            rm -rf "${CERT_PATH:?}/$DOMAIN"
-            echo -e "${GREEN}Da xoa chung chi SSL cu cua $DOMAIN.${NC}"
-        fi
+        # 2. Xóa chứng chỉ SSL cũ của $DOMAIN (bao gồm cả Let's Encrypt và ZeroSSL)
+        for cert_dir in /var/lib/caddy/.local/share/caddy/certificates/*/"$DOMAIN"; do
+            if [[ -n "$DOMAIN" && -d "$cert_dir" ]]; then
+                rm -rf "$cert_dir"
+                echo -e "${GREEN}Da xoa chung chi SSL cu tai: $cert_dir${NC}"
+            fi
+        done
+        unset cert_dir
 
         # 3. Nếu không còn tên miền nào khác đang trỏ vào /var/www/adminer thì dọn sạch toàn bộ Adminer
         if ! grep -ql "$ADMINER_DIR" /etc/caddy/sites-enabled/*.caddy 2>/dev/null; then
             if command -v mariadb &> /dev/null; then
-                mariadb -u root -e "DROP USER IF EXISTS 'adminer_db'@'localhost'; FLUSH PRIVILEGES;" 2>/dev/null || true
-                echo -e "${GREEN}Da xoa tai khoan DB 'adminer_db'@'localhost'.${NC}"
+                if mariadb -u root -e "DROP USER IF EXISTS 'adminer_db'@'localhost'; FLUSH PRIVILEGES;" 2>/dev/null; then
+                    echo -e "${GREEN}Da xoa tai khoan DB 'adminer_db'@'localhost'.${NC}"
+                else
+                    echo -e "${RED}Canh bao: Khong the xoa tai khoan DB 'adminer_db'@'localhost' (Kiem tra trang thai MariaDB).${NC}"
+                fi
             fi
 
             if [[ -d "$ADMINER_DIR" ]]; then
@@ -131,7 +136,7 @@ if [[ ! -d "$ROOT_DIR" ]]; then
                 echo -e "${GREEN}Da xoa thu muc ma nguon $ADMINER_DIR.${NC}"
             fi
 
-            rm -f /var/log/caddy/adminer_access.log*
+            rm -f /var/log/caddy/adminer_access*.log*
             SCRIPT_WPSILA_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
             rm -f "$SCRIPT_WPSILA_DIR/adminerp.txt"
             echo -e "${GREEN}Da xoa log va file mat khau adminerp.txt.${NC}"
