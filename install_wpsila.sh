@@ -20,7 +20,7 @@ SILA_VERSION="v1.4.0"
 # curl -sL https://vps.wpsila.com | sudo bash
 # -------------------------------------------------------------------------
 # Test trước khi đẩy lên link chính
-# curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/dev/install_wpsila.sh | sudo bash
+# curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main/install_wpsila.sh | sudo bash
 # -------------------------------------------------------------------------
 
 # +++
