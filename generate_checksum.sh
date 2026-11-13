@@ -4,7 +4,8 @@
 set -euo pipefail
 
 # Phiên bản của bash script
-VERSION="v1.3.0"
+# Mỗi lần ra phiên bản mới cần điều chỉnh version ở đây.
+VERSION="v1.4.0"
 
 # +++
 
