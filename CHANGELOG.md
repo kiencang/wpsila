@@ -9,6 +9,10 @@ và dự án này tuân thủ [Semantic Versioning](https://semver.org/spec/v2.0
 ### Added
 - Tạo file /etc/caddy/snippets/wp_common.conf chứa các cấu hình chung cho toàn bộ website. Chỉ cần sửa ở đây sẽ cập nhật cho toàn bộ (ví dụ như chặn file, cách cache dữ liệu).
 
+## [1.4.1] - 2025-11-13
+### Fixed
+- Sửa lỗi quên điều chỉnh phiên bản mới nhất ở `check_for_update.sh` (lỗi này sẽ khiến người dùng phiên bản mới nhất nhưng khi check lại thấy phiên bản cũ);
+
 ## [1.4.0] - 2025-11-13
 ### Added
 - Thêm tính năng Backup local;
