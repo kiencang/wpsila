@@ -23,7 +23,7 @@ NC='\033[0m' # No Color (ngắt màu)
 
 # -------------------------------------------------------------------------------------------------------------------------------
 # Chạy lệnh
-# curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/dev/install_wpsila_no_check_sum.sh | sudo bash
+# curl -sL https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/test/install_wpsila_no_check_sum.sh | sudo bash
 # Cài mới và ghi đè hoàn toàn, không kiểm tra checksum, không kiểm tra sự tồn tại của wpsila.conf, không chặn ghi đè.
 # Không cần yếu tố phiên bản trong mã
 # -------------------------------------------------------------------------------------------------------------------------------
@@ -36,7 +36,7 @@ NC='\033[0m' # No Color (ngắt màu)
 INSTALL_DIR="/opt/kiencang-wpsila"
 
 # Chú ý link Repo, cần cập nhật cả vps.wpsila.com nếu nó có thay đổi
-REPO_URL="https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/main" 
+REPO_URL="https://raw.githubusercontent.com/kiencang/wpsila/refs/heads/test" 
 BIN_LINK="/usr/local/bin/wpsila"
 
 # Hàm báo lỗi và thoát
